@@ -8,5 +8,5 @@ const routes = (server) => {
 }
 
 module.exports = {
-    server
+    routes
 }
