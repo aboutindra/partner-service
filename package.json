@@ -4,7 +4,8 @@
   "description": "partner service for inpoin point exchange system",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
+    "start": "node index.js",
+    "dev": "set NODE_ENV=dev&&nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -25,6 +26,7 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
+    "config": "^3.2.4",
     "mocha": "^6.2.2",
     "morgan": "^1.9.1",
     "nyc": "^14.1.1",
