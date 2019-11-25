@@ -1,5 +1,5 @@
 const wrapper = require('../utilities/wrapper');
-const AcquirerPackage = require('../databases/postgresql/models/acquirerPakage');
+const AcquirerPackage = require('../databases/postgresql/models/acquirerPackage');
 const acquirerPackage = new AcquirerPackage(process.env.POSTGRESQL_DATABASE_PARTNER);
 const { ERROR:erroCode, SUCCESS:successCode } = require('../utilities/httpStatusCode');
 const { NotFoundError,InternalServerError,ConflictError,BadRequestError,ForbiddenError } = require('../utilities/error');
@@ -74,15 +74,14 @@ const deletePackage = async (request, response) => {
 }
 
 const getPackages = async (request, response) => {
-    let id = parseInt(request.query.id);
+    let result;
 
-    if (isNaN(id)) {
-        wrapper.response(response, false, wrapper.error(new BadRequestError("Id must be an integer value")));
-        return;
-    }
-
-    let result = {};
-    if (id) {
+    if (request.query.id) {
+        let id = parseInt(request.query.id);
+        if (isNaN(id)) {
+            wrapper.response(response, false, wrapper.error(new BadRequestError("Id must be an integer value")));
+            return;
+        }
         result = await acquirerPackage.getPackageById(id);
     } else {
         result = await acquirerPackage.getAllPackage();
