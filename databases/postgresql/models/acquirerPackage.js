@@ -1,7 +1,7 @@
 const logger = require('../../../utilities/logger');
 const { NotFoundError,InternalServerError,ConflictError,BadRequestError,ForbiddenError } = require('../../../utilities/error');
 const wrapper = require('../../../utilities/wrapper');
-const postgresqlWrapper = require('../../postgresql');
+const postgresqlWrapper = require('..');
 
 class AcquirerPackage {
     constructor(database) {
@@ -11,8 +11,8 @@ class AcquirerPackage {
     async insertPackage(name, costType, amount) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let insertPackageQuery = {
-            name: 'add-new-issuer-package',
-            text: `INSERT INTO public.issuer_cost_package(
+            name: 'add-new-acquirer-package',
+            text: `INSERT INTO public.acquirer_cost_package(
                 name, cost_type, amount, is_deleted, created_at, updated_at)
                 VALUES ($1, $2::cost_type, $3, $4, $5, $6);`,
             values: [name, costType, amount, false, new Date(), new Date()]
@@ -86,7 +86,7 @@ class AcquirerPackage {
     async getPackageById(id) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getPackageByIdQuery = {
-            name: 'get-acquirer-cost-package-list',
+            name: 'get-acquirer-cost-package',
             text: `SELECT * FROM public.acquirer_cost_package
                 WHERE id = $1`,
             values: [id]
