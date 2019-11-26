@@ -8,7 +8,7 @@ const discount = new Discount(process.env.POSTGRESQL_DATABASE_PARTNER);
 const insertDiscount = async (request, response) => {
     let { code, name, deductionDiscountType, deductionDiscountAmount, additionDiscountType, additionDiscountAmount, startDate, endDate } = request.body;
     code = code.toUpperCase();
-    if (deductionDiscountType !== 'null') {
+    if (deductionDiscountType !== 'null' || deductionDiscountType !== null) {
         deductionDiscountAmount = Number(deductionDiscountAmount);
         if (isNaN(deductionDiscountAmount)) {
             wrapper.response(response, false, wrapper.error(new BadRequestError("Deduction discount amount must be a number value")));
@@ -19,7 +19,7 @@ const insertDiscount = async (request, response) => {
         deductionDiscountAmount = null;
     }
 
-    if (additionDiscountType !== 'null') {
+    if (additionDiscountType !== 'null' || additionDiscountType !== null) {
         additionDiscountAmount = Number(additionDiscountAmount);
         if (isNaN(additionDiscountAmount)) {
             wrapper.response(response, false, wrapper.error(new BadRequestError("Addition discount amount must be a number value")));
