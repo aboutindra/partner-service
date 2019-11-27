@@ -12,7 +12,7 @@ const error = (err) => ({ err, data: [] });
 const response = (res, status, result, message = '', code = 200) => {
   let data = result.data;
   if(status === false){
-    data = [];
+    data = data || [];
     message = result.err.message || message;
     code = checkErrorCode(result.err);
   }
