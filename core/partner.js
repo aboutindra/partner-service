@@ -1,10 +1,19 @@
 const wrapper = require('../utilities/wrapper');
+const { validationResult } = require('express-validator');
 const { ERROR:erroCode, SUCCESS:successCode } = require('../utilities/httpStatusCode');
 const { NotFoundError,InternalServerError,ConflictError,BadRequestError,ForbiddenError } = require('../utilities/error');
 const Partner = require('../databases/postgresql/models/partner');
 const partner = new Partner(process.env.POSTGRESQL_DATABASE_PARTNER);
 
 const insertPartner = async (request, response) => {
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        error.data = errors.array();
+        wrapper.response(response, false, error);
+        return;
+    }
+
     let { code, name, isAcquirer, isIssuer, issuerCostPackageId, acquirerCostPackageId, segmentId, logo, unit } = request.body;
     code = code.toUpperCase();
     name = name.toLowerCase();
@@ -27,6 +36,14 @@ const insertPartner = async (request, response) => {
 }
 
 const updatePartner = async (request, response) => {
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        error.data = errors.array();
+        wrapper.response(response, false, error);
+        return;
+    }
+
     let { name, isAcquirer, isIssuer, issuerCostPackageId, acquirerCostPackageId, segmentId, logo, unit } = request.body;
     let code = request.params.code.toUpperCase();
     name = name.toLowerCase();
@@ -49,7 +66,14 @@ const updatePartner = async (request, response) => {
 }
 
 const deletePartner = async (request, response) => {
+    let code = request.params.code.toUpperCase();
 
+    let result = await partner.softDeletePartner(code);
+    if (result.err) {
+        wrapper.response(response, false, result);
+    } else {
+        wrapper.response(response, true, result, "Partner deleted", successCode.OK);
+    }
 }
 
 const getPartners = async (request, response) => {

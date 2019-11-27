@@ -73,7 +73,7 @@ class Partner {
             name: 'soft-delete-partner-program-by-partner-code',
             text: `UPDATE public.partner_program
                 SET is_active = false, updated_at = $2, deleted_at = $3
-                WHERE partner_code = UPPER($1)`,
+                WHERE partner_code = $1`,
             values: [code, new Date(), new Date()]
         }
 
