@@ -1,43 +1,21 @@
 const wrapper = require('../utilities/wrapper');
-const moment = require('moment');
+const { validationResult } = require('express-validator');
 const { ERROR:erroCode, SUCCESS:successCode } = require('../utilities/httpStatusCode');
 const { NotFoundError,InternalServerError,ConflictError,BadRequestError,ForbiddenError } = require('../utilities/error');
 const Discount = require('../databases/postgresql/models/discount');
 const discount = new Discount(process.env.POSTGRESQL_DATABASE_PARTNER);
 
 const insertDiscount = async (request, response) => {
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        error.data = errors.array();
+        wrapper.response(response, false, error);
+        return;
+    }
+
     let { code, name, deductionDiscountType, deductionDiscountAmount, additionDiscountType, additionDiscountAmount, startDate, endDate } = request.body;
     code = code.toUpperCase();
-    if (deductionDiscountType !== 'null' || deductionDiscountType !== null) {
-        deductionDiscountAmount = Number(deductionDiscountAmount);
-        if (isNaN(deductionDiscountAmount)) {
-            wrapper.response(response, false, wrapper.error(new BadRequestError("Deduction discount amount must be a number value")));
-            return;
-        }
-    } else {
-        deductionDiscountType = null;
-        deductionDiscountAmount = null;
-    }
-
-    if (additionDiscountType !== 'null' || additionDiscountType !== null) {
-        additionDiscountAmount = Number(additionDiscountAmount);
-        if (isNaN(additionDiscountAmount)) {
-            wrapper.response(response, false, wrapper.error(new BadRequestError("Addition discount amount must be a number value")));
-            return;
-        }
-    } else {
-        additionDiscountType = null
-        additionDiscountAmount = null;
-    }
-
-    startDate = moment(startDate);
-    endDate = moment(endDate);
-
-    if (!startDate.isValid() || !endDate.isValid()) {
-        wrapper.response(response, false, wrapper.error(new BadRequestError("Invalid date value")));
-    } else {
-        startDate = startDate.toDate();
-    }
 
     let currentProgram = await discount.getActiveDiscount();
     if (currentProgram.data.length > 0) {
@@ -53,7 +31,7 @@ const insertDiscount = async (request, response) => {
     }
 }
 
-const softDeleteDiscount = async (request, response) => {
+const deleteDiscount = async (request, response) => {
     let code = request.params.code.toUpperCase();
 
     let result = await discount.softDeleteDiscount(code);
@@ -93,7 +71,7 @@ const getActiveDiscounts = async (request, response) => {
 
 module.exports = {
     insertDiscount,
-    softDeleteDiscount,
+    deleteDiscount,
     getDiscounts,
     getActiveDiscounts
 }
