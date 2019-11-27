@@ -1,21 +1,21 @@
 const wrapper = require('../utilities/wrapper');
+const { validationResult } = require('express-validator');
 const AcquirerPackage = require('../databases/postgresql/models/acquirerPackage');
 const acquirerPackage = new AcquirerPackage(process.env.POSTGRESQL_DATABASE_PARTNER);
 const { ERROR:erroCode, SUCCESS:successCode } = require('../utilities/httpStatusCode');
 const { NotFoundError,InternalServerError,ConflictError,BadRequestError,ForbiddenError } = require('../utilities/error');
 
 const insertPackage = async (request, response) => {
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        error.data = errors.array();
+        wrapper.response(response, false, error);
+        return;
+    }
+
     let { name, costType } = request.body;
     let amount = Number(request.body.amount);
-
-    if(isNaN(amount)) {
-        wrapper.response(response, false, wrapper.error(new BadRequestError("Amount must be an integer value")));
-        return;
-    }
-    if (amount < 0) {
-        wrapper.response(response, false, wrapper.error(new BadRequestError("Amount must be greater than zero")));
-        return;
-    }
 
     let result = await acquirerPackage.insertPackage(name, costType.toLowerCase(), amount);
 
@@ -28,22 +28,17 @@ const insertPackage = async (request, response) => {
 }
 
 const updatePackage = async (request, response) => {
-    let id = request.params.id;
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        error.data = errors.array();
+        wrapper.response(response, false, error);
+        return;
+    }
+    
+    let id = parseInt(request.params.id);
     let { name, costType } = request.body;
     let amount = Number(request.body.amount);
-
-    if (isNaN(id)) {
-        wrapper.response(response, false, wrapper.error(new BadRequestError("Id must be an integer value")));
-        return;
-    }
-    if(isNaN(amount)) {
-        wrapper.response(response, false, wrapper.error(new BadRequestError("Amount must be an integer value")));
-        return;
-    }
-    if (amount < 0) {
-        wrapper.response(response, false, wrapper.error(new BadRequestError("Amount must be greater than zero")));
-        return;
-    }
 
     let result = await acquirerPackage.updatePackageById(id, name, costType.toLowerCase(), amount);
 
@@ -56,12 +51,15 @@ const updatePackage = async (request, response) => {
 }
 
 const deletePackage = async (request, response) => {
-    let id = request.params.id;
-
-    if (isNaN(id)) {
-        wrapper.response(response, false, wrapper.error(new BadRequestError("Id must be an integer value")));
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        error.data = errors.array();
+        wrapper.response(response, false, error);
         return;
     }
+
+    let id = parseInt(request.params.id);
 
     let result = await acquirerPackage.softDeletePackageById(id);
 
