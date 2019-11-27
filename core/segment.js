@@ -1,10 +1,19 @@
 const wrapper = require('../utilities/wrapper');
+const { validationResult } = require('express-validator');
 const Segment = require('../databases/postgresql/models/segment');
 const segment = new Segment(process.env.POSTGRESQL_DATABASE_PARTNER);
 const { ERROR:erroCode, SUCCESS:successCode } = require('../utilities/httpStatusCode');
 const { NotFoundError,InternalServerError,ConflictError,BadRequestError,ForbiddenError } = require('../utilities/error');
 
 const insertSegment = async (request, response) => {
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        error.data = errors.array();
+        wrapper.response(response, false, error);
+        return;
+    }
+
     let { name } = request.body;
 
     let result = await segment.insertSegment(name);
@@ -17,13 +26,16 @@ const insertSegment = async (request, response) => {
 }
 
 const updateSegment = async (request, response) => {
-    let id = request.params.id;
-    let { name } = request.body;
-
-    if (isNaN(id)) {
-        wrapper.response(response, false, wrapper.error(new BadRequestError("Id must be an integer value")));
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        error.data = errors.array();
+        wrapper.response(response, false, error);
         return;
     }
+    
+    let id = parseInt(request.params.id);
+    let { name } = request.body;
 
     let result = await segment.updateSegment(id, name);
 
@@ -52,7 +64,7 @@ const getSegments = async (request, response) => {
     if (result.err) {
         wrapper.response(response, false, result);
     } else {
-        wrapper.response(response, true, result, "Packages retrieved", successCode.OK);
+        wrapper.response(response, true, result, "Segment(s) retrieved", successCode.OK);
     }
     return;
 }
