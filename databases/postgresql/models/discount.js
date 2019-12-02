@@ -1,7 +1,7 @@
-const logger = require('../../../utilities/logger');
 const { NotFoundError,InternalServerError,ConflictError,BadRequestError,ForbiddenError } = require('../../../utilities/error');
 const wrapper = require('../../../utilities/wrapper');
 const postgresqlWrapper = require('../../postgresql');
+const { ERROR:errorCode } = require('../errorCode');
 
 class Discount {
     constructor(database) {
@@ -26,15 +26,13 @@ class Discount {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
-            if (error.code === '22P02') {
+            if (error.code === errorCode.INVALID_ENUM) {
                 return wrapper.error(new BadRequestError("Invalid type value"));
             }
-            if (error.code === '23505') {
+            if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Code already exist"));
             }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
@@ -60,10 +58,7 @@ class Discount {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            console.log(error);
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
@@ -71,7 +66,10 @@ class Discount {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllDiscountQuery = {
             name: 'get-discount-history',
-            text: `SELECT * FROM public.discount_program`
+            text: `SELECT code, name, deduction_discount_type AS "deductionDiscountType", deduction_discount_amount AS "deductionDiscountAmount", 
+                addition_discount_type AS "additionDiscountType", addition_discount_amount AS "additionDiscountAmount", is_active AS "isActive", start_date AS "startDate", 
+                end_date AS "endDate", created_at AS "createdAt", updated_at AS "updatedAt", deactivated_at AS "deactivatedAt"
+                FROM public.discount_program`
         }
 
         try {
@@ -82,9 +80,7 @@ class Discount {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
@@ -92,7 +88,10 @@ class Discount {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getDiscountQuery = {
             name: 'get-discount',
-            text: `SELECT * FROM public.discount_program
+            text: `SELECT code, name, deduction_discount_type AS "deductionDiscountType", deduction_discount_amount AS "deductionDiscountAmount", 
+                addition_discount_type AS "additionDiscountType", addition_discount_amount AS "additionDiscountAmount", is_active AS "isActive", start_date AS "startDate", 
+                end_date AS "endDate", created_at AS "createdAt", updated_at AS "updatedAt", deactivated_at AS "deactivatedAt"
+                FROM public.discount_program
                 WHERE code = $1`,
             values: [code]
         }
@@ -105,9 +104,7 @@ class Discount {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
@@ -129,9 +126,7 @@ class Discount {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 }
