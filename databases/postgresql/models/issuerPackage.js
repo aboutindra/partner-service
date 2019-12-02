@@ -1,7 +1,7 @@
-const logger = require('../../../utilities/logger');
-const { NotFoundError,InternalServerError,ConflictError,BadRequestError,ForbiddenError } = require('../../../utilities/error');
+const { NotFoundError, InternalServerError, BadRequestError } = require('../../../utilities/error');
 const wrapper = require('../../../utilities/wrapper');
 const postgresqlWrapper = require('../../postgresql');
+const { ERROR:errorCode } = require('../errorCode');
 
 class IssuerPackage {
     constructor(database) {
@@ -26,12 +26,10 @@ class IssuerPackage {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
-            if(error.code === '22P02'){
+            if (error.code === errorCode.INVALID_ENUM) {
                 return wrapper.error(new BadRequestError("Invalid type value"));
             }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
@@ -53,12 +51,10 @@ class IssuerPackage {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
-            if(error.code === '22P02'){
+            if (error.code === errorCode.INVALID_ENUM) {
                 return wrapper.error(new BadRequestError("Invalid type value"));
             }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
@@ -66,7 +62,8 @@ class IssuerPackage {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllPackagesQuery = {
             name: 'get-issuer-cost-package-list',
-            text: `SELECT * FROM public.issuer_cost_package`
+            text: `SELECT id, name, cost_type AS "costType", amount, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
+                FROM public.issuer_cost_package`
         }
         try {
             let result = await dbClient.query(getAllPackagesQuery);
@@ -76,9 +73,7 @@ class IssuerPackage {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
@@ -86,7 +81,8 @@ class IssuerPackage {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getPackageByIdQuery = {
             name: 'get-issuer-cost-package',
-            text: `SELECT * FROM public.issuer_cost_package
+            text: `SELECT id, name, cost_type AS "costType", amount, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
+                FROM public.issuer_cost_package
                 WHERE id = $1`,
             values: [id]
         }
@@ -99,9 +95,7 @@ class IssuerPackage {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
@@ -123,9 +117,7 @@ class IssuerPackage {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
