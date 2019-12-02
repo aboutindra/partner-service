@@ -1,5 +1,5 @@
-const logger = require('../../../utilities/logger');
-const { NotFoundError,InternalServerError,ConflictError,BadRequestError,ForbiddenError } = require('../../../utilities/error');
+const { NotFoundError, InternalServerError, ForbiddenError } = require('../../../utilities/error');
+const { ERROR:errorCode } = require('../errorCode');
 const wrapper = require('../../../utilities/wrapper');
 const postgresqlWrapper = require('../../postgresql');
 
@@ -28,7 +28,7 @@ class PartnerQuota {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === '23503') {
+            if (error.code === errorCode.FOREIGN_KEY_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Partner doesn't exist"));
             }
             return wrapper.error(new InternalServerError("Internal server error"));
