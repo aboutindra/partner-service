@@ -55,9 +55,19 @@ const getRemainingQuota = async (request, response) => {
     }
 }
 
+const getAllRemainingQuota = async (request, response) => {
+    let result = await partnerQuota.getAllQuota();
+
+    if (result.err) {
+        wrapper.response(response, false, result);
+    } else {
+        wrapper.response(response, true, result, "Partner quota(s) retrieved", successCode.OK);
+    }
+}
 
 module.exports = {
     upsertQuota,
     deductQuota,
-    getRemainingQuota
+    getRemainingQuota,
+    getAllRemainingQuota
 }
