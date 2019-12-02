@@ -1,7 +1,7 @@
 const wrapper = require('../utilities/wrapper');
 const { validationResult } = require('express-validator');
-const { ERROR:errorCode, SUCCESS:successCode } = require('../utilities/httpStatusCode');
-const { NotFoundError,InternalServerError,ConflictError,BadRequestError,ForbiddenError } = require('../utilities/error');
+const { SUCCESS:successCode } = require('../utilities/httpStatusCode');
+const { BadRequestError,ForbiddenError } = require('../utilities/error');
 const PartnerProgram = require('../databases/postgresql/models/partnerProgram');
 const partnerProgram = new PartnerProgram(process.env.POSTGRESQL_DATABASE_PARTNER);
 

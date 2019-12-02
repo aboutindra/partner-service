@@ -2,8 +2,8 @@ const wrapper = require('../utilities/wrapper');
 const { validationResult } = require('express-validator');
 const Segment = require('../databases/postgresql/models/segment');
 const segment = new Segment(process.env.POSTGRESQL_DATABASE_PARTNER);
-const { ERROR:errorCode, SUCCESS:successCode } = require('../utilities/httpStatusCode');
-const { NotFoundError,InternalServerError,ConflictError,BadRequestError,ForbiddenError } = require('../utilities/error');
+const { SUCCESS:successCode } = require('../utilities/httpStatusCode');
+const { BadRequestError } = require('../utilities/error');
 
 const insertSegment = async (request, response) => {
     const errors = validationResult(request);

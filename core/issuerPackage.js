@@ -2,8 +2,8 @@ const wrapper = require('../utilities/wrapper');
 const { validationResult } = require('express-validator');
 const IssuerPackage = require('../databases/postgresql/models/issuerPackage');
 const issuerPackage = new IssuerPackage(process.env.POSTGRESQL_DATABASE_PARTNER);
-const { ERROR:errorCode, SUCCESS:successCode } = require('../utilities/httpStatusCode');
-const { NotFoundError,InternalServerError,ConflictError,BadRequestError,ForbiddenError } = require('../utilities/error');
+const { SUCCESS:successCode } = require('../utilities/httpStatusCode');
+const { BadRequestError } = require('../utilities/error');
 
 const insertPackage = async (request, response) => {
     const errors = validationResult(request);
