@@ -73,7 +73,8 @@ const getPrograms = async (request, response) => {
 }
 
 const getPartnerPrograms = async (request, response) => {
-    let result = await partnerProgram.getPartnerPrograms();
+    let partnerCode = request.params.partnerCode;
+    let result = await partnerProgram.getPartnerProgram(partnerCode);
 
     if (result.err) {
         wrapper.response(response, false, result);
