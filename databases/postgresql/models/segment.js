@@ -1,5 +1,4 @@
-const logger = require('../../../utilities/logger');
-const { NotFoundError,InternalServerError,ConflictError,BadRequestError,ForbiddenError } = require('../../../utilities/error');
+const { NotFoundError, InternalServerError } = require('../../../utilities/error');
 const wrapper = require('../../../utilities/wrapper');
 const postgresqlWrapper = require('../../postgresql');
 
@@ -26,9 +25,7 @@ class Segment {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
@@ -50,9 +47,7 @@ class Segment {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
@@ -60,7 +55,8 @@ class Segment {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getSegmentQuery = {
             name: 'get-segment-list',
-            text: `SELECT * FROM public.segment`
+            text: `SELECT id, name, created_at AS "createdAt", updated_at AS "updatedAt"
+                FROM public.segment`
         }
 
         try {
@@ -71,9 +67,7 @@ class Segment {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
@@ -81,7 +75,8 @@ class Segment {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getSegmentByIdQuery = {
             name: 'get-segment',
-            text: `SELECT * FROM public.segment
+            text: `SELECT id, name, created_at AS "createdAt", updated_at AS "updatedAt"
+                FROM public.segment
                 WHERE id = $1`,
             values: [id]
         }
@@ -94,9 +89,7 @@ class Segment {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 }
