@@ -40,9 +40,12 @@ class PartnerProgram {
             if (result.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Failed add new partner program"));
             }
+            client.release();
             return wrapper.data(result.rows);
         }
         catch (error) {
+            await client.query('ROLLBACK');
+            client.release();
             if (error.code === '23505') {
                 return wrapper.error(new ForbiddenError("Code already exist"));
             }
