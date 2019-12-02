@@ -28,12 +28,10 @@ class PartnerQuota {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
             if (error.code === '23503') {
                 return wrapper.error(new ForbiddenError("Partner doesn't exist"));
             }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
@@ -62,9 +60,7 @@ class PartnerQuota {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
@@ -72,7 +68,8 @@ class PartnerQuota {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllQuotaQuery = {
             name: 'get-all-quota',
-            text: `SELECT * FROM public.partner_quota`
+            text: `SELECT partner_code AS "partnerCode", remaining_deduction_quota_per_day AS "remainingQuotaPerDay", remaining_deduction_quota_per_month AS "remainingQuotaPerMonth"
+                FROM public.partner_quota`
         }
 
         try {
@@ -83,9 +80,7 @@ class PartnerQuota {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
@@ -107,9 +102,7 @@ class PartnerQuota {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 }
