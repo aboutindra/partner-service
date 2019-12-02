@@ -1,7 +1,7 @@
-const logger = require('../../../utilities/logger');
-const { NotFoundError,InternalServerError,ConflictError,BadRequestError,ForbiddenError } = require('../../../utilities/error');
+const { NotFoundError, InternalServerError, BadRequestError, ForbiddenError } = require('../../../utilities/error');
 const wrapper = require('../../../utilities/wrapper');
 const postgresqlWrapper = require('../../postgresql');
+const { ERROR:errorCode } = require('../errorCode');
 
 class Partner {
     constructor(database) {
@@ -26,18 +26,13 @@ class Partner {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
-            if (error.code === '22P02') {
+            if (error.code === errorCode.INVALID_ENUM) {
                 return wrapper.error(new BadRequestError("Invalid type value"));
             }
-            if (error.code === '23505') {
+            if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Code already exist"));
             }
-            if (error.code === '23502') {
-                return wrapper.error(new BadRequestError("Segment id can not be null"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
 
     }
@@ -60,10 +55,7 @@ class Partner {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            console.log(error);
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
@@ -85,10 +77,7 @@ class Partner {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            console.log(error);
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
@@ -96,7 +85,9 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllPartnerQuery = {
             name: "get-partner-list",
-            text: `SELECT * FROM public.partner`
+            text: `SELECT code, name, is_acquirer AS "isAcquirer", is_issuer AS "isIssuer", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPacakgeId",
+                is_deleted AS "isDeleted", segment_id AS "segmentId", logo, unit, created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
+                FROM public.partner`
         }
 
         try {
@@ -107,9 +98,7 @@ class Partner {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
@@ -117,7 +106,9 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllPartnerQuery = {
             name: "get-partner",
-            text: `SELECT * FROM public.partner
+            text: `SELECT code, name, is_acquirer AS "isAcquirer", is_issuer AS "isIssuer", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPacakgeId",
+                is_deleted AS "isDeleted", segment_id AS "segmentId", logo, unit, created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
+                FROM public.partner
                 WHERE code = $1`,
             values: [code]
         }
@@ -130,9 +121,7 @@ class Partner {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
@@ -140,8 +129,10 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllActivePartnerQuery = {
             name: "get-active-partner-list",
-            text: `SELECT * FROM public.partner
-            WHERE is_deleted = false`
+            text: `SELECT code, name, is_acquirer AS "isAcquirer", is_issuer AS "isIssuer", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPacakgeId",
+                is_deleted AS "isDeleted", segment_id AS "segmentId", logo, unit, created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
+                FROM public.partner
+                WHERE is_deleted = false`
         }
 
         try {
@@ -152,9 +143,7 @@ class Partner {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
     
@@ -162,9 +151,10 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllIssuersQuery = {
             name: "get-issuer-list",
-            text: `SELECT *
-            FROM public.partner
-            WHERE is_issuer = true AND is_deleted = false`
+            text: `SELECT code, name, is_acquirer AS "isAcquirer", is_issuer AS "isIssuer", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPacakgeId",
+                is_deleted AS "isDeleted", segment_id AS "segmentId", logo, unit, created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
+                FROM public.partner
+                WHERE is_issuer = true AND is_deleted = false`
         }
 
         try {
@@ -175,9 +165,7 @@ class Partner {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
@@ -200,9 +188,7 @@ class Partner {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
@@ -210,8 +196,10 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllAcquirersQuery = {
             name: "get-acquirer-list",
-            text: `SELECT * FROM public.partner
-            WHERE is_acquirer = true AND is_deleted = false`
+            text: `SELECT code, name, is_acquirer AS "isAcquirer", is_issuer AS "isIssuer", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPacakgeId",
+                is_deleted AS "isDeleted", segment_id AS "segmentId", logo, unit, created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
+                FROM public.partner
+                WHERE is_acquirer = true AND is_deleted = false`
         }
 
         try {
@@ -222,9 +210,7 @@ class Partner {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
@@ -247,9 +233,7 @@ class Partner {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                return wrapper.error(new InternalServerError("Internal server error"));
-            }
+            return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
