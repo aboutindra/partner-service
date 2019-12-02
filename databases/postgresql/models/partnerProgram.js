@@ -29,7 +29,6 @@ class PartnerProgram {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            console.log(error);
             if (error.code === 'ECONNREFUSED') {
                 return wrapper.error(new InternalServerError("Internal server error"));
             }
@@ -64,7 +63,6 @@ class PartnerProgram {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            console.log(error);
             if (error.code === 'ECONNREFUSED') {
                 return wrapper.error(new InternalServerError("Internal server error"));
             }
