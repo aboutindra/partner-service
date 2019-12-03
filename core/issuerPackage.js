@@ -99,14 +99,14 @@ const getPackages = async (request, response) => {
             offset = limit * (page - 1);
         }
         
-        result = await issuerPackage.getAllPackage(limit, offset);
+        result = await issuerPackage.getAllPackage(page, limit, offset);
     }
 
     if (result.err) {
         wrapper.response(response, false, result);
         return;
     } else {
-        wrapper.response(response, true, result, "Packages(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, result, "Packages(s) retrieved", successCode.OK);
     }
     return;
 }

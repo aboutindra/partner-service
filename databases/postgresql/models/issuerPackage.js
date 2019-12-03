@@ -64,7 +64,7 @@ class IssuerPackage {
         }
     }
 
-    async getAllPackage(limit = null, offset = null) {
+    async getAllPackage(page = null, limit = null, offset = null) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllPackagesQuery = {
             name: 'get-issuer-cost-package-list',
@@ -74,14 +74,35 @@ class IssuerPackage {
                 LIMIT $1 OFFSET $2;`,
                 values: [limit, offset]
         }
+        let countDataQuery = {
+            name: 'count-issuer-cost-package-list',
+            text: `SELECT COUNT(*)
+                FROM public.issuer_cost_package`
+        }
         try {
             let result = await dbClient.query(getAllPackagesQuery);
             if (result.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Package(s) not found"));
             }
-            return wrapper.data(result.rows);
+
+            let count = await dbClient.query(countDataQuery);
+            let totalData = parseInt(count.rows[0].count);
+            let totalPage = Math.ceil(totalData / limit);
+            if (totalPage === Infinity) {
+                totalPage = 1;
+            }
+            let totalDataOnPage = result.rows.length;
+            let meta = {
+                page: page || 1,
+                totalData,
+                totalPage,
+                totalDataOnPage
+            }
+
+            return wrapper.paginationData(result.rows, meta);
         }
         catch (error) {
+            console.log(error);
             return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
