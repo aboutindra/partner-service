@@ -43,13 +43,30 @@ const deleteDiscount = async (request, response) => {
 }
 
 const getDiscounts = async (request, response) => {
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        error.data = errors.array();
+        wrapper.response(response, false, error);
+        return;
+    }
+    
     let result;
 
     if (request.query.code) {
         let code = request.query.code.toUpperCase();
         result = await discount.getDiscountByCode(code);
     } else {
-        result = await discount.getAllDiscount();
+        let page = null;
+        let limit = null;
+        let offset = null;
+        if (request.query.page && request.query.limit) {
+            page = parseInt(request.query.page);
+            limit = parseInt(request.query.limit);
+            offset = limit * (page - 1);
+        }
+        
+        result = await discount.getAllDiscount(limit, offset);
     }
 
     if (result.err) {

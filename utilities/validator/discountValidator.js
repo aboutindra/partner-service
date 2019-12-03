@@ -1,4 +1,4 @@
-const { body } = require('express-validator');
+const { query, body } = require('express-validator');
 const moment = require('moment');
 
 exports.validateInsert = [
@@ -14,6 +14,11 @@ exports.validateInsert = [
     body('deductionDiscountType').if(body('additionDiscountType').isEmpty()).not().isEmpty().withMessage("Deduction discount or addition discount must be filled"),
     body('startDate').custom(validateDate).withMessage("Start date must be in UTC, ISO-8601, or RFC 2822 format"),
     body('endDate').custom(validateDate).withMessage("End date must be in UTC, ISO-8601, or RFC 2822 format")
+]
+
+exports.validateGet = [
+    query('page').optional({ nullable: true }).isInt({ min: 1 }).withMessage("Page must be filled with integer greater than 0"),
+    query('limit').optional({ nullable: true }).isInt({ min: 1 }).withMessage("Limit must be filled with integer greater than 0"),
 ]
 
 function validateDate(dateString) {

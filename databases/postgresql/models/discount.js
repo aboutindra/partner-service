@@ -62,14 +62,17 @@ class Discount {
         }
     }
 
-    async getAllDiscount() {
+    async getAllDiscount(limit = null, offset = null) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllDiscountQuery = {
             name: 'get-discount-history',
             text: `SELECT code, name, deduction_discount_type AS "deductionDiscountType", deduction_discount_amount AS "deductionDiscountAmount", 
                 addition_discount_type AS "additionDiscountType", addition_discount_amount AS "additionDiscountAmount", is_active AS "isActive", start_date AS "startDate", 
                 end_date AS "endDate", created_at AS "createdAt", updated_at AS "updatedAt", deactivated_at AS "deactivatedAt"
-                FROM public.discount_program`
+                FROM public.discount_program
+                ORDER BY created_at
+                LIMIT $1 OFFSET $2;`,
+            values: [limit, offset]
         }
 
         try {
@@ -92,7 +95,7 @@ class Discount {
                 addition_discount_type AS "additionDiscountType", addition_discount_amount AS "additionDiscountAmount", is_active AS "isActive", start_date AS "startDate", 
                 end_date AS "endDate", created_at AS "createdAt", updated_at AS "updatedAt", deactivated_at AS "deactivatedAt"
                 FROM public.discount_program
-                WHERE code = $1`,
+                WHERE code = $1;`,
             values: [code]
         }
 
@@ -112,7 +115,8 @@ class Discount {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getActiveDiscountQuery = {
             name: 'get-active-discount-list',
-            text: `SELECT code, name, deduction_discount_type, deduction_discount_amount, addition_discount_type, addition_discount_amount
+            text: `SELECT code, name, deduction_discount_type AS "deductionDiscountType", deduction_discount_amount AS "deductionDiscountAmount", addition_discount_type AS "additionDiscountType",
+                addition_discount_amount AS "additionDiscountAmount"
                 FROM public.discount_program
                 WHERE start_date <= NOW() AND NOW() <= end_date AND is_active = true
                 FETCH FIRST 1 ROWS ONLY`
