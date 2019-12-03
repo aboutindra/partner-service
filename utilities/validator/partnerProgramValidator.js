@@ -1,4 +1,4 @@
-const { param, body } = require('express-validator');
+const { query, param, body } = require('express-validator');
 const moment = require('moment');
 
 exports.validateInsert = [
@@ -16,6 +16,11 @@ exports.validateInsert = [
 
 exports.validateDelete = [
     param('id').isInt().withMessage("Id must be positive integer")
+]
+
+exports.validateGet = [
+    query('page').optional({ nullable: true }).isInt({ min: 1 }).withMessage("Page must be filled with integer greater than 0"),
+    query('limit').optional({ nullable: true }).isInt({ min: 1 }).withMessage("Limit must be filled with integer greater than 0"),
 ]
 
 function validateDate(dateString) {
