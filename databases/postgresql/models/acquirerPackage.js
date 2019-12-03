@@ -29,6 +29,9 @@ class AcquirerPackage {
             if (error.code === errorCode.INVALID_ENUM) {
                 return wrapper.error(new BadRequestError("Invalid type value"));
             }
+            if (error.code === errorCode.UNIQUE_VIOLATION) {
+                return wrapper.error(new ForbiddenError("Package name already exist"));
+            }
             return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
@@ -48,6 +51,9 @@ class AcquirerPackage {
             if (result.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Package(s) not found"));
             }
+            if (error.code === errorCode.UNIQUE_VIOLATION) {
+                return wrapper.error(new ForbiddenError("Package name already exist"));
+            }
             return wrapper.data(result.rows);
         }
         catch (error) {
@@ -58,12 +64,15 @@ class AcquirerPackage {
         }
     }
 
-    async getAllPackage() {
+    async getAllPackage(limit = null, offset = null) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllPackagesQuery = {
             name: 'get-acquirer-cost-package-list',
             text: `SELECT id, name, cost_type AS "costType", amount, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
-                FROM public.acquirer_cost_package`
+                FROM public.acquirer_cost_package
+                ORDER BY id
+                LIMIT $1 OFFSET $2;`,
+                values: [limit, offset]
         }
 
         try {

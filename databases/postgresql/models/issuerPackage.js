@@ -1,4 +1,4 @@
-const { NotFoundError, InternalServerError, BadRequestError } = require('../../../utilities/error');
+const { NotFoundError, InternalServerError, BadRequestError, ForbiddenError } = require('../../../utilities/error');
 const wrapper = require('../../../utilities/wrapper');
 const postgresqlWrapper = require('../../postgresql');
 const { ERROR:errorCode } = require('../errorCode');
@@ -29,6 +29,9 @@ class IssuerPackage {
             if (error.code === errorCode.INVALID_ENUM) {
                 return wrapper.error(new BadRequestError("Invalid type value"));
             }
+            if (error.code === errorCode.UNIQUE_VIOLATION) {
+                return wrapper.error(new ForbiddenError("Package name already exist"));
+            }
             return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
@@ -54,16 +57,22 @@ class IssuerPackage {
             if (error.code === errorCode.INVALID_ENUM) {
                 return wrapper.error(new BadRequestError("Invalid type value"));
             }
+            if (error.code === errorCode.UNIQUE_VIOLATION) {
+                return wrapper.error(new ForbiddenError("Package name already exist"));
+            }
             return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
 
-    async getAllPackage() {
+    async getAllPackage(limit = null, offset = null) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllPackagesQuery = {
             name: 'get-issuer-cost-package-list',
             text: `SELECT id, name, cost_type AS "costType", amount, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
-                FROM public.issuer_cost_package`
+                FROM public.issuer_cost_package
+                ORDER BY id
+                LIMIT $1 OFFSET $2;`,
+                values: [limit, offset]
         }
         try {
             let result = await dbClient.query(getAllPackagesQuery);

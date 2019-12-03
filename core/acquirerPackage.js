@@ -72,6 +72,14 @@ const deletePackage = async (request, response) => {
 }
 
 const getPackages = async (request, response) => {
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        error.data = errors.array();
+        wrapper.response(response, false, error);
+        return;
+    }
+
     let result;
 
     if (request.query.id) {
@@ -82,7 +90,16 @@ const getPackages = async (request, response) => {
         }
         result = await acquirerPackage.getPackageById(id);
     } else {
-        result = await acquirerPackage.getAllPackage();
+        let page = null;
+        let limit = null;
+        let offset = null;
+        if (request.query.page && request.query.limit) {
+            page = parseInt(request.query.page);
+            limit = parseInt(request.query.limit);
+            offset = limit * (page - 1);
+        }
+
+        result = await acquirerPackage.getAllPackage(limit, offset);
     }
 
     if (result.err) {
