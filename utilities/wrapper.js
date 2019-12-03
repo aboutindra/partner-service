@@ -25,17 +25,16 @@ const response = (res, status, result, message = '', code = 200) => {
     });
 };
 
-const paginationResponse = (res, type, result, message = '', code = 200) => {
-  let status = true;
+const paginationResponse = (res, status, result, message = '', code = 200) => {
   let data = result.data;
-  if(type === 'fail'){
-    status = false;
-    data = '';
-    message = result.err;
+  if(status === false){
+    data = data || [];
+    message = result.err.message || message;
+    code = checkErrorCode(result.err);
   }
-  res.send(code,
+  res.status(code).send(
     {
-      success: status,
+      status,
       data,
       meta: result.meta,
       code,
