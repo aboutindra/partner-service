@@ -1,6 +1,7 @@
-const { NotFoundError, InternalServerError } = require('../../../utilities/error');
+const { NotFoundError, InternalServerError, ForbiddenError } = require('../../../utilities/error');
 const wrapper = require('../../../utilities/wrapper');
 const postgresqlWrapper = require('../../postgresql');
+const { ERROR:errorCode } = require('../errorCode');
 
 class Segment {
     constructor(database) {
@@ -25,6 +26,9 @@ class Segment {
             return wrapper.data(result.rows);
         }
         catch (error) {
+            if (error.code === errorCode.UNIQUE_VIOLATION) {
+                return wrapper.error(new ForbiddenError("Segment name already exist"));
+            }
             return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
@@ -47,6 +51,9 @@ class Segment {
             return wrapper.data(result.rows);
         }
         catch (error) {
+            if (error.code === errorCode.UNIQUE_VIOLATION) {
+                return wrapper.error(new ForbiddenError("Segment name already exist"));
+            }
             return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
@@ -56,7 +63,8 @@ class Segment {
         let getSegmentQuery = {
             name: 'get-segment-list',
             text: `SELECT id, name, created_at AS "createdAt", updated_at AS "updatedAt"
-                FROM public.segment`
+                FROM public.segment
+                ORDER BY id;`
         }
 
         try {
