@@ -64,20 +64,43 @@ class PartnerQuota {
         }
     }
 
-    async getAllQuota() {
+    async getAllQuota(page = null, limit = null, offset = null) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllQuotaQuery = {
             name: 'get-all-quota',
             text: `SELECT partner_code AS "partnerCode", remaining_deduction_quota_per_day AS "remainingQuotaPerDay", remaining_deduction_quota_per_month AS "remainingQuotaPerMonth"
+                FROM public.partner_quota
+                ORDER BY partner_code
+                LIMIT $1 OFFSET $2;`,
+                values: [limit, offset]
+        }
+
+        let countDataQuery = {
+            name: 'count-all-quota',
+            text: `SELECT COUNT(*)
                 FROM public.partner_quota`
         }
 
         try {
             let result = await dbClient.query(getAllQuotaQuery);
             if (result.rows.length === 0) {
-                return wrapper.error(new NotFoundError("Partner quota(s) not found"));
+                return wrapper.error(new NotFoundError("Partner(s) not found"));
             }
-            return wrapper.data(result.rows);
+            let count = await dbClient.query(countDataQuery);
+            let totalData = parseInt(count.rows[0].count);
+            let totalPage = Math.ceil(totalData / limit);
+            if (totalPage === Infinity) {
+                totalPage = 1;
+            }
+            let totalDataOnPage = result.rows.length;
+            let meta = {
+                page: page || 1,
+                totalData,
+                totalPage,
+                totalDataOnPage
+            }
+
+            return wrapper.paginationData(result.rows, meta);
         }
         catch (error) {
             return wrapper.error(new InternalServerError("Internal server error"));

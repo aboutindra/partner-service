@@ -56,12 +56,29 @@ const getRemainingQuota = async (request, response) => {
 }
 
 const getAllRemainingQuota = async (request, response) => {
-    let result = await partnerQuota.getAllQuota();
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        error.data = errors.array();
+        wrapper.response(response, false, error);
+        return;
+    }
+
+    let page = null;
+    let limit = null;
+    let offset = null;
+    if (request.query.page && request.query.limit) {
+        page = parseInt(request.query.page);
+        limit = parseInt(request.query.limit);
+        offset = limit * (page - 1);
+    }
+
+    let result = await partnerQuota.getAllQuota(page, limit, offset);
 
     if (result.err) {
         wrapper.response(response, false, result);
     } else {
-        wrapper.response(response, true, result, "Partner quota(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, result, "Partner quota(s) retrieved", successCode.OK);
     }
 }
 

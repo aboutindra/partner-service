@@ -70,7 +70,7 @@ class AcquirerPackage {
             name: 'get-acquirer-cost-package-list',
             text: `SELECT id, name, cost_type AS "costType", amount, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.acquirer_cost_package
-                ORDER BY id
+                ORDER BY name
                 LIMIT $1 OFFSET $2;`,
                 values: [limit, offset]
         }

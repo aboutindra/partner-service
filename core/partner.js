@@ -14,19 +14,11 @@ const insertPartner = async (request, response) => {
         return;
     }
 
-    let { code, name, isAcquirer, isIssuer, issuerCostPackageId, acquirerCostPackageId, segmentId, logo, unit } = request.body;
+    let { code, name, issuerCostPackageId, acquirerCostPackageId, segmentId, urlLogo, unit } = request.body;
     code = code.toUpperCase();
     name = name.toLowerCase();
 
-    if (issuerCostPackageId) {
-        isIssuer = true;
-    }
-
-    if (acquirerCostPackageId) {
-        isAcquirer = true;
-    }
-
-    let result = await partner.insertPartner(code, name, isAcquirer, isIssuer, issuerCostPackageId, acquirerCostPackageId, segmentId, logo, unit);
+    let result = await partner.insertPartner(code, name, issuerCostPackageId, acquirerCostPackageId, segmentId, urlLogo, unit);
 
     if (result.err) {
         wrapper.response(response, false, result);
@@ -44,19 +36,11 @@ const updatePartner = async (request, response) => {
         return;
     }
 
-    let { name, isAcquirer, isIssuer, issuerCostPackageId, acquirerCostPackageId, segmentId, logo, unit } = request.body;
+    let { name, issuerCostPackageId, acquirerCostPackageId, segmentId, urlLogo, unit } = request.body;
     let code = request.params.code.toUpperCase();
     name = name.toLowerCase();
 
-    if (issuerCostPackageId) {
-        isIssuer = true;
-    }
-
-    if (acquirerCostPackageId) {
-        isAcquirer = true;
-    }
-
-    let result = await partner.updatePartner(code, name, isAcquirer, isIssuer, issuerCostPackageId, acquirerCostPackageId, segmentId, logo, unit);
+    let result = await partner.updatePartner(code, name, issuerCostPackageId, acquirerCostPackageId, segmentId, urlLogo, unit);
 
     if (result.err) {
         wrapper.response(response, false, result);
@@ -77,69 +61,171 @@ const deletePartner = async (request, response) => {
 }
 
 const getPartners = async (request, response) => {
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        error.data = errors.array();
+        wrapper.response(response, false, error);
+        return;
+    }
+
     let result;
 
     if (request.query.code) {
         let code = request.query.code.toUpperCase();
         result = await partner.getPartnerByCode(code);
     } else {
-        result = await partner.getAllPartner();
+        let page = null;
+        let limit = null;
+        let offset = null;
+        if (request.query.page && request.query.limit) {
+            page = parseInt(request.query.page);
+            limit = parseInt(request.query.limit);
+            offset = limit * (page - 1);
+        }
+
+        result = await partner.getAllPartner(page, limit, offset);
     }
 
     if (result.err) {
         wrapper.response(response, false, result);
     } else {
-        wrapper.response(response, true, result, "Partner(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, result, "Partner(s) retrieved", successCode.OK);
     }
 }
 
 const getActivePartners = async (request, response) => {
-    let result = await partner.getAllActivePartner();
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        error.data = errors.array();
+        wrapper.response(response, false, error);
+        return;
+    }
+
+    let page = null;
+    let limit = null;
+    let offset = null;
+    if (request.query.page && request.query.limit) {
+        page = parseInt(request.query.page);
+        limit = parseInt(request.query.limit);
+        offset = limit * (page - 1);
+    }
+
+    let result = await partner.getAllActivePartner(page, limit, offset);
 
     if (result.err) {
         wrapper.response(response, false, result);
     } else {
-        wrapper.response(response, true, result, "Partner(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, result, "Partner(s) retrieved", successCode.OK);
     }
 }
 
 const getIssuers = async (request, response) => {
-    let result = await partner.getAllIssuers();
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        error.data = errors.array();
+        wrapper.response(response, false, error);
+        return;
+    }
+
+    let page = null;
+    let limit = null;
+    let offset = null;
+    if (request.query.page && request.query.limit) {
+        page = parseInt(request.query.page);
+        limit = parseInt(request.query.limit);
+        offset = limit * (page - 1);
+    }
+
+    let result = await partner.getAllIssuers(page, limit, offset);
 
     if (result.err) {
         wrapper.response(response, false, result);
     } else {
-        wrapper.response(response, true, result, "Partner(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, result, "Partner(s) retrieved", successCode.OK);
     }
 }
 
 const getActiveIssuers = async (request, response) => {
-    let result = await partner.getAllActiveIssuers();
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        error.data = errors.array();
+        wrapper.response(response, false, error);
+        return;
+    }
+
+    let page = null;
+    let limit = null;
+    let offset = null;
+    if (request.query.page && request.query.limit) {
+        page = parseInt(request.query.page);
+        limit = parseInt(request.query.limit);
+        offset = limit * (page - 1);
+    }
+
+    let result = await partner.getAllActiveIssuers(page, limit, offset);
 
     if (result.err) {
         wrapper.response(response, false, result);
     } else {
-        wrapper.response(response, true, result, "Partner(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, result, "Partner(s) retrieved", successCode.OK);
     }
 }
 
 const getAcquirers = async (request, response) => {
-    let result = await partner.getAllAcquirers();
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        error.data = errors.array();
+        wrapper.response(response, false, error);
+        return;
+    }
+
+    let page = null;
+    let limit = null;
+    let offset = null;
+    if (request.query.page && request.query.limit) {
+        page = parseInt(request.query.page);
+        limit = parseInt(request.query.limit);
+        offset = limit * (page - 1);
+    }
+
+    let result = await partner.getAllAcquirers(page, limit, offset);
 
     if (result.err) {
         wrapper.response(response, false, result);
     } else {
-        wrapper.response(response, true, result, "Partner(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, result, "Partner(s) retrieved", successCode.OK);
     }
 }
 
 const getActiveAcquirers = async (request, response) => {
-    let result = await partner.getAllActiveAcquirers();
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        error.data = errors.array();
+        wrapper.response(response, false, error);
+        return;
+    }
+
+    let page = null;
+    let limit = null;
+    let offset = null;
+    if (request.query.page && request.query.limit) {
+        page = parseInt(request.query.page);
+        limit = parseInt(request.query.limit);
+        offset = limit * (page - 1);
+    }
+
+    let result = await partner.getAllActiveAcquirers(page, limit, offset);
 
     if (result.err) {
         wrapper.response(response, false, result);
     } else {
-        wrapper.response(response, true, result, "Partner(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, result, "Partner(s) retrieved", successCode.OK);
     }
 }
 

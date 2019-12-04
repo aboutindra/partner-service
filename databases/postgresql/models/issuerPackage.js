@@ -70,7 +70,7 @@ class IssuerPackage {
             name: 'get-issuer-cost-package-list',
             text: `SELECT id, name, cost_type AS "costType", amount, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.issuer_cost_package
-                ORDER BY id
+                ORDER BY created_at DESC
                 LIMIT $1 OFFSET $2;`,
                 values: [limit, offset]
         }
@@ -102,7 +102,6 @@ class IssuerPackage {
             return wrapper.paginationData(result.rows, meta);
         }
         catch (error) {
-            console.log(error);
             return wrapper.error(new InternalServerError("Internal server error"));
         }
     }

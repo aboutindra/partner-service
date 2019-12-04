@@ -70,7 +70,7 @@ class Discount {
                 addition_discount_type AS "additionDiscountType", addition_discount_amount AS "additionDiscountAmount", is_active AS "isActive", start_date AS "startDate", 
                 end_date AS "endDate", created_at AS "createdAt", updated_at AS "updatedAt", deactivated_at AS "deactivatedAt"
                 FROM public.discount_program
-                ORDER BY created_at
+                ORDER BY created_at DESC
                 LIMIT $1 OFFSET $2;`,
             values: [limit, offset]
         }
