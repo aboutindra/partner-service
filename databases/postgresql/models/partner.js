@@ -141,7 +141,7 @@ class Partner {
                 END AS "partnerType",
                 is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.partner
-                WHERE code = $1`,
+                WHERE code = $1;`,
             values: [code]
         }
 
@@ -292,6 +292,33 @@ class Partner {
         }
     }
 
+    async getIssuer(partnerCode) {
+        let dbClient = postgresqlWrapper.getConnection(this.database);
+        let getIssuerQuery = {
+            name: "get-issuer",
+            text: `SELECT  code, cost_type AS "costType", amount, exchange_rate AS "exchangeRate",
+                remaining_deduction_quota_per_day AS "remainingDeductionQuotaPerDay",
+                remaining_deduction_quota_per_month AS "remainingDeductionQuotaPerMonth"
+                FROM public.partner
+                INNER JOIN public.issuer_cost_package AS package ON (id = issuer_cost_package_id)
+                INNER JOIN public.partner_quota AS quota ON (code = quota.partner_code)
+                INNER JOIN public.partner_program AS programs ON (code = programs.partner_code)
+                WHERE code = $1 AND package.is_deleted = false AND programs.is_active = true
+                AND programs.start_date <= NOW() AND programs.end_date > NOW();`,
+            values: [partnerCode]
+        }
+        try {
+            let result = await dbClient.query(getIssuerQuery);
+            if (result.rows.length === 0) {
+                return wrapper.error(new NotFoundError("Issuer not found"));
+            }
+            return wrapper.data(result.rows);
+        }
+        catch (error) {
+            return wrapper.error(new InternalServerError("Internal server error"));
+        }
+    }
+
     async getAllAcquirers(page = null, limit = null, offset = null) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllAcquirersQuery = {
@@ -377,6 +404,30 @@ class Partner {
             }
 
             return wrapper.paginationData(result.rows, meta);
+        }
+        catch (error) {
+            return wrapper.error(new InternalServerError("Internal server error"));
+        }
+    }
+
+    async getAcquirer(partnerCode) {
+        let dbClient = postgresqlWrapper.getConnection(this.database);
+        let getAcquirerQuery = {
+            name: "get-acquirer",
+            text: `SELECT  code, cost_type AS "costType", amount, exchange_rate AS "exchangeRate"
+                FROM public.partner
+                INNER JOIN public.acquirer_cost_package AS package ON (id = acquirer_cost_package_id)
+                INNER JOIN public.partner_program AS programs ON (code = programs.partner_code)
+                WHERE code = $1 AND package.is_deleted = false AND programs.is_active = true
+                AND programs.start_date <= NOW() AND programs.end_date > NOW();`,
+            values: [partnerCode]
+        }
+        try {
+            let result = await dbClient.query(getAcquirerQuery);
+            if (result.rows.length === 0) {
+                return wrapper.error(new NotFoundError("Issuer not found"));
+            }
+            return wrapper.data(result.rows);
         }
         catch (error) {
             return wrapper.error(new InternalServerError("Internal server error"));

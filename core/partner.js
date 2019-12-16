@@ -121,6 +121,20 @@ const getActivePartners = async (request, response) => {
     }
 }
 
+const getIssuer = async (request, response) => {
+    let { partnerCode } = request.params;
+
+    partnerCode = partnerCode.toUpperCase();
+
+    let result = await partner.getIssuer(partnerCode);
+
+    if (result.err) {
+        wrapper.response(response, false, result);
+    } else {
+        wrapper.paginationResponse(response, true, result, "Issuer retrieved", successCode.OK);
+    }
+}
+
 const getIssuers = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
@@ -172,6 +186,20 @@ const getActiveIssuers = async (request, response) => {
         wrapper.response(response, false, result);
     } else {
         wrapper.paginationResponse(response, true, result, "Partner(s) retrieved", successCode.OK);
+    }
+}
+
+const getAcquirer = async (request, response) => {
+    let { partnerCode } = request.params;
+
+    partnerCode = partnerCode.toUpperCase();
+
+    let result = await partner.getAcquirer(partnerCode);
+
+    if (result.err) {
+        wrapper.response(response, false, result);
+    } else {
+        wrapper.paginationResponse(response, true, result, "Acquirer retrieved", successCode.OK);
     }
 }
 
@@ -234,6 +262,8 @@ module.exports = {
     updatePartner,
     deletePartner,
     getPartners,
+    getIssuer,
+    getAcquirer,
     getActivePartners,
     getIssuers,
     getActiveIssuers,

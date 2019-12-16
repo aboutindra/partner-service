@@ -11,6 +11,8 @@ const routes = (server) => {
     server.get('/api/v1/partners/acquirers', [validator.validateGet], partnerHandler.getAcquirers);
     server.get('/api/v1/partners/active-acquirers', [validator.validateGet], partnerHandler.getActiveAcquirers);
     server.get('/api/v1/partners/active-issuers', [validator.validateGet], partnerHandler.getActiveIssuers);
+    server.get('/api/v1/partners/active-issuers/:partnerCode', [], partnerHandler.getIssuer);
+    server.get('/api/v1/partners/active-acquirers/:partnerCode', [], partnerHandler.getAcquirer);
 }
 
 module.exports = {
