@@ -297,6 +297,8 @@ class Partner {
         let getIssuerQuery = {
             name: "get-issuer",
             text: `SELECT  code, cost_type AS "costType", amount, exchange_rate AS "exchangeRate",
+                minimum_amount_per_transaction AS "minimumAmountPerTransaction",
+                maximum_amount_per_transaction AS "maximumAmountPerTransaction",
                 remaining_deduction_quota_per_day AS "remainingDeductionQuotaPerDay",
                 remaining_deduction_quota_per_month AS "remainingDeductionQuotaPerMonth"
                 FROM public.partner
