@@ -296,7 +296,7 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getIssuerQuery = {
             name: "get-issuer",
-            text: `SELECT  code, cost_type AS "costType", amount, exchange_rate AS "exchangeRate",
+            text: `SELECT  code, cost_type AS "costType", amount AS "costAmount", exchange_rate AS "exchangeRate",
                 minimum_amount_per_transaction AS "minimumAmountPerTransaction",
                 maximum_amount_per_transaction AS "maximumAmountPerTransaction",
                 remaining_deduction_quota_per_day AS "remainingDeductionQuotaPerDay",
@@ -416,7 +416,7 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAcquirerQuery = {
             name: "get-acquirer",
-            text: `SELECT  code, cost_type AS "costType", amount, exchange_rate AS "exchangeRate"
+            text: `SELECT  code, cost_type AS "costType", amount AS "costAmount", exchange_rate AS "exchangeRate"
                 FROM public.partner
                 INNER JOIN public.acquirer_cost_package AS package ON (id = acquirer_cost_package_id)
                 INNER JOIN public.partner_program AS programs ON (code = programs.partner_code)
