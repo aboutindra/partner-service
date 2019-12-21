@@ -51,12 +51,12 @@ class AcquirerPackage {
             if (result.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Package(s) not found"));
             }
-            if (error.code === errorCode.UNIQUE_VIOLATION) {
-                return wrapper.error(new ForbiddenError("Package name already exist"));
-            }
             return wrapper.data(result.rows);
         }
         catch (error) {
+            if (error.code === errorCode.UNIQUE_VIOLATION) {
+                return wrapper.error(new ForbiddenError("Package name already exist"));
+            }
             if (error.code === errorCode.INVALID_ENUM) {
                 return wrapper.error(new BadRequestError("Invalid type value"));
             }
