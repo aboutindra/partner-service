@@ -36,10 +36,6 @@ class Discount {
         }
     }
 
-    async updateDiscount() {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-    }
-
     async softDeleteDiscount(code) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let deleteDiscountQuery = {
@@ -126,6 +122,26 @@ class Discount {
             let result = await dbClient.query(getActiveDiscountQuery);
             if (result.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Active discount not found"));
+            }
+            return wrapper.data(result.rows);
+        }
+        catch (error) {
+            return wrapper.error(new InternalServerError("Internal server error"));
+        }
+    }
+
+    async updateDiscountStatus() {
+        let dbPool = postgresqlWrapper.getConnection(this.database);
+        let updateDiscountQuery = {
+            name: 'update-discount-status',
+            text: `UPDATE public.discount_program
+                SET is_active=false, deactivated_at=NOW()
+                WHERE (NOW() < start_date OR end_date < NOW()) AND is_active=true;`
+        }
+        try {
+            let result = await dbPool.query(updateDiscountQuery);
+            if (result.rowCount === 0) {
+                return wrapper.error(new NotFoundError("Discount not found"));
             }
             return wrapper.data(result.rows);
         }
