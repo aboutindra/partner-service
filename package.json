@@ -21,6 +21,7 @@
     "express": "^4.17.1",
     "express-validator": "^6.2.0",
     "moment": "^2.24.0",
+    "node-cron": "^2.0.3",
     "pg": "^7.12.1",
     "redis": "^2.8.0"
   },
