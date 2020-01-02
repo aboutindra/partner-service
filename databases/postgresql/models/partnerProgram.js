@@ -216,6 +216,26 @@ class PartnerProgram {
             return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
+
+    async updatePartnerProgramStatus() {
+        let dbPool = postgresqlWrapper.getConnection(this.database);
+        let updatePartnerProgram = {
+            name: 'update-partner-program-status',
+            text: `UPDATE public.partner_program
+                SET is_active=false, deactivated_at=NOW()
+                WHERE (NOW() < start_date OR end_date < NOW()) AND is_active=true;`
+        }
+        try {
+            let result = await dbPool.query(updatePartnerProgram);
+            if (result.rowCount === 0) {
+                return wrapper.error(new NotFoundError("Discount not found"));
+            }
+            return wrapper.data(result.rows);
+        }
+        catch (error) {
+            return wrapper.error(new InternalServerError("Internal server error"));
+        }
+    }
 }
 
 module.exports = PartnerProgram;
