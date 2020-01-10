@@ -10,6 +10,11 @@ class PartnerProgram {
 
     async insertProgram(partnerCode, exchangeRate, minAmountPerTransaction, maxAmountPerTransaction, maxTransactionAmountPerDay, maxTransactionAmountPerMonth, 
         startDate, endDate) {
+        let status = false;
+        let timestamp = new Date();
+        if (startDate.getTime() <= timestamp.getTime() && timestamp.getTime() < endDate.getTime()) {
+            status = true;
+        }
         let dbPool = postgresqlWrapper.getConnection(this.database);
         let insertPartnerProgramQuery = {
             name: 'add-new-partner-program',
@@ -18,7 +23,7 @@ class PartnerProgram {
                 maximum_transaction_amount_per_month, is_active, created_at, updated_at)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);`,
             values: [partnerCode, exchangeRate, startDate, endDate, minAmountPerTransaction, maxAmountPerTransaction, maxTransactionAmountPerDay, maxTransactionAmountPerMonth,
-                true, new Date(), new Date()]
+                status, timestamp, timestamp]
         }
 
         let inserQuotaQuery = {
@@ -219,16 +224,27 @@ class PartnerProgram {
 
     async updatePartnerProgramStatus() {
         let dbPool = postgresqlWrapper.getConnection(this.database);
-        let updatePartnerProgram = {
-            name: 'update-partner-program-status',
+        let deactivateProgram = {
+            name: 'deactivate-partner-program',
             text: `UPDATE public.partner_program
                 SET is_active=false, deactivated_at=NOW()
-                WHERE (NOW() < start_date OR end_date < NOW()) AND is_active=true;`
+                WHERE end_date < NOW() AND is_active=true;`
         }
+        let activateProgram = {
+            name: 'activate-partner-program',
+            text: `UPDATE public.partner_program
+                SET is_active=true
+                WHERE start_date <= NOW() && NOW() <= end_date AND is_active=false AND deactivated_at IS NULL;`
+        }
+
+        let client = await dbPool.connect();
         try {
-            let result = await dbPool.query(updatePartnerProgram);
+            await client.query('BEGIN');
+            await client.query(deactivateProgram);
+            await client.query(activateProgram);
+            let result = await client.query('COMMIT');
             if (result.rowCount === 0) {
-                return wrapper.error(new NotFoundError("Discount not found"));
+                return wrapper.error(new NotFoundError("Partner program not found"));
             }
             return wrapper.data(result.rows);
         }
