@@ -234,7 +234,7 @@ class PartnerProgram {
             name: 'activate-partner-program',
             text: `UPDATE public.partner_program
                 SET is_active=true
-                WHERE start_date <= NOW() && NOW() <= end_date AND is_active=false AND deactivated_at IS NULL;`
+                WHERE start_date <= NOW() AND NOW() <= end_date AND is_active=false AND deactivated_at IS NULL;`
         }
 
         let client = await dbPool.connect();
@@ -249,6 +249,7 @@ class PartnerProgram {
             return wrapper.data(result.rows);
         }
         catch (error) {
+            console.log(error);
             return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
