@@ -24,7 +24,7 @@ const insertProgram = async (request, response) => {
     }
 
     let result = await partnerProgram.insertProgram(partnerCode, exchangeRate, minAmountPerTransaction, maxAmountPerTransaction, maxTransactionAmountPerDay, maxTransactionAmountPerMonth, 
-        startDate, endDate);
+        new Date(startDate), new Date(endDate));
     if (result.err) {
         wrapper.response(response, false, result);
     } else {
