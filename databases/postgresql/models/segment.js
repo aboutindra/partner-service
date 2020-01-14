@@ -70,7 +70,7 @@ class Segment {
         try {
             let result = await dbClient.query(getSegmentQuery);
             if (result.rows.length === 0) {
-                return wrapper.error(new NotFoundError("Segment not found"));
+                return wrapper.error(new NotFoundError("Segment(s) not found"));
             }
             return wrapper.data(result.rows);
         }
