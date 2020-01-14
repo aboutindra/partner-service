@@ -16,3 +16,5 @@ cron.schedule("0 * * * *", async function() {
 let listener = appServer.app.listen(port, _ => {
     logger.info("Service started, listening at " + listener.address().port);
 });
+
+module.exports = appServer.app;
