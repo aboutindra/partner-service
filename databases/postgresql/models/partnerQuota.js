@@ -74,7 +74,6 @@ class PartnerQuota {
                 LIMIT $1 OFFSET $2;`,
                 values: [limit, offset]
         }
-
         let countDataQuery = {
             name: 'count-all-quota',
             text: `SELECT COUNT(*)
