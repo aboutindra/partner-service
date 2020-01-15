@@ -18,10 +18,11 @@ exports.validateUpdate = [
 ]
 
 exports.validateGet = [
+    query('id').optional({ nullable: true }).isInt({ min: 0 }).withMessage("Id must be filled with integer greater than equal 0"),
     query('page').optional({ nullable: true }).isInt({ min: 1 }).withMessage("Page must be filled with integer greater than 0"),
     query('limit').optional({ nullable: true }).isInt({ min: 1 }).withMessage("Limit must be filled with integer greater than 0"),
 ]
 
 exports.validateDelete = [
-    param('id').isInt().withMessage("Id must be positive integer")
+    param('id').isInt({ min: 0 }).withMessage("Id must be positive integer")
 ]

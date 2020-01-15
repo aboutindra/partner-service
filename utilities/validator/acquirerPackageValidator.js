@@ -5,7 +5,7 @@ exports.validateInsert = [
     body('costType').not().isEmpty().withMessage("Cost type can not be empty")
     .isIn(['fixed', 'percentage', 'FIXED', 'PERCENTAGE']).withMessage("Cost type can only be fixed or percentage"),
     body('amount').not().isEmpty().withMessage("Amount can not be empty")
-    .isFloat({ min: 0 }).withMessage("Amount must be positive integer")
+    .isFloat({ min: 0 }).withMessage("Amount must be positive float")
 ]
 
 exports.validateUpdate = [
