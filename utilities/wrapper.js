@@ -1,4 +1,3 @@
-
 const { NotFoundError, InternalServerError, BadRequestError, ConflictError, ExpectationFailedError,
   ForbiddenError, GatewayTimeoutError, ServiceUnavailableError, UnauthorizedError } = require('./error');
 const { ERROR:httpError } = require('./httpStatusCode');
@@ -27,6 +26,7 @@ const response = (res, status, result, message = '', code = 200) => {
 
 const paginationResponse = (res, status, result, message = '', code = 200) => {
   let data = result.data;
+  /* istanbul ignore next */
   if(status === false){
     data = data || [];
     message = result.err.message || message;
@@ -44,7 +44,7 @@ const paginationResponse = (res, status, result, message = '', code = 200) => {
 };
 
 const checkErrorCode = (error) => {
-
+/* istanbul ignore next */
   switch (error.constructor) {
   case BadRequestError:
     return httpError.BAD_REQUEST;
