@@ -2,8 +2,7 @@ const { query, body } = require('express-validator');
 const moment = require('moment');
 
 exports.validateInsert = [
-    body('code').not().isEmpty().withMessage("Code can not be empty")
-    .isLength({ max: 10 }).withMessage("Code must be maximum 10 characters"),
+    body('code').not().isEmpty().isLength({ max: 10 }).withMessage("Code must be maximum 10 characters"),
     body('name').not().isEmpty().withMessage("Name can not be empty"),
     body('deductionDiscountType').optional({ nullable: true }).isIn(['fixed', 'percentage']).withMessage("Discount type can only be fixed or percentage"),
     body('deductionDiscountAmount').if(body('deductionDiscountType').not().isEmpty()).not().isEmpty().withMessage("Deduction discount amount is required if deduction discount type is not empty")
