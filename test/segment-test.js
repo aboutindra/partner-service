@@ -16,11 +16,11 @@ describe("Get Segment(s)", _ => {
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(500);
             response.body.status.should.equal(false);
             response.body.message.should.equal("Internal server error");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -35,11 +35,11 @@ describe("Get Segment(s)", _ => {
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(404);
             response.body.status.should.equal(false);
             response.body.message.should.equal("Segment(s) not found");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -67,11 +67,11 @@ describe("Get Segment(s)", _ => {
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(200);
             response.body.status.should.equal(true);
             response.body.message.should.equal("Segment(s) retrieved");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -83,11 +83,11 @@ describe("Get Segment(s)", _ => {
         .get(BASE_URL)
         .query({ id: 1 })
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(500);
             response.body.status.should.equal(false);
             response.body.message.should.equal("Internal server error");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -99,11 +99,11 @@ describe("Get Segment(s)", _ => {
         .get(BASE_URL)
         .query({ id: -1 })
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(400);
             response.body.status.should.equal(false);
             response.body.message.should.equal("Id must be an integer value");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -115,11 +115,11 @@ describe("Get Segment(s)", _ => {
         .get(BASE_URL)
         .query({ id: '{ $ne : -1 }' })
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(400);
             response.body.status.should.equal(false);
             response.body.message.should.equal("Id must be an integer value");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -135,11 +135,11 @@ describe("Get Segment(s)", _ => {
         .get(BASE_URL)
         .query({ id: 1 })
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(404);
             response.body.status.should.equal(false);
             response.body.message.should.equal("Segment not found");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -162,11 +162,11 @@ describe("Get Segment(s)", _ => {
         .get(BASE_URL)
         .query({ id: 1 })
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(200);
             response.body.status.should.equal(true);
             response.body.message.should.equal("Segment(s) retrieved");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -222,11 +222,11 @@ describe("Update Segment", _ => {
         .put(BASE_URL + '/' + PARAMS)
         .send({ name: 'Fintech '})
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(500);
             response.body.status.should.equal(false);
             response.body.message.should.equal("Internal server error");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -241,11 +241,11 @@ describe("Update Segment", _ => {
         .put(BASE_URL + '/' + PARAMS)
         .send({ name: 'Fintech '})
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(403);
             response.body.status.should.equal(false);
             response.body.message.should.equal("Segment name already exist");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -261,11 +261,11 @@ describe("Update Segment", _ => {
         .put(BASE_URL + '/' + PARAMS)
         .send({ name: 'Fintech '})
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(404);
             response.body.status.should.equal(false);
             response.body.message.should.equal("Segment not found");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -281,11 +281,11 @@ describe("Update Segment", _ => {
         .put(BASE_URL + '/' + PARAMS)
         .send({ name: 'Fintech '})
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(200);
             response.body.status.should.equal(true);
             response.body.message.should.equal("Segment updated");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -314,11 +314,11 @@ describe("Insert Segment", _ => {
         .post(BASE_URL)
         .send({ name: 'Fintech' })
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(403);
             response.body.status.should.equal(false);
             response.body.message.should.equal("Segment name already exist");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -330,11 +330,11 @@ describe("Insert Segment", _ => {
         .post(BASE_URL)
         .send({ name: 'Fintech' })
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(500);
             response.body.status.should.equal(false);
             response.body.message.should.equal("Internal server error");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -350,11 +350,11 @@ describe("Insert Segment", _ => {
         .post(BASE_URL)
         .send({ name: 'Fintech' })
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(404);
             response.body.status.should.equal(false);
             response.body.message.should.equal("Failed add new segment");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -370,11 +370,11 @@ describe("Insert Segment", _ => {
         .post(BASE_URL)
         .send({ name: 'Fintech' })
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(201);
             response.body.status.should.equal(true);
             response.body.message.should.equal("Segment added");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });

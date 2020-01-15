@@ -18,11 +18,11 @@ describe("Get Partner Wallet", _ => {
         chai.request(server)
         .get(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(500);
             response.body.status.should.equal(false);
             response.body.message.should.equal("Internal server error");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -37,11 +37,11 @@ describe("Get Partner Wallet", _ => {
         chai.request(server)
         .get(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(404);
             response.body.status.should.equal(false);
             response.body.message.should.equal("Partner wallet not found");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -61,11 +61,11 @@ describe("Get Partner Wallet", _ => {
         chai.request(server)
         .get(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(200);
             response.body.status.should.equal(true);
             response.body.message.should.equal("Partner wallet retrieved");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -80,11 +80,11 @@ describe("Delete Partner Wallet", _ => {
         chai.request(server)
         .delete(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(500);
             response.body.status.should.equal(false);
             response.body.message.should.equal("Internal server error");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -99,11 +99,11 @@ describe("Delete Partner Wallet", _ => {
         chai.request(server)
         .delete(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(404);
             response.body.status.should.equal(false);
             response.body.message.should.equal("Failed to delete partner wallet");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -118,11 +118,11 @@ describe("Delete Partner Wallet", _ => {
         chai.request(server)
         .delete(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(200);
             response.body.status.should.equal(true);
             response.body.message.should.equal("Partner wallet deleted");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -177,11 +177,11 @@ describe("Insert or Update Partner Wallet", _ => {
         .post(BASE_URL)
         .send({ partnerCode: "IDK", walletCode: "1029312031" })
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(403);
             response.body.status.should.equal(false);
             response.body.message.should.equal("Partner doesn't exist");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -197,11 +197,11 @@ describe("Insert or Update Partner Wallet", _ => {
         .post(BASE_URL)
         .send({ partnerCode: "IDK", walletCode: "1029312031" })
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(404);
             response.body.status.should.equal(false);
             response.body.message.should.equal("Failed to add new partner wallet");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -213,11 +213,11 @@ describe("Insert or Update Partner Wallet", _ => {
         .post(BASE_URL)
         .send({ partnerCode: "IDK", walletCode: "1029312031" })
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(500);
             response.body.status.should.equal(false);
             response.body.message.should.equal("Internal server error");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
@@ -233,11 +233,11 @@ describe("Insert or Update Partner Wallet", _ => {
         .post(BASE_URL)
         .send({ partnerCode: "IDK", walletCode: "1029312031" })
         .end((error, response) => {
+            sandbox.restore();
             response.should.have.status(201);
             response.body.status.should.equal(true);
             response.body.message.should.equal("Partner wallet added");
             expect(response).to.be.json;
-            sandbox.restore();
             done();
         });
     });
