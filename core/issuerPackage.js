@@ -84,10 +84,6 @@ const getPackages = async (request, response) => {
 
     if (request.query.id) {
         let id = parseInt(request.query.id);
-        if (isNaN(id)) {
-            wrapper.response(response, false, wrapper.error(new BadRequestError("Id must be an integer value")));
-            return;
-        }
         result = await issuerPackage.getPackageById(id);
     } else {
         let page = null;
@@ -106,7 +102,7 @@ const getPackages = async (request, response) => {
         wrapper.response(response, false, result);
         return;
     } else {
-        wrapper.paginationResponse(response, true, result, "Packages(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, result, "Package(s) retrieved", successCode.OK);
     }
     return;
 }
