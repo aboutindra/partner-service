@@ -27,7 +27,7 @@ class Discount {
         }
         catch (error) {
             if (error.code === errorCode.INVALID_ENUM) {
-                return wrapper.error(new BadRequestError("Invalid type value"));
+                return wrapper.error(new ForbiddenError("Invalid type value"));
             }
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Code already exist"));
@@ -58,7 +58,7 @@ class Discount {
         }
     }
 
-    async getAllDiscount(limit = null, offset = null) {
+    async getAllDiscount(page = null, limit = null, offset = null) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllDiscountQuery = {
             name: 'get-discount-history',
@@ -70,13 +70,32 @@ class Discount {
                 LIMIT $1 OFFSET $2;`,
             values: [limit, offset]
         }
+        let countDataQuery = {
+            name: 'count-acquirer-cost-package-list',
+            text: `SELECT COUNT(*)
+                FROM public.acquirer_cost_package`
+        }
 
         try {
             let result = await dbClient.query(getAllDiscountQuery);
             if (result.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Discount(s) not found"));
             }
-            return wrapper.data(result.rows);
+            let count = await dbClient.query(countDataQuery);
+            let totalData = parseInt(count.rows[0].count);
+            let totalPage = Math.ceil(totalData / limit);
+            if (totalPage === Infinity || isNaN(totalData)) {
+                totalPage = 1;
+            }
+            let totalDataOnPage = result.rows.length;
+            let meta = {
+                page: page || 1,
+                totalData,
+                totalPage,
+                totalDataOnPage
+            }
+
+            return wrapper.paginationData(result.rows, meta);
         }
         catch (error) {
             return wrapper.error(new InternalServerError("Internal server error"));
@@ -130,6 +149,7 @@ class Discount {
         }
     }
 
+    /* istanbul ignore next */
     async updateDiscountStatus() {
         let dbPool = postgresqlWrapper.getConnection(this.database);
         let updateDiscountQuery = {
