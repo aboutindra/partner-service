@@ -1,4 +1,4 @@
-const { NotFoundError, InternalServerError, BadRequestError } = require('../../../utilities/error');
+const { NotFoundError, InternalServerError, BadRequestError, ForbiddenError } = require('../../../utilities/error');
 const wrapper = require('../../../utilities/wrapper');
 const postgresqlWrapper = require('..');
 const { ERROR:errorCode } = require('../errorCode');
@@ -58,7 +58,7 @@ class AcquirerPackage {
                 return wrapper.error(new ForbiddenError("Package name already exist"));
             }
             if (error.code === errorCode.INVALID_ENUM) {
-                return wrapper.error(new BadRequestError("Invalid type value"));
+                return wrapper.error(new ForbiddenError("Invalid type value"));
             }
             return wrapper.error(new InternalServerError("Internal server error"));
         }
@@ -84,11 +84,10 @@ class AcquirerPackage {
             if (result.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Package(s) not found"));
             }
-            
             let count = await dbClient.query(countDataQuery);
             let totalData = parseInt(count.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
-            if (totalPage === Infinity) {
+            if (totalPage === Infinity || isNaN(totalData)) {
                 totalPage = 1;
             }
             let totalDataOnPage = result.rows.length;
