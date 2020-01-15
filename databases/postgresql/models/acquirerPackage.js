@@ -27,7 +27,7 @@ class AcquirerPackage {
         }
         catch (error) {
             if (error.code === errorCode.INVALID_ENUM) {
-                return wrapper.error(new BadRequestError("Invalid type value"));
+                return wrapper.error(new ForbiddenError("Invalid type value"));
             }
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Package name already exist"));

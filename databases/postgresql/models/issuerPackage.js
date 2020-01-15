@@ -27,7 +27,7 @@ class IssuerPackage {
         }
         catch (error) {
             if (error.code === errorCode.INVALID_ENUM) {
-                return wrapper.error(new BadRequestError("Invalid type value"));
+                return wrapper.error(new ForbiddenError("Invalid type value"));
             }
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Package name already exist"));
@@ -55,7 +55,7 @@ class IssuerPackage {
         }
         catch (error) {
             if (error.code === errorCode.INVALID_ENUM) {
-                return wrapper.error(new BadRequestError("Invalid type value"));
+                return wrapper.error(new ForbiddenError("Invalid type value"));
             }
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Package name already exist"));
@@ -88,7 +88,7 @@ class IssuerPackage {
             let count = await dbClient.query(countDataQuery);
             let totalData = parseInt(count.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
-            if (totalPage === Infinity) {
+            if (totalPage === Infinity || isNaN(totalData)) {
                 totalPage = 1;
             }
             let totalDataOnPage = result.rows.length;
