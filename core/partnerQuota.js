@@ -22,6 +22,7 @@ const upsertQuota = async (request, response) => {
     } else {
         wrapper.response(response, true, result, "Partner quota added", successCode.CREATED);
     }
+    return;
 }
 
 const deductQuota = async (request, response) => {
@@ -42,6 +43,7 @@ const deductQuota = async (request, response) => {
     } else {
         wrapper.response(response, true, result, "Partner quota deducted", successCode.OK);
     }
+    return;
 }
 
 const getRemainingQuota = async (request, response) => {
@@ -80,6 +82,7 @@ const getAllRemainingQuota = async (request, response) => {
     } else {
         wrapper.paginationResponse(response, true, result, "Partner quota(s) retrieved", successCode.OK);
     }
+    return;
 }
 
 module.exports = {

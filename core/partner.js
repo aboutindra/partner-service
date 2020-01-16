@@ -25,6 +25,7 @@ const insertPartner = async (request, response) => {
     } else {
         wrapper.response(response, true, result, "Partner added", successCode.OK);
     }
+    return;
 }
 
 const updatePartner = async (request, response) => {
@@ -47,6 +48,7 @@ const updatePartner = async (request, response) => {
     } else {
         wrapper.response(response, true, result, "Partner updated", successCode.OK);
     }
+    return;
 }
 
 const deletePartner = async (request, response) => {
@@ -92,6 +94,7 @@ const getPartners = async (request, response) => {
     } else {
         wrapper.paginationResponse(response, true, result, "Partner(s) retrieved", successCode.OK);
     }
+    return;
 }
 
 const getActivePartners = async (request, response) => {
@@ -119,6 +122,7 @@ const getActivePartners = async (request, response) => {
     } else {
         wrapper.paginationResponse(response, true, result, "Partner(s) retrieved", successCode.OK);
     }
+    return;
 }
 
 const getIssuer = async (request, response) => {
@@ -160,6 +164,7 @@ const getIssuers = async (request, response) => {
     } else {
         wrapper.paginationResponse(response, true, result, "Partner(s) retrieved", successCode.OK);
     }
+    return;
 }
 
 const getActiveIssuers = async (request, response) => {
@@ -187,6 +192,7 @@ const getActiveIssuers = async (request, response) => {
     } else {
         wrapper.paginationResponse(response, true, result, "Partner(s) retrieved", successCode.OK);
     }
+    return;
 }
 
 const getAcquirer = async (request, response) => {
@@ -228,6 +234,7 @@ const getAcquirers = async (request, response) => {
     } else {
         wrapper.paginationResponse(response, true, result, "Partner(s) retrieved", successCode.OK);
     }
+    return;
 }
 
 const getActiveAcquirers = async (request, response) => {
@@ -255,6 +262,7 @@ const getActiveAcquirers = async (request, response) => {
     } else {
         wrapper.paginationResponse(response, true, result, "Partner(s) retrieved", successCode.OK);
     }
+    return;
 }
 
 module.exports = {

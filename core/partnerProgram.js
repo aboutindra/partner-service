@@ -30,6 +30,7 @@ const insertProgram = async (request, response) => {
     } else {
         wrapper.response(response, true, result, "Partner program added", successCode.CREATED);
     }
+    return;
 }
 
 const softDeleteProgram = async (request, response) => {
@@ -49,6 +50,7 @@ const softDeleteProgram = async (request, response) => {
     } else {
         wrapper.response(response, true, result, "Partner program deleted", successCode.OK);
     }
+    return;
 }
 
 const getPrograms = async (request, response) => {
@@ -87,6 +89,7 @@ const getPrograms = async (request, response) => {
     } else {
         wrapper.paginationResponse(response, true, result, "Partner program(s) retrieved", successCode.OK);
     }
+    return;
 }
 
 const getPartnerPrograms = async (request, response) => {
@@ -115,6 +118,7 @@ const getPartnerPrograms = async (request, response) => {
     } else {
         wrapper.paginationResponse(response, true, result, "Partner program(s) retrieved", successCode.OK);
     }
+    return;
 }
 
 module.exports = {

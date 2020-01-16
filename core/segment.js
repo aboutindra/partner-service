@@ -23,6 +23,7 @@ const insertSegment = async (request, response) => {
     } else {
         wrapper.response(response, true, result, "Segment added", successCode.CREATED);
     }
+    return;
 }
 
 const updateSegment = async (request, response) => {
