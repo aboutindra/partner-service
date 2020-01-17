@@ -213,7 +213,7 @@ class PartnerProgram {
         try {
             let result = await dbPool.query(getActiveDiscountQuery);
             if (result.rows.length === 0) {
-                return wrapper.error(new NotFoundError("Active discount not found"));
+                return wrapper.error(new NotFoundError("Active partner program not found"));
             }
             return wrapper.data(result.rows);
         }
