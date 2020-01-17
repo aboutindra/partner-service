@@ -1,7 +1,7 @@
 const wrapper = require('../utilities/wrapper');
 const { validationResult } = require('express-validator');
 const { SUCCESS:successCode } = require('../utilities/httpStatusCode');
-const { BadRequestError, ForbiddenError } = require('../utilities/error');
+const { BadRequestError, ForbiddenError, NotFoundError } = require('../utilities/error');
 const Discount = require('../databases/postgresql/models/discount');
 const discount = new Discount(process.env.POSTGRESQL_DATABASE_PARTNER);
 
@@ -18,9 +18,14 @@ const insertDiscount = async (request, response) => {
     code = code.toUpperCase();
 
     let currentProgram = await discount.getActiveDiscount();
-    if (currentProgram.data.length > 0) {
-        wrapper.response(response, false, wrapper.error(new ForbiddenError("There is another program currently running")));
+    if (currentProgram.err && currentProgram.err.message !== "Active discount not found") {
+        wrapper.response(response, false, currentProgram);
         return;
+    } else {
+        if (currentProgram.data.length > 0) {
+            wrapper.response(response, false, wrapper.error(new ForbiddenError("There is another program currently running")));
+            return;
+        }
     }
 
     let result = await discount.insertDiscount(code, name, deductionDiscountType, deductionDiscountAmount, additionDiscountType, additionDiscountAmount, startDate, endDate);
