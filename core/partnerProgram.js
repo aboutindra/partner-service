@@ -43,8 +43,8 @@ const softDeleteProgram = async (request, response) => {
     }
 
     let id = parseInt(request.params.id);
-
     let result = await partnerProgram.softDeleteProgram(id);
+    
     if (result.err) {
         wrapper.response(response, false, result);
     } else {
@@ -66,10 +66,6 @@ const getPrograms = async (request, response) => {
 
     if (request.query.id) {
         let id = parseInt(request.query.id);
-        if (isNaN(id)) {
-            wrapper.response(response, false, wrapper.error(new BadRequestError("Id must be an integer value")));
-            return;
-        }
         result = await partnerProgram.getProgramById(id);
     } else {
         let page = null;
