@@ -18,9 +18,14 @@ const insertProgram = async (request, response) => {
     partnerCode = partnerCode.toUpperCase();
 
     let currentProgram = await partnerProgram.getActivePartnerProgram(partnerCode);
-    if (currentProgram.data.length > 0) {
-        wrapper.response(response, false, wrapper.error(new ForbiddenError("There is another program currently running")));
+    if (currentProgram.err && currentProgram.err.message !== "Active partner program not found") {
+        wrapper.response(response, false, currentProgram);
         return;
+    } else {
+        if (currentProgram.data.length > 0) {
+            wrapper.response(response, false, wrapper.error(new ForbiddenError("There is another program currently running")));
+            return;
+        }
     }
 
     let result = await partnerProgram.insertProgram(partnerCode, exchangeRate, minAmountPerTransaction, maxAmountPerTransaction, maxTransactionAmountPerDay, maxTransactionAmountPerMonth, 
