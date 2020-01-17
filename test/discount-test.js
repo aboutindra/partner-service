@@ -477,7 +477,7 @@ describe("Add Discount", _ => {
         chai.request(server)
         .post(BASE_URL)
         .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'nonfixed', deductionDiscountAmount: 100, additionDiscountType: "zero", additionDiscountAmount: 100,
-            startDate: 'AFK', endDate: 'AFK'})
+            startDate: '', endDate: ''})
         .end((error, response) => {
             response.should.have.status(400);
             response.body.status.should.equal(false);
@@ -512,6 +512,23 @@ describe("Add Discount", _ => {
         });
     });
 
+    it("Sending add discount request with internal server error response on current active query", done => {
+        sandbox.stub(pgPool.prototype, 'query').onSecondCall().rejects();
+
+        chai.request(server)
+        .post(BASE_URL)
+        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, additionDiscountType: "percentage", additionDiscountAmount: 10,
+            startDate: new Date(), endDate: new Date()})
+        .end((error, response) => {
+            sandbox.restore();
+            response.should.have.status(500);
+            response.body.status.should.equal(false);
+            response.body.message.should.equal("Internal server error");
+            expect(response).to.be.json;
+            done();
+        });
+    });
+
     it("Sending add discount request with internal server error response", done => {
         let existingDiscount = {
             rowCount: 0,
@@ -526,7 +543,7 @@ describe("Add Discount", _ => {
         .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, additionDiscountType: "percentage", additionDiscountAmount: 10,
             startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
-            sandbox.restore();
+            pool.restore();
             response.should.have.status(500);
             response.body.status.should.equal(false);
             response.body.message.should.equal("Internal server error");
@@ -552,7 +569,7 @@ describe("Add Discount", _ => {
         .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, additionDiscountType: "percentage", additionDiscountAmount: 10,
             startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
-            sandbox.restore();
+            pool.restore();
             response.should.have.status(403);
             response.body.status.should.equal(false);
             response.body.message.should.equal("Invalid type value");
@@ -578,7 +595,7 @@ describe("Add Discount", _ => {
         .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, additionDiscountType: "percentage", additionDiscountAmount: 10,
             startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
-            sandbox.restore();
+            pool.restore();
             response.should.have.status(403);
             response.body.status.should.equal(false);
             response.body.message.should.equal("Code already exist");
@@ -605,7 +622,7 @@ describe("Add Discount", _ => {
         .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, additionDiscountType: "percentage", additionDiscountAmount: 10,
             startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
-            sandbox.restore();
+            pool.restore();
             response.should.have.status(404);
             response.body.status.should.equal(false);
             response.body.message.should.equal("Failed add new package");
@@ -632,7 +649,7 @@ describe("Add Discount", _ => {
         .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, additionDiscountType: "percentage", additionDiscountAmount: 10,
             startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
-            sandbox.restore();
+            pool.restore();
             response.should.have.status(201);
             response.body.status.should.equal(true);
             response.body.message.should.equal("Discount added");
