@@ -143,7 +143,7 @@ class PartnerProgram {
         try {
             let result = await dbPool.query(getPartnerProgramQuery);
             if (result.rows.length === 0) {
-                return wrapper.error(new NotFoundError("Partner program(s) not found"));
+                return wrapper.error(new NotFoundError("Partner program not found"));
             }
             return wrapper.data(result.rows);
         }
@@ -222,6 +222,7 @@ class PartnerProgram {
         }
     }
 
+    /* istanbul ignore next */
     async updatePartnerProgramStatus() {
         let dbPool = postgresqlWrapper.getConnection(this.database);
         let deactivateProgram = {
