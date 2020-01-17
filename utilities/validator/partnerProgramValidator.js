@@ -8,8 +8,8 @@ exports.validateInsert = [
     body('maxAmountPerTransaction').optional({ nullable: true }).isInt({ gt: 0 }).withMessage("Maximum amount per transaction must be positive integer greater than 0"),
     body('maxTransactionAmountPerDay').optional({ nullable: true }).isInt({ gt: 0 }).withMessage("Maximum transaction amount per day must be positive integer greater than 0"),
     body('maxTransactionAmountPerMonth').optional({ nullable: true }).isInt({ gt: 0 }).withMessage("Maximum transaction amount per month must be positive integer greater than 0"),
-    body('startDate').custom(validateDate).withMessage("Start date must be in UTC, ISO-8601, or RFC 2822 format"),
-    body('endDate').custom(validateDate).withMessage("End date must be in UTC, ISO-8601, or RFC 2822 format")
+    body('startDate').not().isEmpty().custom(validateDate).withMessage("Start date must be in UTC, ISO-8601, or RFC 2822 format"),
+    body('endDate').not().isEmpty().custom(validateDate).custom(validateDateRange).withMessage("End date must be in UTC, ISO-8601, or RFC 2822 format and must be higher than start date")
 ]
 
 exports.validateDelete = [
@@ -25,6 +25,17 @@ exports.validateGet = [
 function validateDate(dateString) {
     let date = moment(dateString);
     if (date.isValid()) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function validateDateRange(_, { req }) {
+    let startDate = new Date(req.body.startDate);
+    let endDate = new Date(req.body.endDate);
+
+    if (startDate.getTime() < endDate.getTime()) {
         return true;
     } else {
         return false;
