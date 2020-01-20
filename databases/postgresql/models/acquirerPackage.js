@@ -87,7 +87,7 @@ class AcquirerPackage {
             let count = await dbClient.query(countDataQuery);
             let totalData = parseInt(count.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
-            if (totalPage === Infinity || isNaN(totalData)) {
+            if (limit === null) {
                 totalPage = 1;
             }
             let totalDataOnPage = result.rows.length;

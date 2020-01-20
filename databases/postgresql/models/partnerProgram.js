@@ -110,7 +110,7 @@ class PartnerProgram {
             let count = await dbPool.query(countDataQuery);
             let totalData = parseInt(count.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
-            if (totalPage === Infinity) {
+            if (limit === null) {
                 totalPage = 1;
             }
             let totalDataOnPage = result.rows.length;
@@ -182,7 +182,7 @@ class PartnerProgram {
             let count = await dbPool.query(countDataQuery);
             let totalData = parseInt(count.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
-            if (totalPage === Infinity) {
+            if (limit === null) {
                 totalPage = 1;
             }
             let totalDataOnPage = result.rows.length;
