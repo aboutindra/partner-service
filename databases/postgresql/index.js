@@ -27,6 +27,7 @@ async function createConnectionPool() {
     }
 }
 
+/* istanbul ignore next */
 function getConnection(index) {
     for (let connection of connectionPool) {
         if (connection.index === index) {
