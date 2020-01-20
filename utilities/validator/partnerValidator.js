@@ -3,8 +3,6 @@ const { query, body } = require('express-validator');
 exports.validateInsert = [
     body('code').not().isEmpty().withMessage("Code can not be empty"),
     body('name').not().isEmpty().withMessage("Name can not be empty"),
-    body('issuerCostPackageId').if(body('isIssuer').isIn([true])).not().isEmpty().withMessage("Issuer cost package id is required if issuer status is true"),
-    body('acquirerCostPackageId').if(body('isAcquirer').isIn([true])).not().isEmpty().withMessage("Acquirer cost package id is required if acquirer status is true"),
     body('segmentId').not().isEmpty().withMessage("Segment id can not be empty"),
     body('urlLogo').not().isEmpty().withMessage("Url logo can not be empty"),
     body('unit').not().isEmpty().withMessage("Unit can not be empty")
@@ -12,8 +10,6 @@ exports.validateInsert = [
 
 exports.validateUpdate = [
     body('name').not().isEmpty().withMessage("Name can not be empty"),
-    body('issuerCostPackageId').if(body('isIssuer').isIn([true])).not().isEmpty().withMessage("Issuer cost package id is required if issuer status is true"),
-    body('acquirerCostPackageId').if(body('isAcquirer').isIn([true])).not().isEmpty().withMessage("Acquirer cost package id is required if acquirer status is true"),
     body('segmentId').not().isEmpty().withMessage("Segment id can not be empty"),
     body('urlLogo').not().isEmpty().withMessage("Url logo can not be empty"),
     body('unit').not().isEmpty().withMessage("Unit can not be empty")
