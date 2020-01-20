@@ -26,11 +26,11 @@ class Partner {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            if (error.code === errorCode.INVALID_ENUM) {
-                return wrapper.error(new BadRequestError("Invalid type value"));
-            }
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Code already exist"));
+            }
+            if (error.code === errorCode.FOREIGN_KEY_VIOLATION) {
+                return wrapper.error(new ForbiddenError("Id not exist"));
             }
             return wrapper.error(new InternalServerError("Internal server error"));
         }
@@ -55,6 +55,9 @@ class Partner {
             return wrapper.data(result.rows);
         }
         catch (error) {
+            if (error.code === errorCode.FOREIGN_KEY_VIOLATION) {
+                return wrapper.error(new ForbiddenError("Id not exist"));
+            }
             return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
@@ -111,7 +114,7 @@ class Partner {
             let count = await dbClient.query(countDataQuery);
             let totalData = parseInt(count.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
-            if (totalPage === Infinity) {
+            if (limit === null) {
                 totalPage = 1;
             }
             let totalDataOnPage = result.rows.length;
@@ -183,7 +186,7 @@ class Partner {
             let count = await dbClient.query(countDataQuery);
             let totalData = parseInt(count.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
-            if (totalPage === Infinity) {
+            if (limit === null) {
                 totalPage = 1;
             }
             let totalDataOnPage = result.rows.length;
@@ -227,7 +230,7 @@ class Partner {
             let count = await dbClient.query(countDataQuery);
             let totalData = parseInt(count.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
-            if (totalPage === Infinity) {
+            if (limit === null) {
                 totalPage = 1;
             }
             let totalDataOnPage = result.rows.length;
@@ -274,7 +277,7 @@ class Partner {
             let count = await dbClient.query(countDataQuery);
             let totalData = parseInt(count.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
-            if (totalPage === Infinity) {
+            if (limit === null) {
                 totalPage = 1;
             }
             let totalDataOnPage = result.rows.length;
@@ -347,7 +350,7 @@ class Partner {
             let count = await dbClient.query(countDataQuery);
             let totalData = parseInt(count.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
-            if (totalPage === Infinity) {
+            if (limit === null) {
                 totalPage = 1;
             }
             let totalDataOnPage = result.rows.length;
@@ -394,7 +397,7 @@ class Partner {
             let count = await dbClient.query(countDataQuery);
             let totalData = parseInt(count.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
-            if (totalPage === Infinity) {
+            if (limit === null) {
                 totalPage = 1;
             }
             let totalDataOnPage = result.rows.length;
@@ -427,7 +430,7 @@ class Partner {
         try {
             let result = await dbClient.query(getAcquirerQuery);
             if (result.rows.length === 0) {
-                return wrapper.error(new NotFoundError("Issuer not found"));
+                return wrapper.error(new NotFoundError("Acquirer not found"));
             }
             return wrapper.data(result.rows);
         }
