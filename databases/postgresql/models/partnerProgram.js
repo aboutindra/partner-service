@@ -8,6 +8,7 @@ class PartnerProgram {
         this.database = database;
     }
 
+    /* istanbul ignore next */
     async insertProgram(partnerCode, exchangeRate, minAmountPerTransaction, maxAmountPerTransaction, maxTransactionAmountPerDay, maxTransactionAmountPerMonth, 
         startDate, endDate) {
         let status = false;

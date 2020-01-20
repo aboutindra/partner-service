@@ -5,6 +5,7 @@ const { BadRequestError,ForbiddenError } = require('../utilities/error');
 const PartnerProgram = require('../databases/postgresql/models/partnerProgram');
 const partnerProgram = new PartnerProgram(process.env.POSTGRESQL_DATABASE_PARTNER);
 
+/* istanbul ignore next */
 const insertProgram = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
