@@ -16,7 +16,6 @@ const insertPartner = async (request, response) => {
 
     let { code, name, issuerCostPackageId, acquirerCostPackageId, segmentId, urlLogo, unit } = request.body;
     code = code.toUpperCase();
-    name = name.toLowerCase();
 
     let result = await partner.insertPartner(code, name, issuerCostPackageId, acquirerCostPackageId, segmentId, urlLogo, unit);
 
@@ -39,7 +38,6 @@ const updatePartner = async (request, response) => {
 
     let { name, issuerCostPackageId, acquirerCostPackageId, segmentId, urlLogo, unit } = request.body;
     let code = request.params.code.toUpperCase();
-    name = name.toLowerCase();
 
     let result = await partner.updatePartner(code, name, issuerCostPackageId, acquirerCostPackageId, segmentId, urlLogo, unit);
 
