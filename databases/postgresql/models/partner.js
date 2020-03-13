@@ -84,7 +84,7 @@ class Partner {
         }
     }
 
-    async getAllPartner(page = null, limit = null, offset = null) {
+    async getAllPartner(page, limit, offset) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllPartnerQuery = {
             name: "get-partner-list",
@@ -160,7 +160,7 @@ class Partner {
         }
     }
 
-    async getAllActivePartner(page = null, limit = null, offset = null) {
+    async getAllActivePartner(page, limit, offset) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllActivePartnerQuery = {
             name: "get-active-partner-list",
@@ -204,7 +204,7 @@ class Partner {
         }
     }
     
-    async getAllIssuers(page = null, limit = null, offset = null) {
+    async getAllIssuers(page, limit, offset) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllIssuersQuery = {
             name: "get-issuer-list",
@@ -248,7 +248,7 @@ class Partner {
         }
     }
 
-    async getAllActiveIssuers(page = null, limit = null, offset = null) {
+    async getAllActiveIssuers(page, limit, offset) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllActiveIssuersQuery = {
             name: "get-active-issuer-list",
@@ -324,7 +324,7 @@ class Partner {
         }
     }
 
-    async getAllAcquirers(page = null, limit = null, offset = null) {
+    async getAllAcquirers(page, limit, offset) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllAcquirersQuery = {
             name: "get-acquirer-list",
@@ -368,7 +368,7 @@ class Partner {
         }
     }
 
-    async getAllActiveAcquirers(page = null, limit = null, offset = null) {
+    async getAllActiveAcquirers(page, limit, offset) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllActiveAcquirersQuery = {
             name: "get-active-acquirer-list",

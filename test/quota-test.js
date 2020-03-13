@@ -504,4 +504,17 @@ describe("Insert or Update Partner Quota", _ => {
             done();
         });
     });
+
+    it("Sending hearthbeat request", done => {
+
+        chai.request(server)
+        .get("/")
+        .end((error, response) => {
+            response.should.have.status(200);
+            response.body.status.should.equal(true);
+            response.body.message.should.equal("Service is active");
+            expect(response).to.be.json;
+            done();
+        });
+    });
 });

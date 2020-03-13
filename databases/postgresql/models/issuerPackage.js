@@ -64,7 +64,7 @@ class IssuerPackage {
         }
     }
 
-    async getAllPackage(page = null, limit = null, offset = null) {
+    async getAllPackage(page, limit, offset) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllPackagesQuery = {
             name: 'get-issuer-cost-package-list',

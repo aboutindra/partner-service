@@ -66,7 +66,7 @@ class PartnerQuota {
         }
     }
 
-    async getAllQuota(page = null, limit = null, offset = null) {
+    async getAllQuota(page, limit, offset) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllQuotaQuery = {
             name: 'get-all-quota',

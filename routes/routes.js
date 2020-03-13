@@ -24,13 +24,12 @@ function AppServer() {
         res.header("Access-Control-Allow-Origin", "*");
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization, x-access-token");
         res.header('Access-Control-Allow-Methods', "GET,PUT,POST,DELETE,PATCH,OPTIONS");
-        res.sendError = (response, dataSet=[]) => {
-            return response.status(400).json({
-                status: false,
-                data: {},
-                message: dataSet[ 0 ].msg
-            });
-        }
+        next();
+    });
+
+    this.app.use(function(req, res, next) {
+        let ip = req.headers[ 'x-forwarded-for' ] || req.connection.remoteAddress;
+        logger.info(`Request Ip: ${ip}`, "receive request");
         next();
     });
 
@@ -38,11 +37,6 @@ function AppServer() {
     if (process.env.NODE_ENV === 'dev')
     {
         this.app.use(morgan('dev'));
-        this.app.use(function(req, res, next) {
-            let ip = req.headers[ 'x-forwarded-for' ] || req.connection.remoteAddress;
-            logger.info(`Request Ip: ${ip}`, "receive request");
-            next();
-        });
     }
 
     this.app.get('/', (request, response) => {

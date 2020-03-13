@@ -8,7 +8,7 @@ class Discount {
         this.database = database
     }
 
-    async insertDiscount(code, name, deductionDiscountType = null, deductionDiscountAmount = null, additionDiscountType = null, additionDiscountAmount = null, startDate, endDate) {
+    async insertDiscount(code, name, deductionDiscountType, deductionDiscountAmount, additionDiscountType, additionDiscountAmount, startDate, endDate) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let insertDiscountQuery = {
             name: 'insert-discount',
@@ -58,7 +58,7 @@ class Discount {
         }
     }
 
-    async getAllDiscount(page = null, limit = null, offset = null) {
+    async getAllDiscount(page, limit, offset) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllDiscountQuery = {
             name: 'get-discount-history',
