@@ -70,7 +70,8 @@ class PartnerQuota {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllQuotaQuery = {
             name: 'get-all-quota',
-            text: `SELECT partner_code AS "partnerCode", remaining_deduction_quota_per_day AS "remainingQuotaPerDay", remaining_deduction_quota_per_month AS "remainingQuotaPerMonth"
+            text: `SELECT partner_code AS "partnerCode", remaining_deduction_quota_per_day AS "remainingQuotaPerDay",
+                remaining_deduction_quota_per_month AS "remainingQuotaPerMonth"
                 FROM public.partner_quota
                 ORDER BY partner_code
                 LIMIT $1 OFFSET $2;`,
@@ -112,7 +113,8 @@ class PartnerQuota {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getPartnerQuotaQuery = {
             name: 'get-quota-partner',
-            text: `SELECT partner_code AS "partnerCode", remaining_deduction_quota_per_day AS "remainingQuotaPerDay", remaining_deduction_quota_per_month AS "remainingQuotaPerMonth"
+            text: `SELECT partner_code AS "partnerCode", remaining_deduction_quota_per_day AS "remainingQuotaPerDay",
+                remaining_deduction_quota_per_month AS "remainingQuotaPerMonth"
                 FROM public.partner_quota
                 WHERE partner_code = $1`,
             values: [partnerCode]

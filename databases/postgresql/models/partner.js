@@ -88,7 +88,8 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllPartnerQuery = {
             name: "get-partner-list",
-            text: `SELECT code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPacakgeId", name, url_logo AS "urlLogo", unit,
+            text: `SELECT code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPacakgeId",
+                name, url_logo AS "urlLogo", unit,
                 CASE WHEN issuer_cost_package_id IS NOT NULL AND acquirer_cost_package_id IS NOT NULL THEN 'Both'
                     WHEN issuer_cost_package_id IS NOT NULL THEN 'Issuer'
                     WHEN acquirer_cost_package_id IS NOT NULL THEN 'Acquirer'
@@ -136,7 +137,8 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getPartnerQuery = {
             name: "get-partner",
-            text: `SELECT  code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPacakgeId", name, url_logo AS "urlLogo", unit,
+            text: `SELECT  code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPacakgeId",
+                name, url_logo AS "urlLogo", unit,
                 CASE WHEN issuer_cost_package_id IS NOT NULL AND acquirer_cost_package_id IS NOT NULL THEN 'Both'
                     WHEN issuer_cost_package_id IS NOT NULL THEN 'Issuer'
                     WHEN acquirer_cost_package_id IS NOT NULL THEN 'Acquirer'
@@ -164,7 +166,8 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllActivePartnerQuery = {
             name: "get-active-partner-list",
-            text: `SELECT  code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPacakgeId", name, url_logo AS "urlLogo", unit,
+            text: `SELECT  code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPacakgeId",
+                name, url_logo AS "urlLogo", unit,
                 is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.partner
                 WHERE is_deleted = false
@@ -208,7 +211,8 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllIssuersQuery = {
             name: "get-issuer-list",
-            text: `SELECT  code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPacakgeId", name, url_logo AS "urlLogo", unit,
+            text: `SELECT  code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPacakgeId",
+                name, url_logo AS "urlLogo", unit,
                 is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.partner
                 WHERE issuer_cost_package_id IS NOT NULL
@@ -328,7 +332,8 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllAcquirersQuery = {
             name: "get-acquirer-list",
-            text: `SELECT  code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPacakgeId", name, url_logo AS "urlLogo", unit,
+            text: `SELECT  code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPacakgeId",
+                name, url_logo AS "urlLogo", unit,
                 is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.partner
                 WHERE acquirer_cost_package_id IS NOT NULL AND is_deleted = false

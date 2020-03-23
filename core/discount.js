@@ -28,7 +28,8 @@ const insertDiscount = async (request, response) => {
         }
     }
 
-    let result = await discount.insertDiscount(code, name, deductionDiscountType, deductionDiscountAmount, additionDiscountType, additionDiscountAmount, startDate, endDate);
+    let params = {code, name, deductionDiscountType, deductionDiscountAmount, additionDiscountType, additionDiscountAmount, startDate, endDate};
+    let result = await discount.insertDiscount(params);
     if (result.err) {
         wrapper.response(response, false, result);
     } else {

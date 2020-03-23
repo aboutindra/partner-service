@@ -15,10 +15,7 @@ const insertProgram = async (request, response) => {
         return;
     }
 
-    let { partnerCode, exchangeRate, minAmountPerTransaction, maxAmountPerTransaction, maxTransactionAmountPerDay, maxTransactionAmountPerMonth, startDate, endDate } = request.body;
-    partnerCode = partnerCode.toUpperCase();
-
-    let currentProgram = await partnerProgram.getActivePartnerProgram(partnerCode);
+    let currentProgram = await partnerProgram.getActivePartnerProgram(request.body.partnerCode);
     if (currentProgram.err && currentProgram.err.message !== "Active partner program not found") {
         wrapper.response(response, false, currentProgram);
         return;
@@ -29,12 +26,13 @@ const insertProgram = async (request, response) => {
         }
     }
 
-    let result = await partnerProgram.insertProgram(partnerCode, exchangeRate, minAmountPerTransaction, maxAmountPerTransaction, maxTransactionAmountPerDay, maxTransactionAmountPerMonth,
-        new Date(startDate), new Date(endDate));
-    if (result.err) {
-        wrapper.response(response, false, result);
+    request.body.startDate = new Date(request.body.startDate);
+    request.body.endDate = new Date(request.body.endDate);
+    let addPartnerResult = await partnerProgram.insertProgram(request.body);
+    if (addPartnerResult.err) {
+        wrapper.response(response, false, addPartnerResult);
     } else {
-        wrapper.response(response, true, result, "Partner program added", successCode.CREATED);
+        wrapper.response(response, true, addPartnerResult, "Partner program added", successCode.CREATED);
     }
     return;
 }

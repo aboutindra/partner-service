@@ -2,7 +2,7 @@ const { query, param, body } = require('express-validator');
 const moment = require('moment');
 
 exports.validateInsert = [
-    body('partnerCode').not().isEmpty().isLength({ max: 5 }).withMessage("Partner code must be maximum 5 characters"),
+    body('partnerCode').not().isEmpty().isLength({ max: 5 }).customSanitizer(value => {return value.toUpperCase()}).withMessage("Partner code must be maximum 5 characters"),
     body('exchangeRate').isInt({ gt: 0 }).withMessage("Exchange rate must be positive integer greater than 0"),
     body('minAmountPerTransaction').optional({ nullable: true }).isInt({ gt: 0 }).withMessage("Minimum amount per transaction must be positive integer greater than 0"),
     body('maxAmountPerTransaction').optional({ nullable: true }).isInt({ gt: 0 }).withMessage("Maximum amount per transaction must be positive integer greater than 0"),

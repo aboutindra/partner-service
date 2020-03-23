@@ -8,7 +8,8 @@ class Discount {
         this.database = database
     }
 
-    async insertDiscount(code, name, deductionDiscountType, deductionDiscountAmount, additionDiscountType, additionDiscountAmount, startDate, endDate) {
+    async insertDiscount(params) {
+        let {code, name, deductionDiscountType, deductionDiscountAmount, additionDiscountType, additionDiscountAmount, startDate, endDate} = params;
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let insertDiscountQuery = {
             name: 'insert-discount',
