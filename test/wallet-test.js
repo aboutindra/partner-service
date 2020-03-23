@@ -241,4 +241,4 @@ describe("Insert or Update Partner Wallet", _ => {
             done();
         });
     });
-})
+});

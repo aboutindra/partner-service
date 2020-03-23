@@ -308,7 +308,7 @@ describe("Delete Discount", _ => {
 
     it("Sending delete discount request with internal server error response", done => {
         sandbox.stub(pgPool.prototype, 'query').rejects();
-        
+
         chai.request(server)
         .delete(BASE_URL + '/' + PARAMS)
         .query({ code: 'NEWYEAR5'})
@@ -402,7 +402,6 @@ describe("Add Discount", _ => {
         });
     });
 
-    
     it("Sending add discount request without deduction discount amount parameter", done => {
         chai.request(server)
         .post(BASE_URL)

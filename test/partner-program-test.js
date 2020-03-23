@@ -241,7 +241,7 @@ describe("Get Partner Program(s)", _ => {
             done();
         });
     });
-    
+
     it("Sending get partner program request with database connection failure", done => {
         sandbox.stub(pgPool.prototype, 'query').rejects();
 
@@ -715,7 +715,7 @@ describe("Add Partner Program", _ => {
     it("Sending add partner program request with invalid limit transaction parameters", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ partnerCode: "AEST", exchangeRate: 10, startDate: new Date(), endDate: new Date(Date.now() + 1000 * 1000), minAmountPerTransaction: 0, maxAmountPerTransaction: 0, 
+        .send({ partnerCode: "AEST", exchangeRate: 10, startDate: new Date(), endDate: new Date(Date.now() + 1000 * 1000), minAmountPerTransaction: 0, maxAmountPerTransaction: 0,
         maxTransactionAmountPerDay: 0, maxTransactionAmountPerMonth: 0 })
         .end((error, response) => {
             response.should.have.status(400);

@@ -378,4 +378,4 @@ describe("Insert Segment", _ => {
             done();
         });
     });
-})
+});

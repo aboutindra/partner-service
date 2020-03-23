@@ -29,7 +29,7 @@ const insertProgram = async (request, response) => {
         }
     }
 
-    let result = await partnerProgram.insertProgram(partnerCode, exchangeRate, minAmountPerTransaction, maxAmountPerTransaction, maxTransactionAmountPerDay, maxTransactionAmountPerMonth, 
+    let result = await partnerProgram.insertProgram(partnerCode, exchangeRate, minAmountPerTransaction, maxAmountPerTransaction, maxTransactionAmountPerDay, maxTransactionAmountPerMonth,
         new Date(startDate), new Date(endDate));
     if (result.err) {
         wrapper.response(response, false, result);
@@ -50,7 +50,7 @@ const softDeleteProgram = async (request, response) => {
 
     let id = parseInt(request.params.id);
     let result = await partnerProgram.softDeleteProgram(id);
-    
+
     if (result.err) {
         wrapper.response(response, false, result);
     } else {

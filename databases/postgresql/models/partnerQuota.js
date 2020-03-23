@@ -40,12 +40,12 @@ class PartnerQuota {
         let updateQuotaQuery = {
             name: 'update-quota',
             text: `UPDATE public.partner_quota
-                SET remaining_deduction_quota_per_day = (CASE 
+                SET remaining_deduction_quota_per_day = (CASE
                     WHEN remaining_deduction_quota_per_day IS NULL
                         THEN remaining_deduction_quota_per_day
                     ELSE remaining_deduction_quota_per_day - $2
                 END),
-                remaining_deduction_quota_per_month = (CASE 
+                remaining_deduction_quota_per_month = (CASE
                     WHEN remaining_deduction_quota_per_month IS NULL
                         THEN remaining_deduction_quota_per_month
                     ELSE remaining_deduction_quota_per_month - $3

@@ -18,7 +18,6 @@ function addConnectionPool() {
             connectionPool.push(newConnection);
         }
     }
-    
 }
 
 async function createConnectionPool() {

@@ -9,7 +9,7 @@ class PartnerProgram {
     }
 
     /* istanbul ignore next */
-    async insertProgram(partnerCode, exchangeRate, minAmountPerTransaction, maxAmountPerTransaction, maxTransactionAmountPerDay, maxTransactionAmountPerMonth, 
+    async insertProgram(partnerCode, exchangeRate, minAmountPerTransaction, maxAmountPerTransaction, maxTransactionAmountPerDay, maxTransactionAmountPerMonth,
         startDate, endDate) {
         let status = false;
         let timestamp = new Date();
@@ -88,7 +88,7 @@ class PartnerProgram {
         let dbPool = postgresqlWrapper.getConnection(this.database);
         let getAllDiscountQuery = {
             name: 'get-partner-program-list',
-            text: `SELECT id, partner_code AS "partnerCode", exchange_rate AS "exchangeRate", minimum_amount_per_transaction AS "minimumAmountPerTransaction", 
+            text: `SELECT id, partner_code AS "partnerCode", exchange_rate AS "exchangeRate", minimum_amount_per_transaction AS "minimumAmountPerTransaction",
                 maximum_amount_per_transaction as "maximumAmountPerTransaction", maximum_transaction_amount_per_day AS "maximumTransactionAmountPerDay",
                 maximum_transaction_amount_per_month AS "maximumTransactionAmountPerMonth", is_active AS "isActive", start_date AS "startDate", end_date AS "endDate",
                 created_at AS "createdAt", updated_at AS "updatedAt", deactivated_at AS "deactivatedAt"
@@ -132,7 +132,7 @@ class PartnerProgram {
         let dbPool = postgresqlWrapper.getConnection(this.database);
         let getPartnerProgramQuery = {
             name: 'get-partner-program',
-            text: `SELECT id, partner_code AS "partnerCode", exchange_rate AS "exchangeRate", minimum_amount_per_transaction AS "minimumAmountPerTransaction", 
+            text: `SELECT id, partner_code AS "partnerCode", exchange_rate AS "exchangeRate", minimum_amount_per_transaction AS "minimumAmountPerTransaction",
                 maximum_amount_per_transaction as "maximumAmountPerTransaction", maximum_transaction_amount_per_day AS "maximumTransactionAmountPerDay",
                 maximum_transaction_amount_per_month AS "maximumTransactionAmountPerMonth", is_active AS "isActive", start_date AS "startDate", end_date AS "endDate",
                 created_at AS "createdAt", updated_at AS "updatedAt", deactivated_at AS "deactivatedAt"
@@ -157,7 +157,7 @@ class PartnerProgram {
         let dbPool = postgresqlWrapper.getConnection(this.database);
         let getPartnerProgramQuery = {
             name: 'get-program-of-partner',
-            text: `SELECT id, partner_code AS "partnerCode", exchange_rate AS "exchangeRate", minimum_amount_per_transaction AS "minimumAmountPerTransaction", 
+            text: `SELECT id, partner_code AS "partnerCode", exchange_rate AS "exchangeRate", minimum_amount_per_transaction AS "minimumAmountPerTransaction",
                 maximum_amount_per_transaction as "maximumAmountPerTransaction", maximum_transaction_amount_per_day AS "maximumTransactionAmountPerDay",
                 maximum_transaction_amount_per_month AS "maximumTransactionAmountPerMonth", is_active AS "isActive", start_date AS "startDate", end_date AS "endDate",
                 created_at AS "createdAt", updated_at AS "updatedAt", deactivated_at AS "deactivatedAt"

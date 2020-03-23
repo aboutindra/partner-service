@@ -56,7 +56,7 @@ const getDiscounts = async (request, response) => {
         wrapper.response(response, false, error);
         return;
     }
-    
+
     let result;
 
     if (request.query.code) {
@@ -71,7 +71,7 @@ const getDiscounts = async (request, response) => {
             limit = parseInt(request.query.limit);
             offset = limit * (page - 1);
         }
-        
+
         result = await discount.getAllDiscount(page, limit, offset);
     }
 

@@ -203,7 +203,7 @@ class Partner {
             return wrapper.error(new InternalServerError("Internal server error"));
         }
     }
-    
+
     async getAllIssuers(page, limit, offset) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllIssuersQuery = {

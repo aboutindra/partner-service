@@ -35,7 +35,7 @@ const updatePackage = async (request, response) => {
         wrapper.response(response, false, error);
         return;
     }
-    
+
     let id = parseInt(request.params.id);
     let { name, costType } = request.body;
     let amount = Number(request.body.amount);

@@ -13,7 +13,7 @@ const insertPackage = async (request, response) => {
         wrapper.response(response, false, error);
         return;
     }
-    
+
     let { name, costType } = request.body;
     let amount = Number(request.body.amount);
 
@@ -80,7 +80,7 @@ const getPackages = async (request, response) => {
         return;
     }
 
-    let result = undefined;
+    let result = null;
 
     if (request.query.id) {
         let id = parseInt(request.query.id);
@@ -94,7 +94,7 @@ const getPackages = async (request, response) => {
             limit = parseInt(request.query.limit);
             offset = limit * (page - 1);
         }
-        
+
         result = await issuerPackage.getAllPackage(page, limit, offset);
     }
 

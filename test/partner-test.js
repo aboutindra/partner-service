@@ -1386,7 +1386,7 @@ describe("Update Partner", _ => {
             done();
         });
     });
-    
+
     it("Sending update partner request with database connection failure response", done => {
         sandbox.stub(pgPool.prototype, 'query').rejects();
 
@@ -1540,7 +1540,7 @@ describe("Add New Partner", _ => {
             done();
         });
     });
-    
+
     it("Sending add new partner request with database connection failure response", done => {
         sandbox.stub(pgPool.prototype, 'query').rejects();
 
