@@ -26,9 +26,8 @@ const checkErrorCode = (error) => {
     default:
       return httpError.CONFLICT;
     }
-  
   };
-  
+
 const data = (data) => ({ err: null, data});
 
 const paginationData = (data, meta) => ({ err: null, data, meta});

@@ -14,7 +14,8 @@ class Discount {
         let insertDiscountQuery = {
             name: 'insert-discount',
             text: `INSERT INTO public.discount_program(
-                code, name, deduction_discount_type, deduction_discount_amount, addition_discount_type, addition_discount_amount, is_active, start_date, end_date, created_at, updated_at)
+                code, name, deduction_discount_type, deduction_discount_amount, addition_discount_type, addition_discount_amount, is_active, start_date,
+                end_date, created_at, updated_at)
                 VALUES ($1, $2, LOWER($3)::cost_type, $4, LOWER($5)::cost_type, $6, $7, $8, $9, $10, $11);`,
             values: [code, name, deductionDiscountType, deductionDiscountAmount, additionDiscountType, additionDiscountAmount, true, startDate, endDate, new Date(), new Date()]
         }
@@ -131,7 +132,8 @@ class Discount {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getActiveDiscountQuery = {
             name: 'get-active-discount-list',
-            text: `SELECT code, name, deduction_discount_type AS "deductionDiscountType", deduction_discount_amount AS "deductionDiscountAmount", addition_discount_type AS "additionDiscountType",
+            text: `SELECT code, name, deduction_discount_type AS "deductionDiscountType", deduction_discount_amount AS "deductionDiscountAmount",
+                addition_discount_type AS "additionDiscountType",
                 addition_discount_amount AS "additionDiscountAmount"
                 FROM public.discount_program
                 WHERE start_date <= NOW() AND NOW() <= end_date AND is_active = true
