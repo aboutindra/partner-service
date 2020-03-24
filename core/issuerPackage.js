@@ -5,7 +5,7 @@ const issuerPackage = new IssuerPackage(process.env.POSTGRESQL_DATABASE_PARTNER)
 const { SUCCESS:successCode } = require('../utilities/httpStatusCode');
 const { BadRequestError } = require('../utilities/error');
 
-const insertPackage = async (request, response) => {
+const insertIssuerPackage = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
         let error = wrapper.error(new BadRequestError("Invalid input parameter"));
@@ -27,7 +27,7 @@ const insertPackage = async (request, response) => {
     return;
 }
 
-const updatePackage = async (request, response) => {
+const updateIssuerPackage = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
         let error = wrapper.error(new BadRequestError("Invalid input parameter"));
@@ -50,7 +50,7 @@ const updatePackage = async (request, response) => {
     return;
 }
 
-const deletePackage = async (request, response) => {
+const deleteIssuerPackage = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
         let error = wrapper.error(new BadRequestError("Invalid input parameter"));
@@ -71,7 +71,7 @@ const deletePackage = async (request, response) => {
     return;
 }
 
-const getPackages = async (request, response) => {
+const getIssuerPackages = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
         let error = wrapper.error(new BadRequestError("Invalid input parameter"));
@@ -108,8 +108,8 @@ const getPackages = async (request, response) => {
 }
 
 module.exports = {
-    insertPackage,
-    updatePackage,
-    deletePackage,
-    getPackages
+    insertIssuerPackage,
+    updateIssuerPackage,
+    deleteIssuerPackage,
+    getIssuerPackages
 }

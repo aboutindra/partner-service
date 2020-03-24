@@ -48,11 +48,11 @@ class Partner {
         }
 
         try {
-            let result = await dbClient.query(updatePartnerQuery);
-            if (result.rowCount === 0) {
+            let updatePartnerResult = await dbClient.query(updatePartnerQuery);
+            if (updatePartnerResult.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Partner not found"));
             }
-            return wrapper.data(result.rows);
+            return wrapper.data(updatePartnerResult.rows);
         }
         catch (error) {
             if (error.code === errorCode.FOREIGN_KEY_VIOLATION) {
@@ -73,11 +73,11 @@ class Partner {
         }
 
         try {
-            let result = await dbClient.query(deleteDiscountQuery);
-            if (result.rowCount === 0) {
+            let deletePartnerResult = await dbClient.query(deleteDiscountQuery);
+            if (deletePartnerResult.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Partner not found"));
             }
-            return wrapper.data(result.rows);
+            return wrapper.data(deletePartnerResult.rows);
         }
         catch (error) {
             return wrapper.error(new InternalServerError("Internal server error"));
@@ -108,17 +108,17 @@ class Partner {
         }
 
         try {
-            let result = await dbClient.query(getAllPartnerQuery);
-            if (result.rows.length === 0) {
+            let getAllPartnersResult = await dbClient.query(getAllPartnerQuery);
+            if (getAllPartnersResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Partner(s) not found"));
             }
-            let count = await dbClient.query(countDataQuery);
-            let totalData = parseInt(count.rows[0].count);
+            let countAllPartnersResult = await dbClient.query(countDataQuery);
+            let totalData = parseInt(countAllPartnersResult.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = result.rows.length;
+            let totalDataOnPage = getAllPartnersResult.rows.length;
             let meta = {
                 page: page || 1,
                 totalData,
@@ -126,7 +126,7 @@ class Partner {
                 totalDataOnPage
             }
 
-            return wrapper.paginationData(result.rows, meta);
+            return wrapper.paginationData(getAllPartnersResult.rows, meta);
         }
         catch (error) {
             return wrapper.error(new InternalServerError("Internal server error"));
@@ -151,11 +151,11 @@ class Partner {
         }
 
         try {
-            let result = await dbClient.query(getPartnerQuery);
-            if (result.rows.length === 0) {
+            let getPartnerByCodeResult = await dbClient.query(getPartnerQuery);
+            if (getPartnerByCodeResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Partner(s) not found"));
             }
-            return wrapper.data(result.rows);
+            return wrapper.data(getPartnerByCodeResult.rows);
         }
         catch (error) {
             return wrapper.error(new InternalServerError("Internal server error"));
@@ -182,17 +182,17 @@ class Partner {
                 WHERE is_deleted = false;`
         }
         try {
-            let result = await dbClient.query(getAllActivePartnerQuery);
-            if (result.rows.length === 0) {
+            let getAllActivePartnerResult = await dbClient.query(getAllActivePartnerQuery);
+            if (getAllActivePartnerResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Partner(s) not found"));
             }
-            let count = await dbClient.query(countDataQuery);
-            let totalData = parseInt(count.rows[0].count);
+            let countAllActivePartnerResult = await dbClient.query(countDataQuery);
+            let totalData = parseInt(countAllActivePartnerResult.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = result.rows.length;
+            let totalDataOnPage = getAllActivePartnerResult.rows.length;
             let meta = {
                 page: page || 1,
                 totalData,
@@ -200,7 +200,7 @@ class Partner {
                 totalDataOnPage
             }
 
-            return wrapper.paginationData(result.rows, meta);
+            return wrapper.paginationData(getAllActivePartnerResult.rows, meta);
         }
         catch (error) {
             return wrapper.error(new InternalServerError("Internal server error"));
@@ -227,17 +227,17 @@ class Partner {
                 WHERE issuer_cost_package_id IS NOT NULL;`
         }
         try {
-            let result = await dbClient.query(getAllIssuersQuery);
-            if (result.rows.length === 0) {
+            let getAllIssuersResult = await dbClient.query(getAllIssuersQuery);
+            if (getAllIssuersResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Partner(s) not found"));
             }
-            let count = await dbClient.query(countDataQuery);
-            let totalData = parseInt(count.rows[0].count);
+            let countAllIssuersResult = await dbClient.query(countDataQuery);
+            let totalData = parseInt(countAllIssuersResult.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = result.rows.length;
+            let totalDataOnPage = getAllIssuersResult.rows.length;
             let meta = {
                 page: page || 1,
                 totalData,
@@ -245,7 +245,7 @@ class Partner {
                 totalDataOnPage
             }
 
-            return wrapper.paginationData(result.rows, meta);
+            return wrapper.paginationData(getAllIssuersResult.rows, meta);
         }
         catch (error) {
             return wrapper.error(new InternalServerError("Internal server error"));
@@ -274,17 +274,17 @@ class Partner {
                 AND partners.issuer_cost_package_id IS NOT NULL AND partners.is_deleted = false`
         }
         try {
-            let result = await dbClient.query(getAllActiveIssuersQuery);
-            if (result.rows.length === 0) {
+            let getAllActiveIssuersResult = await dbClient.query(getAllActiveIssuersQuery);
+            if (getAllActiveIssuersResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Partner(s) not found"));
             }
-            let count = await dbClient.query(countDataQuery);
-            let totalData = parseInt(count.rows[0].count);
+            let countAllActiveIssuersResult = await dbClient.query(countDataQuery);
+            let totalData = parseInt(countAllActiveIssuersResult.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = result.rows.length;
+            let totalDataOnPage = getAllActiveIssuersResult.rows.length;
             let meta = {
                 page: page || 1,
                 totalData,
@@ -292,7 +292,7 @@ class Partner {
                 totalDataOnPage
             }
 
-            return wrapper.paginationData(result.rows, meta);
+            return wrapper.paginationData(getAllActiveIssuersResult.rows, meta);
         }
         catch (error) {
             return wrapper.error(new InternalServerError("Internal server error"));
@@ -317,11 +317,11 @@ class Partner {
             values: [partnerCode]
         }
         try {
-            let result = await dbClient.query(getIssuerQuery);
-            if (result.rows.length === 0) {
+            let getIssuerResult = await dbClient.query(getIssuerQuery);
+            if (getIssuerResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Issuer not found"));
             }
-            return wrapper.data(result.rows);
+            return wrapper.data(getIssuerResult.rows);
         }
         catch (error) {
             return wrapper.error(new InternalServerError("Internal server error"));
@@ -348,17 +348,17 @@ class Partner {
                 WHERE acquirer_cost_package_id IS NOT NULL;`
         }
         try {
-            let result = await dbClient.query(getAllAcquirersQuery);
-            if (result.rows.length === 0) {
+            let getAllAcquirersResult = await dbClient.query(getAllAcquirersQuery);
+            if (getAllAcquirersResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Partner(s) not found"));
             }
-            let count = await dbClient.query(countDataQuery);
-            let totalData = parseInt(count.rows[0].count);
+            let countAllAcquirersResult = await dbClient.query(countDataQuery);
+            let totalData = parseInt(countAllAcquirersResult.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = result.rows.length;
+            let totalDataOnPage = getAllAcquirersResult.rows.length;
             let meta = {
                 page: page || 1,
                 totalData,
@@ -366,7 +366,7 @@ class Partner {
                 totalDataOnPage
             }
 
-            return wrapper.paginationData(result.rows, meta);
+            return wrapper.paginationData(getAllAcquirersResult.rows, meta);
         }
         catch (error) {
             return wrapper.error(new InternalServerError("Internal server error"));
@@ -395,8 +395,8 @@ class Partner {
                 AND partners.acquirer_cost_package_id IS NOT NULL AND partners.is_deleted = false`
         }
         try {
-            let result = await dbClient.query(getAllActiveAcquirersQuery);
-            if (result.rows.length === 0) {
+            let getAllActiveAcquirersResult = await dbClient.query(getAllActiveAcquirersQuery);
+            if (getAllActiveAcquirersResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Partner(s) not found"));
             }
             let count = await dbClient.query(countDataQuery);
@@ -405,7 +405,7 @@ class Partner {
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = result.rows.length;
+            let totalDataOnPage = getAllActiveAcquirersResult.rows.length;
             let meta = {
                 page: page || 1,
                 totalData,
@@ -413,7 +413,7 @@ class Partner {
                 totalDataOnPage
             }
 
-            return wrapper.paginationData(result.rows, meta);
+            return wrapper.paginationData(getAllActiveAcquirersResult.rows, meta);
         }
         catch (error) {
             return wrapper.error(new InternalServerError("Internal server error"));
@@ -433,11 +433,11 @@ class Partner {
             values: [partnerCode]
         }
         try {
-            let result = await dbClient.query(getAcquirerQuery);
-            if (result.rows.length === 0) {
+            let getAcquireResult = await dbClient.query(getAcquirerQuery);
+            if (getAcquireResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Acquirer not found"));
             }
-            return wrapper.data(result.rows);
+            return wrapper.data(getAcquireResult.rows);
         }
         catch (error) {
             return wrapper.error(new InternalServerError("Internal server error"));
