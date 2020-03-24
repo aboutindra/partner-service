@@ -14,9 +14,7 @@ exports.validateUpdateAcquirerPackage = [
 ]
 
 exports.validateGetAcquirerPackage = [
-    query('id').optional({ nullable: true }).isInt({ min: 0 }).withMessage("Id must be filled with integer greater than equal 0"),
-    query('page').optional({ nullable: true }).isInt({ min: 1 }).withMessage("Page must be filled with integer greater than 0"),
-    query('limit').optional({ nullable: true }).isInt({ min: 1 }).withMessage("Limit must be filled with integer greater than 0"),
+    query('id').optional({ nullable: true }).isInt({ min: 0 }).withMessage("Id must be filled with integer greater than equal 0")
 ]
 
 exports.validateDeleteAcquirerPackage = [

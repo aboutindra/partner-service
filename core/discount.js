@@ -64,15 +64,7 @@ const getDiscounts = async (request, response) => {
         let code = request.query.code.toUpperCase();
         result = await discount.getDiscountByCode(code);
     } else {
-        let page = null;
-        let limit = null;
-        let offset = null;
-        if (request.query.page && request.query.limit) {
-            page = parseInt(request.query.page);
-            limit = parseInt(request.query.limit);
-            offset = limit * (page - 1);
-        }
-
+        let {page, limit, offset} = request.query;
         result = await discount.getAllDiscount(page, limit, offset);
     }
 

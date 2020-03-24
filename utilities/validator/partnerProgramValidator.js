@@ -1,9 +1,8 @@
 const { query, param, body } = require('express-validator');
-const moment = require('moment');
-const dateValidator = require('./validateDateFormat');
+const dateValidator = require('./dateFormatValidator');
 
 exports.validateInsertPartnerProgram = [
-    body('partnerCode').not().isEmpty().isLength({ max: 5 }).customSanitizer(value => {return value.toUpperCase()}).withMessage("Partner code must be maximum 5 characters"),
+    body('partnerCode').not().isEmpty().isLength({ max: 5 }).customSanitizer(upperingCase).withMessage("Partner code must be maximum 5 characters"),
     body('exchangeRate').isInt({ gt: 0 }).withMessage("Exchange rate must be positive integer greater than 0"),
     body('minAmountPerTransaction').optional({ nullable: true }).isInt({ gt: 0 }).withMessage("Minimum amount per transaction must be positive integer greater than 0"),
     body('maxAmountPerTransaction').optional({ nullable: true }).isInt({ gt: 0 }).withMessage("Maximum amount per transaction must be positive integer greater than 0"),
@@ -19,7 +18,11 @@ exports.validateDeletePartnerProgram = [
 ]
 
 exports.validateGetPartnerProgram = [
-    query('id').optional({ nullable: true }).isInt({ min: 1 }).withMessage("Id must be filled with integer greater than 0"),
-    query('page').optional({ nullable: true }).isInt({ min: 1 }).withMessage("Page must be filled with integer greater than 0"),
-    query('limit').optional({ nullable: true }).isInt({ min: 1 }).withMessage("Limit must be filled with integer greater than 0"),
+    query('id').optional({ nullable: true }).isInt({ min: 1 }).withMessage("Id must be filled with integer greater than 0")
 ]
+
+function upperingCase (value) {
+    if (value) {
+        return value.toUpperCase();
+    }
+}

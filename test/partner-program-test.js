@@ -9,7 +9,95 @@ const pgPool = require('pg-pool');
 
 chai.use(chaiHttp);
 
-describe("Get Partner Program(s)", _ => {
+describe("Get Partner Program", _ => {
+    it("Sending get partner program request with invalid id query parameter", done => {
+        chai.request(server)
+        .get(BASE_URL)
+        .query({ id: 0 })
+        .end((error, response) => {
+            response.should.have.status(400);
+            response.body.status.should.equal(false);
+            response.body.message.should.equal("Invalid input parameter");
+            expect(response).to.be.json;
+            done();
+        });
+    });
+
+    it("Sending get partner program request with database connection failure", done => {
+        sandbox.stub(pgPool.prototype, 'query').rejects();
+
+        chai.request(server)
+        .get(BASE_URL)
+        .query({ id: 2 })
+        .end((error, response) => {
+            sandbox.restore();
+            response.should.have.status(500);
+            response.body.status.should.equal(false);
+            response.body.message.should.equal("Internal server error");
+            expect(response).to.be.json;
+            done();
+        });
+    });
+
+    it("Sending get partner program request with empty partner program detail", done => {
+        let queryResult = {
+            rowCount: 0,
+            rows: []
+        }
+        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+
+        chai.request(server)
+        .get(BASE_URL)
+        .query({ id: 2 })
+        .end((error, response) => {
+            sandbox.restore();
+            response.should.have.status(404);
+            response.body.status.should.equal(false);
+            response.body.message.should.equal("Partner program not found");
+            expect(response).to.be.json;
+            done();
+        });
+    });
+
+    it("Sending get partner program request with partner program detail", done => {
+        let queryResult = {
+            rowCount: 1,
+            rows: [
+                {
+                    "id": 2,
+                    "partnerCode": "LKJ",
+                    "exchangeRate": 1,
+                    "minimumAmountPerTransaction": null,
+                    "maximumAmountPerTransaction": null,
+                    "maximumTransactionAmountPerDay": null,
+                    "maximumTransactionAmountPerMonth": null,
+                    "isActive": false,
+                    "startDate": "2019-11-25T17:00:00.000Z",
+                    "endDate": "2020-02-03T17:00:00.000Z",
+                    "createdAt": "2019-12-04T04:39:26.146Z",
+                    "updatedAt": "2019-12-04T05:36:16.692Z",
+                    "deactivatedAt": "2019-12-04T05:36:16.692Z"
+                }
+            ]
+        }
+
+        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+
+        chai.request(server)
+        .get(BASE_URL)
+        .query({ id: 2 })
+        .end((error, response) => {
+            sandbox.restore();
+            response.should.have.status(200);
+            response.body.status.should.equal(true);
+            response.body.message.should.equal("Partner program(s) retrieved");
+            expect(response).to.be.json;
+            done();
+        });
+    });
+});
+
+describe("Get Partner Programs", () => {
     it("Sending get all partner program request with invalid page query parameter", done => {
         chai.request(server)
         .get(BASE_URL)
@@ -228,95 +316,9 @@ describe("Get Partner Program(s)", _ => {
             done();
         });
     });
-
-    it("Sending get partner program request with invalid id query parameter", done => {
-        chai.request(server)
-        .get(BASE_URL)
-        .query({ id: 0 })
-        .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
-            done();
-        });
-    });
-
-    it("Sending get partner program request with database connection failure", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
-
-        chai.request(server)
-        .get(BASE_URL)
-        .query({ id: 2 })
-        .end((error, response) => {
-            sandbox.restore();
-            response.should.have.status(500);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Internal server error");
-            expect(response).to.be.json;
-            done();
-        });
-    });
-
-    it("Sending get partner program request with empty partner program detail", done => {
-        let queryResult = {
-            rowCount: 0,
-            rows: []
-        }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
-
-        chai.request(server)
-        .get(BASE_URL)
-        .query({ id: 2 })
-        .end((error, response) => {
-            sandbox.restore();
-            response.should.have.status(404);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Partner program not found");
-            expect(response).to.be.json;
-            done();
-        });
-    });
-
-    it("Sending get partner program request with partner program detail", done => {
-        let queryResult = {
-            rowCount: 1,
-            rows: [
-                {
-                    "id": 2,
-                    "partnerCode": "LKJ",
-                    "exchangeRate": 1,
-                    "minimumAmountPerTransaction": null,
-                    "maximumAmountPerTransaction": null,
-                    "maximumTransactionAmountPerDay": null,
-                    "maximumTransactionAmountPerMonth": null,
-                    "isActive": false,
-                    "startDate": "2019-11-25T17:00:00.000Z",
-                    "endDate": "2020-02-03T17:00:00.000Z",
-                    "createdAt": "2019-12-04T04:39:26.146Z",
-                    "updatedAt": "2019-12-04T05:36:16.692Z",
-                    "deactivatedAt": "2019-12-04T05:36:16.692Z"
-                }
-            ]
-        }
-
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
-
-        chai.request(server)
-        .get(BASE_URL)
-        .query({ id: 2 })
-        .end((error, response) => {
-            sandbox.restore();
-            response.should.have.status(200);
-            response.body.status.should.equal(true);
-            response.body.message.should.equal("Partner program(s) retrieved");
-            expect(response).to.be.json;
-            done();
-        });
-    });
 });
 
-describe("Get All Programs of a Partner", _ => {
+describe("Get All Programs of a Partner with invalid page and limit", () => {
     let PARAMS = 'LKJ';
     it("Sending get all programs of a partner request with invalid page query parameter", done => {
         chai.request(server)
@@ -343,7 +345,10 @@ describe("Get All Programs of a Partner", _ => {
             done();
         });
     });
+})
 
+describe("Get All Programs of a Partner", _ => {
+    let PARAMS = 'LKJ';
     it("Sending get all programs of a partner request with database connection failure (main query)", done => {
         sandbox.stub(pgPool.prototype, 'query').rejects();
 
@@ -476,7 +481,7 @@ describe("Get All Programs of a Partner", _ => {
         });
     });
 
-    it("Sending get all programs of a partner request with partner program list (without query parameters)", done => {
+    it("Sending get all programs of a partner request with partner program list (with query parameters)", done => {
         let queryResult = {
             rowCount: 2,
             rows: [

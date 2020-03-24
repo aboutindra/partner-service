@@ -85,7 +85,7 @@ class PartnerProgram {
         }
     }
 
-    async getAllProgram(page, limit = null, offset = null) {
+    async getAllProgram(page, limit, offset) {
         let dbPool = postgresqlWrapper.getConnection(this.database);
         let getAllPartnerProgramQuery = {
             name: 'get-partner-program-list',

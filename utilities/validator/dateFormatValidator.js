@@ -1,3 +1,5 @@
+const moment = require('moment');
+
 exports.validateDate = function(dateString) {
     let date = moment(dateString);
     if (date.isValid()) {

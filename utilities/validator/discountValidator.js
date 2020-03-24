@@ -1,6 +1,5 @@
 const { query, body } = require('express-validator');
-const moment = require('moment');
-const dateValidator = require('./validateDateFormat');
+const dateValidator = require('./dateFormatValidator');
 
 exports.validateInsertDiscount = [
     body('code').not().isEmpty().isLength({ max: 10 }).withMessage("Code must be maximum 10 characters"),
@@ -18,7 +17,3 @@ exports.validateInsertDiscount = [
     body('endDate').custom(dateValidator.validateDate).withMessage("End date must be in UTC, ISO-8601, or RFC 2822 format")
 ]
 
-exports.validateGetDiscount = [
-    query('page').optional({ nullable: true }).isInt({ min: 1 }).withMessage("Page must be filled with integer greater than 0"),
-    query('limit').optional({ nullable: true }).isInt({ min: 1 }).withMessage("Limit must be filled with integer greater than 0"),
-]

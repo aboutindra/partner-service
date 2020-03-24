@@ -14,8 +14,3 @@ exports.validateUpdatePartner = [
     body('urlLogo').not().isEmpty().withMessage("Url logo can not be empty"),
     body('unit').not().isEmpty().withMessage("Unit can not be empty")
 ]
-
-exports.validateGetPartner = [
-    query('page').optional({ nullable: true }).isInt({ min: 1 }).withMessage("Page must be filled with integer greater than 0"),
-    query('limit').optional({ nullable: true }).isInt({ min: 1 }).withMessage("Limit must be filled with integer greater than 0"),
-]

@@ -1,24 +1,100 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('../index');
-const should = chai.should();
-const expect = chai.expect;
 const sandbox = require('sinon').createSandbox();
 const BASE_URL = "/api/v1/packages/issuers";
 const pgPool = require('pg-pool');
+const responseValidator = require('./responseValidator');
 
 chai.use(chaiHttp);
 
-describe("Get issuer Package(s)", _ => {
+describe("Get issuer Package", _ => {
+    it("Sending get package request with invalid id parameter (negative number)", done => {
+        chai.request(server)
+        .get(BASE_URL)
+        .query({ id: -3 })
+        .end((error, response) => {
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
+            done();
+        });
+    });
+
+    it("Sending get package request with invalid id parameter (alphabet)", done => {
+        chai.request(server)
+        .get(BASE_URL)
+        .query({ id: 'sys' })
+        .end((error, response) => {
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
+            done();
+        });
+    });
+
+    it("Sending get package request with database connection failure", done => {
+        sandbox.stub(pgPool.prototype, 'query').rejects();
+
+        chai.request(server)
+        .get(BASE_URL)
+        .query({ id: 1 })
+        .end((error, response) => {
+            sandbox.restore();
+            responseValidator.validateResponse(response, "Internal server error", false, 500);
+            done();
+        });
+    });
+
+    it("Sending get package request with package not found response", done => {
+        let queryResult = {
+            rowCount: 0,
+            rows: []
+        }
+        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+
+        chai.request(server)
+        .get(BASE_URL)
+        .query({ id: 1 })
+        .end((error, response) => {
+            sandbox.restore();
+            responseValidator.validateResponse(response, "Package not found", false, 404);
+            done();
+        });
+    });
+
+    it("Sending get package request with package detail response", done => {
+        let queryResult = {
+            rowCount: 1,
+            rows: [
+                {
+                    "id": 1,
+                    "name": "Trial",
+                    "costType": "fixed",
+                    "amount": "300.00",
+                    "isDeleted": false,
+                    "createdAt": "2019-12-03T07:56:37.573Z",
+                    "updatedAt": "2019-12-03T08:11:55.468Z",
+                    "deletedAt": null
+                }
+            ]
+        }
+        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+
+        chai.request(server)
+        .get(BASE_URL)
+        .query({ id: 1 })
+        .end((error, response) => {
+            sandbox.restore();
+            responseValidator.validateResponse(response, "Package(s) retrieved", true, 200);
+            done();
+        });
+    });
+});
+
+describe("Get Issuer Package", () => {
     it("Sending get all packages request with invalid page parameter", done => {
         chai.request(server)
         .get(BASE_URL)
         .query({ page: 0, limit: 10 })
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Page & Limit must be positive integer value", false, 400);
             done();
         });
     });
@@ -28,10 +104,7 @@ describe("Get issuer Package(s)", _ => {
         .get(BASE_URL)
         .query({ page: 1, limit: 0 })
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Page & Limit must be positive integer value", false, 400);
             done();
         });
     });
@@ -44,10 +117,7 @@ describe("Get issuer Package(s)", _ => {
         .query({ page: 1, limit: 10 })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(500);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Internal server error");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
@@ -77,10 +147,7 @@ describe("Get issuer Package(s)", _ => {
         .query({ page: 1, limit: 10 })
         .end((error, response) => {
             pool.restore();
-            response.should.have.status(500);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Internal server error");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
@@ -98,10 +165,7 @@ describe("Get issuer Package(s)", _ => {
         .query({ page: 1, limit: 10 })
         .end((error, response) => {
             pool.restore();
-            response.should.have.status(404);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Package(s) not found");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Package(s) not found", false, 404);
             done();
         });
     });
@@ -148,10 +212,7 @@ describe("Get issuer Package(s)", _ => {
         .query({ page: 1, limit: 2 })
         .end((error, response) => {
             pool.restore();
-            response.should.have.status(200);
-            response.body.status.should.equal(true);
-            response.body.message.should.equal("Package(s) retrieved");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Package(s) retrieved", true, 200);
             done();
         });
     });
@@ -197,107 +258,12 @@ describe("Get issuer Package(s)", _ => {
         .get(BASE_URL)
         .end((error, response) => {
             pool.restore();
-            response.should.have.status(200);
-            response.body.status.should.equal(true);
-            response.body.message.should.equal("Package(s) retrieved");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Package(s) retrieved", true, 200);
             done();
         });
     });
 
-    it("Sending get package request with invalid id parameter (negative number)", done => {
-        chai.request(server)
-        .get(BASE_URL)
-        .query({ id: -3 })
-        .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
-            done();
-        });
-    });
-
-    it("Sending get package request with invalid id parameter (alphabet)", done => {
-        chai.request(server)
-        .get(BASE_URL)
-        .query({ id: 'sys' })
-        .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
-            done();
-        });
-    });
-
-    it("Sending get package request with database connection failure", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
-
-        chai.request(server)
-        .get(BASE_URL)
-        .query({ id: 1 })
-        .end((error, response) => {
-            sandbox.restore();
-            response.should.have.status(500);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Internal server error");
-            expect(response).to.be.json;
-            done();
-        });
-    });
-
-    it("Sending get package request with package not found response", done => {
-        let queryResult = {
-            rowCount: 0,
-            rows: []
-        }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
-
-        chai.request(server)
-        .get(BASE_URL)
-        .query({ id: 1 })
-        .end((error, response) => {
-            sandbox.restore();
-            response.should.have.status(404);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Package not found");
-            expect(response).to.be.json;
-            done();
-        });
-    });
-
-    it("Sending get package request with package detail response", done => {
-        let queryResult = {
-            rowCount: 1,
-            rows: [
-                {
-                    "id": 1,
-                    "name": "Trial",
-                    "costType": "fixed",
-                    "amount": "300.00",
-                    "isDeleted": false,
-                    "createdAt": "2019-12-03T07:56:37.573Z",
-                    "updatedAt": "2019-12-03T08:11:55.468Z",
-                    "deletedAt": null
-                }
-            ]
-        }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
-
-        chai.request(server)
-        .get(BASE_URL)
-        .query({ id: 1 })
-        .end((error, response) => {
-            sandbox.restore();
-            response.should.have.status(200);
-            response.body.status.should.equal(true);
-            response.body.message.should.equal("Package(s) retrieved");
-            expect(response).to.be.json;
-            done();
-        });
-    });
-});
+})
 
 describe("Delete issuer Package", _ => {
     let PARAMS = 1;
@@ -306,10 +272,7 @@ describe("Delete issuer Package", _ => {
         chai.request(server)
         .delete(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -319,10 +282,7 @@ describe("Delete issuer Package", _ => {
         chai.request(server)
         .delete(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -338,10 +298,7 @@ describe("Delete issuer Package", _ => {
         .delete(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(404);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Package not found");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Package not found", false, 404);
             done();
         });
     });
@@ -353,10 +310,7 @@ describe("Delete issuer Package", _ => {
         .delete(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(500);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Internal server error");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
@@ -372,10 +326,7 @@ describe("Delete issuer Package", _ => {
         .delete(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(200);
-            response.body.status.should.equal(true);
-            response.body.message.should.equal("Package deleted");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Package deleted", true, 200);
             done();
         });
     });
@@ -388,10 +339,7 @@ describe("Update issuer Package", _ => {
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -401,10 +349,7 @@ describe("Update issuer Package", _ => {
         .put(BASE_URL + '/' + PARAMS)
         .send({ costType: 'fixed', amount: 100 })
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -414,10 +359,7 @@ describe("Update issuer Package", _ => {
         .put(BASE_URL + '/' + PARAMS)
         .send({ name: 'BASIC', amount: 100 })
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -427,10 +369,7 @@ describe("Update issuer Package", _ => {
         .put(BASE_URL + '/' + PARAMS)
         .send({ costType: 'fixed', name: 'BASIC' })
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -440,10 +379,7 @@ describe("Update issuer Package", _ => {
         .put(BASE_URL + '/' + PARAMS)
         .send({ name: 'BASIC', costType: 'fixed', amount: -1 })
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -453,10 +389,7 @@ describe("Update issuer Package", _ => {
         .put(BASE_URL + '/' + PARAMS)
         .send({ name: 'BASIC', costType: 'fixed', amount: 'sys' })
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -466,10 +399,7 @@ describe("Update issuer Package", _ => {
         .put(BASE_URL + '/' + PARAMS)
         .send({ name: 'BASIC', costType: 'empty', amount: 100 })
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -485,10 +415,7 @@ describe("Update issuer Package", _ => {
         .send({ name: 'BASIC', costType: 'fixed', amount: 100 })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(403);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Package name already exist");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Package name already exist", false, 403);
             done();
         });
     });
@@ -504,10 +431,7 @@ describe("Update issuer Package", _ => {
         .send({ name: 'BASIC', costType: 'fixed', amount: 100 })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(403);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid type value");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid type value", false, 403);
             done();
         });
     });
@@ -520,10 +444,7 @@ describe("Update issuer Package", _ => {
         .send({ name: 'BASIC', costType: 'fixed', amount: 100 })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(500);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Internal server error");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
@@ -540,10 +461,7 @@ describe("Update issuer Package", _ => {
         .send({ name: 'BASIC', costType: 'fixed', amount: 100 })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(404);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Package(s) not found");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Package(s) not found", false, 404);
             done();
         });
     });
@@ -560,10 +478,7 @@ describe("Update issuer Package", _ => {
         .send({ name: 'BASIC', costType: 'fixed', amount: 100 })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(200);
-            response.body.status.should.equal(true);
-            response.body.message.should.equal("Package updated");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Package updated", true, 200);
             done();
         });
     });
@@ -574,10 +489,7 @@ describe("Insert issuer Package", _ => {
         chai.request(server)
         .post(BASE_URL)
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -587,10 +499,7 @@ describe("Insert issuer Package", _ => {
         .post(BASE_URL)
         .send({ costType: 'fixed', amount: 100 })
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -600,10 +509,7 @@ describe("Insert issuer Package", _ => {
         .post(BASE_URL)
         .send({ name: 'BASIC', amount: 100 })
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -613,10 +519,7 @@ describe("Insert issuer Package", _ => {
         .post(BASE_URL)
         .send({ costType: 'fixed', name: 'BASIC' })
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -626,10 +529,7 @@ describe("Insert issuer Package", _ => {
         .post(BASE_URL)
         .send({ name: 'BASIC', costType: 'fixed', amount: -1 })
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -639,10 +539,7 @@ describe("Insert issuer Package", _ => {
         .post(BASE_URL)
         .send({ name: 'BASIC', costType: 'fixed', amount: 'sys' })
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -652,10 +549,7 @@ describe("Insert issuer Package", _ => {
         .post(BASE_URL)
         .send({ name: 'BASIC', costType: 'empty', amount: 100 })
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -671,10 +565,7 @@ describe("Insert issuer Package", _ => {
         .send({ name: 'BASIC', costType: 'fixed', amount: 100 })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(403);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Package name already exist");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Package name already exist", false, 403);
             done();
         });
     });
@@ -690,10 +581,7 @@ describe("Insert issuer Package", _ => {
         .send({ name: 'BASIC', costType: 'fixed', amount: 100 })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(403);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid type value");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid type value", false, 403);
             done();
         });
     });
@@ -706,10 +594,7 @@ describe("Insert issuer Package", _ => {
         .send({ name: 'BASIC', costType: 'fixed', amount: 100 })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(500);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Internal server error");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
@@ -726,10 +611,7 @@ describe("Insert issuer Package", _ => {
         .send({ name: 'BASIC', costType: 'fixed', amount: 100 })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(404);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Failed add new package");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Failed add new package", false, 404);
             done();
         });
     });
@@ -746,10 +628,7 @@ describe("Insert issuer Package", _ => {
         .send({ name: 'BASIC', costType: 'fixed', amount: 100 })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(201);
-            response.body.status.should.equal(true);
-            response.body.message.should.equal("Package added");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Package added", true, 201);
             done();
         });
     });

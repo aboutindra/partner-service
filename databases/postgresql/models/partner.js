@@ -274,11 +274,11 @@ class Partner {
                 AND partners.issuer_cost_package_id IS NOT NULL AND partners.is_deleted = false`
         }
         try {
-            let getAllActiveIssuersResult = await dbClient.query(countActiveIssuersQuery);
+            let getAllActiveIssuersResult = await dbClient.query(getAllActiveIssuersQuery);
             if (getAllActiveIssuersResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Partner(s) not found"));
             }
-            let countAllActiveIssuersResult = await dbClient.query(countDataQuery);
+            let countAllActiveIssuersResult = await dbClient.query(countActiveIssuersQuery);
             let totalData = parseInt(countAllActiveIssuersResult.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {

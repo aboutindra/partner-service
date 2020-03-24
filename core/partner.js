@@ -75,15 +75,7 @@ const getPartners = async (request, response) => {
         let code = request.query.code.toUpperCase();
         getPartnerResult = await partner.getPartnerByCode(code);
     } else {
-        let page = null;
-        let limit = null;
-        let offset = null;
-        if (request.query.page && request.query.limit) {
-            page = parseInt(request.query.page);
-            limit = parseInt(request.query.limit);
-            offset = limit * (page - 1);
-        }
-
+        let {page, limit, offset} = request.query;
         getPartnerResult = await partner.getAllPartner(page, limit, offset);
     }
 
@@ -104,15 +96,7 @@ const getActivePartners = async (request, response) => {
         return;
     }
 
-    let page = null;
-    let limit = null;
-    let offset = null;
-    if (request.query.page && request.query.limit) {
-        page = parseInt(request.query.page);
-        limit = parseInt(request.query.limit);
-        offset = limit * (page - 1);
-    }
-
+    let {page, limit, offset} = request.query;
     let getActivePartnerResult = await partner.getAllActivePartner(page, limit, offset);
 
     if (getActivePartnerResult.err) {
@@ -146,15 +130,7 @@ const getIssuers = async (request, response) => {
         return;
     }
 
-    let page = null;
-    let limit = null;
-    let offset = null;
-    if (request.query.page && request.query.limit) {
-        page = parseInt(request.query.page);
-        limit = parseInt(request.query.limit);
-        offset = limit * (page - 1);
-    }
-
+    let {page, limit, offset} = request.query;
     let getIssuersResult = await partner.getAllIssuers(page, limit, offset);
 
     if (getIssuersResult.err) {
@@ -174,15 +150,7 @@ const getActiveIssuers = async (request, response) => {
         return;
     }
 
-    let page = null;
-    let limit = null;
-    let offset = null;
-    if (request.query.page && request.query.limit) {
-        page = parseInt(request.query.page);
-        limit = parseInt(request.query.limit);
-        offset = limit * (page - 1);
-    }
-
+    let {page, limit, offset} = request.query;
     let getActiveIssuersResult = await partner.getAllActiveIssuers(page, limit, offset);
 
     if (getActiveIssuersResult.err) {
@@ -216,15 +184,7 @@ const getAcquirers = async (request, response) => {
         return;
     }
 
-    let page = null;
-    let limit = null;
-    let offset = null;
-    if (request.query.page && request.query.limit) {
-        page = parseInt(request.query.page);
-        limit = parseInt(request.query.limit);
-        offset = limit * (page - 1);
-    }
-
+    let {page, limit, offset} = request.query;
     let getAcquirersResult = await partner.getAllAcquirers(page, limit, offset);
 
     if (getAcquirersResult.err) {
@@ -244,15 +204,7 @@ const getActiveAcquirers = async (request, response) => {
         return;
     }
 
-    let page = null;
-    let limit = null;
-    let offset = null;
-    if (request.query.page && request.query.limit) {
-        page = parseInt(request.query.page);
-        limit = parseInt(request.query.limit);
-        offset = limit * (page - 1);
-    }
-
+    let {page, limit, offset} = request.query;
     let getActiveAcquirersResult = await partner.getAllActiveAcquirers(page, limit, offset);
 
     if (getActiveAcquirersResult.err) {

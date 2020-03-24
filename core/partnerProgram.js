@@ -72,15 +72,7 @@ const getPrograms = async (request, response) => {
         let id = parseInt(request.query.id);
         getPartnerProgramsResult = await partnerProgram.getProgramById(id);
     } else {
-        let page = null;
-        let limit = null;
-        let offset = null;
-        if (request.query.page && request.query.limit) {
-            page = parseInt(request.query.page);
-            limit = parseInt(request.query.limit);
-            offset = limit * (page - 1);
-        }
-
+        let {page, limit, offset} = request.query;
         getPartnerProgramsResult = await partnerProgram.getAllProgram(page, limit, offset);
     }
 
@@ -101,15 +93,7 @@ const getPartnerPrograms = async (request, response) => {
         return;
     }
 
-    let page = null;
-    let limit = null;
-    let offset = null;
-    if (request.query.page && request.query.limit) {
-        page = parseInt(request.query.page);
-        limit = parseInt(request.query.limit);
-        offset = limit * (page - 1);
-    }
-
+    let {page, limit, offset} = request.query;
     let partnerCode = request.params.partnerCode.toUpperCase();
     let getPartnerProgramResult = await partnerProgram.getPartnerProgram(partnerCode, page, limit, offset);
 

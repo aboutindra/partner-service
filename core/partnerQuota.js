@@ -66,15 +66,7 @@ const getAllRemainingQuota = async (request, response) => {
         return;
     }
 
-    let page = null;
-    let limit = null;
-    let offset = null;
-    if (request.query.page && request.query.limit) {
-        page = parseInt(request.query.page);
-        limit = parseInt(request.query.limit);
-        offset = limit * (page - 1);
-    }
-
+    let {page, limit, offset} = request.query;
     let allRemainingQuotaResult = await partnerQuota.getAllQuota(page, limit, offset);
 
     if (allRemainingQuotaResult.err) {

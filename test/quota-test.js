@@ -6,6 +6,7 @@ const expect = chai.expect;
 const sandbox = require('sinon').createSandbox();
 const BASE_URL = "/api/v1/quotas";
 const pgPool = require('pg-pool');
+const responseValidator = require('./responseValidator');
 
 chai.use(chaiHttp);
 
@@ -22,10 +23,7 @@ describe("Get All Partner Quota", _ => {
         .get(BASE_URL)
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(404);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Partner(s) not found");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Partner(s) not found", false, 404);
             done();
         });
     });
@@ -62,10 +60,7 @@ describe("Get All Partner Quota", _ => {
         .get(BASE_URL)
         .end((error, response) => {
             pool.restore();
-            response.should.have.status(200);
-            response.body.status.should.equal(true);
-            response.body.message.should.equal("Partner quota(s) retrieved");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Partner quota(s) retrieved", true, 200);
             done();
         });
     });
@@ -94,10 +89,7 @@ describe("Get All Partner Quota", _ => {
         .get(BASE_URL)
         .end((error, response) => {
             pool.restore();
-            response.should.have.status(500);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Internal server error");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
@@ -110,10 +102,7 @@ describe("Get All Partner Quota", _ => {
         .get(BASE_URL)
         .end((error, response) => {
             pool.restore();
-            response.should.have.status(500);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Internal server error");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
@@ -123,10 +112,7 @@ describe("Get All Partner Quota", _ => {
         .get(BASE_URL)
         .query({ page: 0 })
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Page must be positive integer value", false, 400);
             done();
         });
     });
@@ -136,10 +122,7 @@ describe("Get All Partner Quota", _ => {
         .get(BASE_URL)
         .query({ limit: -2 })
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Limit must be positive integer value", false, 400);
             done();
         });
     });
@@ -177,10 +160,7 @@ describe("Get All Partner Quota", _ => {
         .query({ page: 2, limit: 1 })
         .end((error, response) => {
             pool.restore();
-            response.should.have.status(200);
-            response.body.status.should.equal(true);
-            response.body.message.should.equal("Partner quota(s) retrieved");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Partner quota(s) retrieved", true, 200);
             done();
         });
     });
@@ -201,25 +181,19 @@ describe("Get Partner Quota", _ => {
         .get(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(404);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Partner quota not found");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Partner quota not found", false, 404);
             done();
         });
     });
 
-    it("Sending get quota request with no quota(s) was found response", done => {
+    it("Sending get quota request when database error occured", done => {
         sandbox.stub(pgPool.prototype, 'query').onFirstCall().rejects();
 
         chai.request(server)
         .get(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(500);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Internal server error");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
@@ -257,10 +231,7 @@ describe("Deduct Partner Quota", _ => {
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -270,10 +241,7 @@ describe("Deduct Partner Quota", _ => {
         .put(BASE_URL + '/' + PARAMS)
         .send({ dailyQuotaDeduction: 0 })
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -283,10 +251,7 @@ describe("Deduct Partner Quota", _ => {
         .put(BASE_URL + '/' + PARAMS)
         .send({ monthlyQuotaDeduction: -1 })
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -299,10 +264,7 @@ describe("Deduct Partner Quota", _ => {
         .send({ monthlyQuotaDeduction: 100 })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(500);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Internal server error");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
@@ -319,10 +281,7 @@ describe("Deduct Partner Quota", _ => {
         .send({ monthlyQuotaDeduction: 100 })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(404);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Partner quota not found");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Partner quota not found", false, 404);
             done();
         });
     });
@@ -339,10 +298,7 @@ describe("Deduct Partner Quota", _ => {
         .send({ dailyQuotaDeduction: 100 })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(200);
-            response.body.status.should.equal(true);
-            response.body.message.should.equal("Partner quota deducted");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Partner quota deducted", true, 200);
             done();
         });
     });
@@ -353,10 +309,7 @@ describe("Insert or Update Partner Quota", _ => {
         chai.request(server)
         .post(BASE_URL)
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -366,10 +319,7 @@ describe("Insert or Update Partner Quota", _ => {
         .post(BASE_URL)
         .send({ partnerCode: "IDH", remainingQuotaPerMonth: -1 })
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -379,10 +329,7 @@ describe("Insert or Update Partner Quota", _ => {
         .post(BASE_URL)
         .send({ partnerCode: "IDH", remainingQuotaPerDay: 0 })
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -399,10 +346,7 @@ describe("Insert or Update Partner Quota", _ => {
         .send({ partnerCode: "IDH" })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(201);
-            response.body.status.should.equal(true);
-            response.body.message.should.equal("Partner quota added");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Partner quota added", true, 201);
             done();
         });
     });
@@ -418,11 +362,8 @@ describe("Insert or Update Partner Quota", _ => {
         .post(BASE_URL)
         .send({ partnerCode: "IDH", remainingQuotaPerMonth: 10000 })
         .end((error, response) => {
-            response.should.have.status(201);
-            response.body.status.should.equal(true);
-            response.body.message.should.equal("Partner quota added");
-            expect(response).to.be.json;
             sandbox.restore();
+            responseValidator.validateResponse(response, "Partner quota added", true, 201);
             done();
         });
     });
@@ -438,11 +379,8 @@ describe("Insert or Update Partner Quota", _ => {
         .post(BASE_URL)
         .send({ partnerCode: "IDH", remainingQuotaPerDay: 10000 })
         .end((error, response) => {
-            response.should.have.status(201);
-            response.body.status.should.equal(true);
-            response.body.message.should.equal("Partner quota added");
-            expect(response).to.be.json;
             sandbox.restore();
+            responseValidator.validateResponse(response, "Partner quota added", true, 201);
             done();
         });
     });
@@ -458,11 +396,8 @@ describe("Insert or Update Partner Quota", _ => {
         .post(BASE_URL)
         .send({ partnerCode: "IDH", remainingQuotaPerDay: 10000 })
         .end((error, response) => {
-            response.should.have.status(404);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Failed add new partner quota");
-            expect(response).to.be.json;
             sandbox.restore();
+            responseValidator.validateResponse(response, "Failed add new partner quota", false, 404);
             done();
         });
     });
@@ -477,11 +412,8 @@ describe("Insert or Update Partner Quota", _ => {
         .post(BASE_URL)
         .send({ partnerCode: "IDH", remainingQuotaPerDay: 10000 })
         .end((error, response) => {
-            response.should.have.status(403);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Partner doesn't exist");
-            expect(response).to.be.json;
             sandbox.restore();
+            responseValidator.validateResponse(response, "Partner doesn't exist", false, 403);
             done();
         });
     });
@@ -496,11 +428,8 @@ describe("Insert or Update Partner Quota", _ => {
         .post(BASE_URL)
         .send({ partnerCode: "IDH", remainingQuotaPerDay: 10000 })
         .end((error, response) => {
-            response.should.have.status(500);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Internal server error");
-            expect(response).to.be.json;
             sandbox.restore();
+            responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
@@ -510,10 +439,7 @@ describe("Insert or Update Partner Quota", _ => {
         chai.request(server)
         .get("/")
         .end((error, response) => {
-            response.should.have.status(200);
-            response.body.status.should.equal(true);
-            response.body.message.should.equal("Service is active");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Service is active", true, 200);
             done();
         });
     });
