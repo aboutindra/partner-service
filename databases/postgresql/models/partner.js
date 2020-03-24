@@ -265,7 +265,7 @@ class Partner {
                 LIMIT $1 OFFSET $2;`,
                 values: [limit, offset]
         }
-        let countDataQuery = {
+        let countActiveIssuersQuery = {
             name: 'count-active-issuer-list',
             text: `SELECT COUNT(*)
                 FROM public.partner as partners
@@ -274,7 +274,7 @@ class Partner {
                 AND partners.issuer_cost_package_id IS NOT NULL AND partners.is_deleted = false`
         }
         try {
-            let getAllActiveIssuersResult = await dbClient.query(getAllActiveIssuersQuery);
+            let getAllActiveIssuersResult = await dbClient.query(countActiveIssuersQuery);
             if (getAllActiveIssuersResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Partner(s) not found"));
             }
@@ -386,7 +386,7 @@ class Partner {
                 LIMIT $1 OFFSET $2;`,
                 values: [limit, offset]
         }
-        let countDataQuery = {
+        let countActiveAcquirersQuery = {
             name: 'count-active-acquirer-list',
             text: `SELECT COUNT(*)
                 FROM public.partner as partners
@@ -399,7 +399,7 @@ class Partner {
             if (getAllActiveAcquirersResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Partner(s) not found"));
             }
-            let count = await dbClient.query(countDataQuery);
+            let count = await dbClient.query(countActiveAcquirersQuery);
             let totalData = parseInt(count.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {
