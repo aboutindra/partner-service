@@ -79,17 +79,17 @@ class Discount {
         }
 
         try {
-            let result = await dbClient.query(getAllDiscountQuery);
-            if (result.rows.length === 0) {
+            let getAllDiscountResult = await dbClient.query(getAllDiscountQuery);
+            if (getAllDiscountResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Discount(s) not found"));
             }
-            let count = await dbClient.query(countDataQuery);
-            let totalData = parseInt(count.rows[0].count);
+            let countAllDiscountResult = await dbClient.query(countDataQuery);
+            let totalData = parseInt(countAllDiscountResult.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = result.rows.length;
+            let totalDataOnPage = getAllDiscountResult.rows.length;
             let meta = {
                 page: page || 1,
                 totalData,
@@ -97,7 +97,7 @@ class Discount {
                 totalDataOnPage
             }
 
-            return wrapper.paginationData(result.rows, meta);
+            return wrapper.paginationData(getAllDiscountResult.rows, meta);
         }
         catch (error) {
             return wrapper.error(new InternalServerError("Internal server error"));

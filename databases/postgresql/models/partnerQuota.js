@@ -84,17 +84,17 @@ class PartnerQuota {
         }
 
         try {
-            let result = await dbClient.query(getAllQuotaQuery);
-            if (result.rows.length === 0) {
+            let getAllQuotaResult = await dbClient.query(getAllQuotaQuery);
+            if (getAllQuotaResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Partner(s) not found"));
             }
-            let count = await dbClient.query(countDataQuery);
-            let totalData = parseInt(count.rows[0].count);
+            let countAllQuotaResult = await dbClient.query(countDataQuery);
+            let totalData = parseInt(countAllQuotaResult.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = result.rows.length;
+            let totalDataOnPage = getAllQuotaResult.rows.length;
             let meta = {
                 page: page || 1,
                 totalData,
@@ -102,7 +102,7 @@ class PartnerQuota {
                 totalDataOnPage
             }
 
-            return wrapper.paginationData(result.rows, meta);
+            return wrapper.paginationData(getAllQuotaResult.rows, meta);
         }
         catch (error) {
             return wrapper.error(new InternalServerError("Internal server error"));

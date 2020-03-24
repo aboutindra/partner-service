@@ -87,7 +87,7 @@ class PartnerProgram {
 
     async getAllProgram(page, limit = null, offset = null) {
         let dbPool = postgresqlWrapper.getConnection(this.database);
-        let getAllDiscountQuery = {
+        let getAllPartnerProgramQuery = {
             name: 'get-partner-program-list',
             text: `SELECT id, partner_code AS "partnerCode", exchange_rate AS "exchangeRate", minimum_amount_per_transaction AS "minimumAmountPerTransaction",
                 maximum_amount_per_transaction as "maximumAmountPerTransaction", maximum_transaction_amount_per_day AS "maximumTransactionAmountPerDay",
@@ -104,17 +104,17 @@ class PartnerProgram {
                 FROM public.partner_program;`
         }
         try {
-            let result = await dbPool.query(getAllDiscountQuery);
-            if (result.rows.length === 0) {
+            let getAllPartnerProgramResult = await dbPool.query(getAllPartnerProgramQuery);
+            if (getAllPartnerProgramResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Partner program(s) not found"));
             }
-            let count = await dbPool.query(countDataQuery);
-            let totalData = parseInt(count.rows[0].count);
+            let countAllPartnerProgramResult = await dbPool.query(countDataQuery);
+            let totalData = parseInt(countAllPartnerProgramResult.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = result.rows.length;
+            let totalDataOnPage = getAllPartnerProgramResult.rows.length;
             let meta = {
                 page: page || 1,
                 totalData,
@@ -122,7 +122,7 @@ class PartnerProgram {
                 totalDataOnPage
             }
 
-            return wrapper.paginationData(result.rows, meta);
+            return wrapper.paginationData(getAllPartnerProgramResult.rows, meta);
         }
         catch (error) {
             return wrapper.error(new InternalServerError("Internal server error"));
@@ -176,8 +176,8 @@ class PartnerProgram {
                 values: [partnerCode]
         }
         try {
-            let result = await dbPool.query(getPartnerProgramQuery);
-            if (result.rows.length === 0) {
+            let getPartnerProgramResult = await dbPool.query(getPartnerProgramQuery);
+            if (getPartnerProgramResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Partner program(s) not found"));
             }
             let count = await dbPool.query(countDataQuery);
@@ -186,7 +186,7 @@ class PartnerProgram {
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = result.rows.length;
+            let totalDataOnPage = getPartnerProgramResult.rows.length;
             let meta = {
                 page: page || 1,
                 totalData,
@@ -194,7 +194,7 @@ class PartnerProgram {
                 totalDataOnPage
             }
 
-            return wrapper.paginationData(result.rows, meta);
+            return wrapper.paginationData(getPartnerProgramResult.rows, meta);
         }
         catch (error) {
             return wrapper.error(new InternalServerError("Internal server error"));
