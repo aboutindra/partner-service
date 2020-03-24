@@ -21,11 +21,11 @@ class Discount {
         }
 
         try {
-            let result = await dbClient.query(insertDiscountQuery);
-            if (result.rowCount === 0) {
+            let insertDiscountResult = await dbClient.query(insertDiscountQuery);
+            if (insertDiscountResult.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Failed add new package"));
             }
-            return wrapper.data(result.rows);
+            return wrapper.data(insertDiscountResult.rows);
         }
         catch (error) {
             if (error.code === errorCode.INVALID_ENUM) {

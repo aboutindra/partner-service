@@ -19,11 +19,11 @@ class IssuerPackage {
         }
 
         try {
-            let result = await dbClient.query(insertPackageQuery);
-            if (result.rowCount === 0) {
+            let insertIssuerPackageResult = await dbClient.query(insertPackageQuery);
+            if (insertIssuerPackageResult.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Failed add new package"));
             }
-            return wrapper.data(result.rows);
+            return wrapper.data(insertIssuerPackageResult.rows);
         }
         catch (error) {
             if (error.code === errorCode.INVALID_ENUM) {

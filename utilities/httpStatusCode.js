@@ -9,12 +9,12 @@ const ERROR = {
 	'SERVICE_UNAVAILABLE': 503,
 	'GATEWAY_TIMEOUT': 504
 };
-  
+
 const SUCCESS = {
 	'OK': 200,
 	'CREATED': 201
 };
-  
+
 module.exports = {
 	ERROR,
 	SUCCESS

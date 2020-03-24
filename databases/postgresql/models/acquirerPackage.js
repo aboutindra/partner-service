@@ -19,11 +19,11 @@ class AcquirerPackage {
         }
 
         try {
-            let result = await dbClient.query(insertPackageQuery);
-            if (result.rowCount === 0) {
+            let insertAcquirerPackageResult = await dbClient.query(insertPackageQuery);
+            if (insertAcquirerPackageResult.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Failed add new package"));
             }
-            return wrapper.data(result.rows);
+            return wrapper.data(insertAcquirerPackageResult.rows);
         }
         catch (error) {
             if (error.code === errorCode.INVALID_ENUM) {

@@ -21,11 +21,11 @@ class PartnerQuota {
         }
 
         try {
-            let result = await dbClient.query(inserQuotaQuery);
-            if (result.rowCount === 0) {
+            let updateQuotaResult = await dbClient.query(inserQuotaQuery);
+            if (updateQuotaResult.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Failed add new partner quota"));
             }
-            return wrapper.data(result.rows);
+            return wrapper.data(updateQuotaResult.rows);
         }
         catch (error) {
             if (error.code === errorCode.FOREIGN_KEY_VIOLATION) {

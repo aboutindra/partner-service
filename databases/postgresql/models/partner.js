@@ -19,11 +19,11 @@ class Partner {
         }
 
         try {
-            let result = await dbClient.query(insertPartnerQuery);
-            if (result.rowCount === 0) {
+            let insertQuotaResult = await dbClient.query(insertPartnerQuery);
+            if (insertQuotaResult.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Failed add new partner"));
             }
-            return wrapper.data(result.rows);
+            return wrapper.data(insertQuotaResult.rows);
         }
         catch (error) {
             if (error.code === errorCode.UNIQUE_VIOLATION) {
