@@ -1,11 +1,10 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('../index');
-const should = chai.should();
-const expect = chai.expect;
 const sandbox = require('sinon').createSandbox();
 const BASE_URL = "/api/v1/segments";
 const pgPool = require('pg-pool');
+const responseValidator = require('./responseValidator');
 
 chai.use(chaiHttp);
 
@@ -17,10 +16,7 @@ describe("Get Segment(s)", _ => {
         .get(BASE_URL)
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(500);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Internal server error");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
@@ -36,10 +32,7 @@ describe("Get Segment(s)", _ => {
         .get(BASE_URL)
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(404);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Segment(s) not found");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Segment(s) not found", false, 404);
             done();
         });
     });
@@ -68,10 +61,7 @@ describe("Get Segment(s)", _ => {
         .get(BASE_URL)
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(200);
-            response.body.status.should.equal(true);
-            response.body.message.should.equal("Segment(s) retrieved");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Segment(s) retrieved", true, 200);
             done();
         });
     });
@@ -84,10 +74,7 @@ describe("Get Segment(s)", _ => {
         .query({ id: 1 })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(500);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Internal server error");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
@@ -100,10 +87,7 @@ describe("Get Segment(s)", _ => {
         .query({ id: -1 })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Id must be an integer value");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Id must be an integer value", false, 400);
             done();
         });
     });
@@ -116,10 +100,7 @@ describe("Get Segment(s)", _ => {
         .query({ id: '{ $ne : -1 }' })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Id must be an integer value");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Id must be an integer value", false, 400);
             done();
         });
     });
@@ -136,10 +117,7 @@ describe("Get Segment(s)", _ => {
         .query({ id: 1 })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(404);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Segment not found");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Segment not found", false, 404);
             done();
         });
     });
@@ -163,10 +141,7 @@ describe("Get Segment(s)", _ => {
         .query({ id: 1 })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(200);
-            response.body.status.should.equal(true);
-            response.body.message.should.equal("Segment(s) retrieved");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Segment(s) retrieved", true, 200);
             done();
         });
     });
@@ -179,10 +154,7 @@ describe("Update Segment", _ => {
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -194,11 +166,8 @@ describe("Update Segment", _ => {
         .put(BASE_URL + '/' + PARAMS)
         .send({ name: "Fintech" })
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
             PARAMS = '1';
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -207,10 +176,7 @@ describe("Update Segment", _ => {
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -223,10 +189,7 @@ describe("Update Segment", _ => {
         .send({ name: 'Fintech '})
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(500);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Internal server error");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
@@ -242,10 +205,7 @@ describe("Update Segment", _ => {
         .send({ name: 'Fintech '})
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(403);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Segment name already exist");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Segment name already exist", false, 403);
             done();
         });
     });
@@ -262,10 +222,7 @@ describe("Update Segment", _ => {
         .send({ name: 'Fintech '})
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(404);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Segment not found");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Segment not found", false, 404);
             done();
         });
     });
@@ -282,10 +239,7 @@ describe("Update Segment", _ => {
         .send({ name: 'Fintech '})
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(200);
-            response.body.status.should.equal(true);
-            response.body.message.should.equal("Segment updated");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Segment updated", true, 200);
             done();
         });
     });
@@ -296,10 +250,7 @@ describe("Insert Segment", _ => {
         chai.request(server)
         .post(BASE_URL)
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -315,10 +266,7 @@ describe("Insert Segment", _ => {
         .send({ name: 'Fintech' })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(403);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Segment name already exist");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Segment name already exist", false, 403);
             done();
         });
     });
@@ -331,10 +279,7 @@ describe("Insert Segment", _ => {
         .send({ name: 'Fintech' })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(500);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Internal server error");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
@@ -351,10 +296,7 @@ describe("Insert Segment", _ => {
         .send({ name: 'Fintech' })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(404);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Failed add new segment");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Failed add new segment", false, 404);
             done();
         });
     });
@@ -371,10 +313,7 @@ describe("Insert Segment", _ => {
         .send({ name: 'Fintech' })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(201);
-            response.body.status.should.equal(true);
-            response.body.message.should.equal("Segment added");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Segment added", true, 201);
             done();
         });
     });

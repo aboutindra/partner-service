@@ -1,11 +1,10 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('../index');
-const should = chai.should();
-const expect = chai.expect;
 const sandbox = require('sinon').createSandbox();
 const BASE_URL = "/api/v1/wallets";
 const pgPool = require('pg-pool');
+const responseValidator = require('./responseValidator');
 
 chai.use(chaiHttp);
 
@@ -19,10 +18,7 @@ describe("Get Partner Wallet", _ => {
         .get(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(500);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Internal server error");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
@@ -38,10 +34,7 @@ describe("Get Partner Wallet", _ => {
         .get(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(404);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Partner wallet not found");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Partner wallet not found", false, 404);
             done();
         });
     });
@@ -62,10 +55,7 @@ describe("Get Partner Wallet", _ => {
         .get(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(200);
-            response.body.status.should.equal(true);
-            response.body.message.should.equal("Partner wallet retrieved");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Partner wallet retrieved", true, 200);
             done();
         });
     });
@@ -81,10 +71,7 @@ describe("Delete Partner Wallet", _ => {
         .delete(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(500);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Internal server error");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
@@ -100,10 +87,7 @@ describe("Delete Partner Wallet", _ => {
         .delete(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(404);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Failed to delete partner wallet");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Failed to delete partner wallet", false, 404);
             done();
         });
     });
@@ -119,10 +103,7 @@ describe("Delete Partner Wallet", _ => {
         .delete(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(200);
-            response.body.status.should.equal(true);
-            response.body.message.should.equal("Partner wallet deleted");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Partner wallet deleted", true, 200);
             done();
         });
     });
@@ -133,10 +114,7 @@ describe("Insert or Update Partner Wallet", _ => {
         chai.request(server)
         .post(BASE_URL)
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -146,10 +124,7 @@ describe("Insert or Update Partner Wallet", _ => {
         .post(BASE_URL)
         .send({ walletCode: "1029312031" })
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -159,10 +134,7 @@ describe("Insert or Update Partner Wallet", _ => {
         .post(BASE_URL)
         .send({ partnerCode: "IDK" })
         .end((error, response) => {
-            response.should.have.status(400);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Invalid input parameter");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
@@ -178,10 +150,7 @@ describe("Insert or Update Partner Wallet", _ => {
         .send({ partnerCode: "IDK", walletCode: "1029312031" })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(403);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Partner doesn't exist");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Partner doesn't exist", false, 403);
             done();
         });
     });
@@ -198,10 +167,7 @@ describe("Insert or Update Partner Wallet", _ => {
         .send({ partnerCode: "IDK", walletCode: "1029312031" })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(404);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Failed to add new partner wallet");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Failed to add new partner wallet", false, 404);
             done();
         });
     });
@@ -214,10 +180,7 @@ describe("Insert or Update Partner Wallet", _ => {
         .send({ partnerCode: "IDK", walletCode: "1029312031" })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(500);
-            response.body.status.should.equal(false);
-            response.body.message.should.equal("Internal server error");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
@@ -234,10 +197,7 @@ describe("Insert or Update Partner Wallet", _ => {
         .send({ partnerCode: "IDK", walletCode: "1029312031" })
         .end((error, response) => {
             sandbox.restore();
-            response.should.have.status(201);
-            response.body.status.should.equal(true);
-            response.body.message.should.equal("Partner wallet added");
-            expect(response).to.be.json;
+            responseValidator.validateResponse(response, "Partner wallet added", true, 201);
             done();
         });
     });
