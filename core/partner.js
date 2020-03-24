@@ -17,12 +17,12 @@ const insertPartner = async (request, response) => {
     let { code, name, issuerCostPackageId, acquirerCostPackageId, segmentId, urlLogo, unit } = request.body;
     code = code.toUpperCase();
 
-    let result = await partner.insertPartner(code, name, issuerCostPackageId, acquirerCostPackageId, segmentId, urlLogo, unit);
+    let insertPartnerResult = await partner.insertPartner(code, name, issuerCostPackageId, acquirerCostPackageId, segmentId, urlLogo, unit);
 
-    if (result.err) {
-        wrapper.response(response, false, result);
+    if (insertPartnerResult.err) {
+        wrapper.response(response, false, insertPartnerResult);
     } else {
-        wrapper.response(response, true, result, "Partner added", successCode.OK);
+        wrapper.response(response, true, insertPartnerResult, "Partner added", successCode.OK);
     }
     return;
 }
@@ -39,12 +39,12 @@ const updatePartner = async (request, response) => {
     let { name, issuerCostPackageId, acquirerCostPackageId, segmentId, urlLogo, unit } = request.body;
     let code = request.params.code.toUpperCase();
 
-    let result = await partner.updatePartner(code, name, issuerCostPackageId, acquirerCostPackageId, segmentId, urlLogo, unit);
+    let updatePartnerResult = await partner.updatePartner(code, name, issuerCostPackageId, acquirerCostPackageId, segmentId, urlLogo, unit);
 
-    if (result.err) {
-        wrapper.response(response, false, result);
+    if (updatePartnerResult.err) {
+        wrapper.response(response, false, updatePartnerResult);
     } else {
-        wrapper.response(response, true, result, "Partner updated", successCode.OK);
+        wrapper.response(response, true, updatePartnerResult, "Partner updated", successCode.OK);
     }
     return;
 }
@@ -52,11 +52,11 @@ const updatePartner = async (request, response) => {
 const deletePartner = async (request, response) => {
     let code = request.params.code.toUpperCase();
 
-    let result = await partner.softDeletePartner(code);
-    if (result.err) {
-        wrapper.response(response, false, result);
+    let deletePartnerResult = await partner.softDeletePartner(code);
+    if (deletePartnerResult.err) {
+        wrapper.response(response, false, deletePartnerResult);
     } else {
-        wrapper.response(response, true, result, "Partner deleted", successCode.OK);
+        wrapper.response(response, true, deletePartnerResult, "Partner deleted", successCode.OK);
     }
 }
 
@@ -69,11 +69,11 @@ const getPartners = async (request, response) => {
         return;
     }
 
-    let result;
+    let getPartnerResult;
 
     if (request.query.code) {
         let code = request.query.code.toUpperCase();
-        result = await partner.getPartnerByCode(code);
+        getPartnerResult = await partner.getPartnerByCode(code);
     } else {
         let page = null;
         let limit = null;
@@ -84,13 +84,13 @@ const getPartners = async (request, response) => {
             offset = limit * (page - 1);
         }
 
-        result = await partner.getAllPartner(page, limit, offset);
+        getPartnerResult = await partner.getAllPartner(page, limit, offset);
     }
 
-    if (result.err) {
-        wrapper.response(response, false, result);
+    if (getPartnerResult.err) {
+        wrapper.response(response, false, getPartnerResult);
     } else {
-        wrapper.paginationResponse(response, true, result, "Partner(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, getPartnerResult, "Partner(s) retrieved", successCode.OK);
     }
     return;
 }
@@ -113,12 +113,12 @@ const getActivePartners = async (request, response) => {
         offset = limit * (page - 1);
     }
 
-    let result = await partner.getAllActivePartner(page, limit, offset);
+    let getActivePartnerResult = await partner.getAllActivePartner(page, limit, offset);
 
-    if (result.err) {
-        wrapper.response(response, false, result);
+    if (getActivePartnerResult.err) {
+        wrapper.response(response, false, getActivePartnerResult);
     } else {
-        wrapper.paginationResponse(response, true, result, "Partner(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, getActivePartnerResult, "Partner(s) retrieved", successCode.OK);
     }
     return;
 }
@@ -128,12 +128,12 @@ const getIssuer = async (request, response) => {
 
     partnerCode = partnerCode.toUpperCase();
 
-    let result = await partner.getIssuer(partnerCode);
+    let getIssuerResult = await partner.getIssuer(partnerCode);
 
-    if (result.err) {
-        wrapper.response(response, false, result);
+    if (getIssuerResult.err) {
+        wrapper.response(response, false, getIssuerResult);
     } else {
-        wrapper.paginationResponse(response, true, result, "Issuer retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, getIssuerResult, "Issuer retrieved", successCode.OK);
     }
 }
 
@@ -155,12 +155,12 @@ const getIssuers = async (request, response) => {
         offset = limit * (page - 1);
     }
 
-    let result = await partner.getAllIssuers(page, limit, offset);
+    let getIssuersResult = await partner.getAllIssuers(page, limit, offset);
 
-    if (result.err) {
-        wrapper.response(response, false, result);
+    if (getIssuersResult.err) {
+        wrapper.response(response, false, getIssuersResult);
     } else {
-        wrapper.paginationResponse(response, true, result, "Partner(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, getIssuersResult, "Partner(s) retrieved", successCode.OK);
     }
     return;
 }
@@ -183,12 +183,12 @@ const getActiveIssuers = async (request, response) => {
         offset = limit * (page - 1);
     }
 
-    let result = await partner.getAllActiveIssuers(page, limit, offset);
+    let getActiveIssuersResult = await partner.getAllActiveIssuers(page, limit, offset);
 
-    if (result.err) {
-        wrapper.response(response, false, result);
+    if (getActiveIssuersResult.err) {
+        wrapper.response(response, false, getActiveIssuersResult);
     } else {
-        wrapper.paginationResponse(response, true, result, "Partner(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, getActiveIssuersResult, "Partner(s) retrieved", successCode.OK);
     }
     return;
 }
@@ -198,12 +198,12 @@ const getAcquirer = async (request, response) => {
 
     partnerCode = partnerCode.toUpperCase();
 
-    let result = await partner.getAcquirer(partnerCode);
+    let getAcquirerResult = await partner.getAcquirer(partnerCode);
 
-    if (result.err) {
-        wrapper.response(response, false, result);
+    if (getAcquirerResult.err) {
+        wrapper.response(response, false, getAcquirerResult);
     } else {
-        wrapper.paginationResponse(response, true, result, "Acquirer retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, getAcquirerResult, "Acquirer retrieved", successCode.OK);
     }
 }
 
@@ -225,12 +225,12 @@ const getAcquirers = async (request, response) => {
         offset = limit * (page - 1);
     }
 
-    let result = await partner.getAllAcquirers(page, limit, offset);
+    let getAcquirersResult = await partner.getAllAcquirers(page, limit, offset);
 
-    if (result.err) {
-        wrapper.response(response, false, result);
+    if (getAcquirersResult.err) {
+        wrapper.response(response, false, getAcquirersResult);
     } else {
-        wrapper.paginationResponse(response, true, result, "Partner(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, getAcquirersResult, "Partner(s) retrieved", successCode.OK);
     }
     return;
 }
@@ -253,12 +253,12 @@ const getActiveAcquirers = async (request, response) => {
         offset = limit * (page - 1);
     }
 
-    let result = await partner.getAllActiveAcquirers(page, limit, offset);
+    let getActiveAcquirersResult = await partner.getAllActiveAcquirers(page, limit, offset);
 
-    if (result.err) {
-        wrapper.response(response, false, result);
+    if (getActiveAcquirersResult.err) {
+        wrapper.response(response, false, getActiveAcquirersResult);
     } else {
-        wrapper.paginationResponse(response, true, result, "Partner(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, getActiveAcquirersResult, "Partner(s) retrieved", successCode.OK);
     }
     return;
 }

@@ -16,11 +16,11 @@ const upsertQuota = async (request, response) => {
 
     let { partnerCode, remainingQuotaPerDay, remainingQuotaPerMonth } = request.body;
 
-    let result = await partnerQuota.upsertQuota(partnerCode, remainingQuotaPerDay, remainingQuotaPerMonth);
-    if (result.err) {
-        wrapper.response(response, false, result);
+    let upsertQuotaResult = await partnerQuota.upsertQuota(partnerCode, remainingQuotaPerDay, remainingQuotaPerMonth);
+    if (upsertQuotaResult.err) {
+        wrapper.response(response, false, upsertQuotaResult);
     } else {
-        wrapper.response(response, true, result, "Partner quota added", successCode.CREATED);
+        wrapper.response(response, true, upsertQuotaResult, "Partner quota added", successCode.CREATED);
     }
     return;
 }
@@ -37,23 +37,23 @@ const deductQuota = async (request, response) => {
     let partnerCode = request.params.partnerCode;
     let { dailyQuotaDeduction, monthlyQuotaDeduction } = request.body;
 
-    let result = await partnerQuota.deductQuota(partnerCode, dailyQuotaDeduction, monthlyQuotaDeduction);
-    if (result.err) {
-        wrapper.response(response, false, result);
+    let deductQuotaResult = await partnerQuota.deductQuota(partnerCode, dailyQuotaDeduction, monthlyQuotaDeduction);
+    if (deductQuotaResult.err) {
+        wrapper.response(response, false, deductQuotaResult);
     } else {
-        wrapper.response(response, true, result, "Partner quota deducted", successCode.OK);
+        wrapper.response(response, true, deductQuotaResult, "Partner quota deducted", successCode.OK);
     }
     return;
 }
 
 const getRemainingQuota = async (request, response) => {
     let partnerCode = request.params.partnerCode;
-    let result = await partnerQuota.getQuotaByPartnerCode(partnerCode);
+    let remainingQuotaResult = await partnerQuota.getQuotaByPartnerCode(partnerCode);
 
-    if (result.err) {
-        wrapper.response(response, false, result);
+    if (remainingQuotaResult.err) {
+        wrapper.response(response, false, remainingQuotaResult);
     } else {
-        wrapper.response(response, true, result, "Partner quota(s) retrieved", successCode.OK);
+        wrapper.response(response, true, remainingQuotaResult, "Partner quota(s) retrieved", successCode.OK);
     }
 }
 
@@ -75,12 +75,12 @@ const getAllRemainingQuota = async (request, response) => {
         offset = limit * (page - 1);
     }
 
-    let result = await partnerQuota.getAllQuota(page, limit, offset);
+    let allRemainingQuotaResult = await partnerQuota.getAllQuota(page, limit, offset);
 
-    if (result.err) {
-        wrapper.response(response, false, result);
+    if (allRemainingQuotaResult.err) {
+        wrapper.response(response, false, allRemainingQuotaResult);
     } else {
-        wrapper.paginationResponse(response, true, result, "Partner quota(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, allRemainingQuotaResult, "Partner quota(s) retrieved", successCode.OK);
     }
     return;
 }

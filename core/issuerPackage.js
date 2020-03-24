@@ -17,12 +17,12 @@ const insertPackage = async (request, response) => {
     let { name, costType } = request.body;
     let amount = Number(request.body.amount);
 
-    let result = await issuerPackage.insertPackage(name, costType.toLowerCase(), amount);
+    let insertIssuerPackageResult = await issuerPackage.insertPackage(name, costType.toLowerCase(), amount);
 
-    if (result.err) {
-        wrapper.response(response, false, result);
+    if (insertIssuerPackageResult.err) {
+        wrapper.response(response, false, insertIssuerPackageResult);
     } else {
-        wrapper.response(response, true, result, "Package added", successCode.CREATED);
+        wrapper.response(response, true, insertIssuerPackageResult, "Package added", successCode.CREATED);
     }
     return;
 }
@@ -40,12 +40,12 @@ const updatePackage = async (request, response) => {
     let { name, costType } = request.body;
     let amount = Number(request.body.amount);
 
-    let result = await issuerPackage.updatePackageById(id, name, costType.toLowerCase(), amount);
+    let updateIssuerPackageResult = await issuerPackage.updatePackageById(id, name, costType.toLowerCase(), amount);
 
-    if (result.err) {
-        wrapper.response(response, false, result);
+    if (updateIssuerPackageResult.err) {
+        wrapper.response(response, false, updateIssuerPackageResult);
     } else {
-        wrapper.response(response, true, result, "Package updated", successCode.OK);
+        wrapper.response(response, true, updateIssuerPackageResult, "Package updated", successCode.OK);
     }
     return;
 }
@@ -61,12 +61,12 @@ const deletePackage = async (request, response) => {
 
     let id = parseInt(request.params.id);
 
-    let result = await issuerPackage.softDeletePackageById(id);
+    let deleteIssuerPackageResult = await issuerPackage.softDeletePackageById(id);
 
-    if (result.err) {
-        wrapper.response(response, false, result);
+    if (deleteIssuerPackageResult.err) {
+        wrapper.response(response, false, deleteIssuerPackageResult);
     } else {
-        wrapper.response(response, true, result, "Package deleted", successCode.OK);
+        wrapper.response(response, true, deleteIssuerPackageResult, "Package deleted", successCode.OK);
     }
     return;
 }
@@ -80,11 +80,11 @@ const getPackages = async (request, response) => {
         return;
     }
 
-    let result = null;
+    let getIssuerPackagesResult = null;
 
     if (request.query.id) {
         let id = parseInt(request.query.id);
-        result = await issuerPackage.getPackageById(id);
+        getIssuerPackagesResult = await issuerPackage.getPackageById(id);
     } else {
         let page = null;
         let limit = null;
@@ -95,14 +95,14 @@ const getPackages = async (request, response) => {
             offset = limit * (page - 1);
         }
 
-        result = await issuerPackage.getAllPackage(page, limit, offset);
+        getIssuerPackagesResult = await issuerPackage.getAllIssuerPackage(page, limit, offset);
     }
 
-    if (result.err) {
-        wrapper.response(response, false, result);
+    if (getIssuerPackagesResult.err) {
+        wrapper.response(response, false, getIssuerPackagesResult);
         return;
     } else {
-        wrapper.paginationResponse(response, true, result, "Package(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, getIssuerPackagesResult, "Package(s) retrieved", successCode.OK);
     }
     return;
 }

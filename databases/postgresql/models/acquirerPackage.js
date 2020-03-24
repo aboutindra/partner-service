@@ -38,7 +38,7 @@ class AcquirerPackage {
 
     async updatePackageById(id, name, costType, amount) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
-        let updatePackageQuery = {
+        let updateAcquirerPackageQuery = {
             name: 'update-acquirer-package',
             text: `UPDATE public.acquirer_cost_package
                 SET name=$2, cost_type=$3::cost_type, amount=$4, updated_at=$5
@@ -47,11 +47,11 @@ class AcquirerPackage {
         }
 
         try {
-            let result = await dbClient.query(updatePackageQuery);
-            if (result.rowCount === 0) {
+            let updateAcquirerPackageResult = await dbClient.query(updateAcquirerPackageQuery);
+            if (updateAcquirerPackageResult.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Package(s) not found"));
             }
-            return wrapper.data(result.rows);
+            return wrapper.data(updateAcquirerPackageResult.rows);
         }
         catch (error) {
             if (error.code === errorCode.UNIQUE_VIOLATION) {
@@ -64,9 +64,9 @@ class AcquirerPackage {
         }
     }
 
-    async getAllPackage(page, limit, offset) {
+    async getAllAcquirerPackage(page, limit, offset) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getAllPackagesQuery = {
+        let getAllAcquirerPackagesQuery = {
             name: 'get-acquirer-cost-package-list',
             text: `SELECT id, name, cost_type AS "costType", amount, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.acquirer_cost_package
@@ -80,17 +80,17 @@ class AcquirerPackage {
                 FROM public.acquirer_cost_package`
         }
         try {
-            let result = await dbClient.query(getAllPackagesQuery);
-            if (result.rows.length === 0) {
+            let getAllAcquirerPackagesResult = await dbClient.query(getAllAcquirerPackagesQuery);
+            if (getAllAcquirerPackagesResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Package(s) not found"));
             }
-            let count = await dbClient.query(countDataQuery);
-            let totalData = parseInt(count.rows[0].count);
+            let countAllAcquirerPackagesResult = await dbClient.query(countDataQuery);
+            let totalData = parseInt(countAllAcquirerPackagesResult.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = result.rows.length;
+            let totalDataOnPage = getAllAcquirerPackagesResult.rows.length;
             let meta = {
                 page: page || 1,
                 totalData,
@@ -98,7 +98,7 @@ class AcquirerPackage {
                 totalDataOnPage
             }
 
-            return wrapper.paginationData(result.rows, meta);
+            return wrapper.paginationData(getAllAcquirerPackagesResult.rows, meta);
         }
         catch (error) {
             return wrapper.error(new InternalServerError("Internal server error"));
@@ -107,7 +107,7 @@ class AcquirerPackage {
 
     async getPackageById(id) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getPackageByIdQuery = {
+        let getAcquirerPackageByIdQuery = {
             name: 'get-acquirer-cost-package',
             text: `SELECT id, name, cost_type AS "costType", amount, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.acquirer_cost_package
@@ -116,11 +116,11 @@ class AcquirerPackage {
         }
 
         try {
-            let result = await dbClient.query(getPackageByIdQuery);
-            if (result.rows.length === 0) {
+            let getAcquirerPackageByIdResult = await dbClient.query(getAcquirerPackageByIdQuery);
+            if (getAcquirerPackageByIdResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Package not found"));
             }
-            return wrapper.data(result.rows);
+            return wrapper.data(getAcquirerPackageByIdResult.rows);
         }
         catch (error) {
             return wrapper.error(new InternalServerError("Internal server error"));
@@ -129,7 +129,7 @@ class AcquirerPackage {
 
     async softDeletePackageById(id) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
-        let deletePackageQuery = {
+        let deleteAcquirerPackageQuery = {
             name: 'soft-delete-acquirer-package',
             text: `UPDATE public.acquirer_cost_package
                 SET is_deleted = true, updated_at = $2, deleted_at = $3
@@ -138,11 +138,11 @@ class AcquirerPackage {
         }
 
         try {
-            let result = await dbClient.query(deletePackageQuery);
-            if (result.rowCount === 0) {
+            let deleteAcquirerPackageResult = await dbClient.query(deleteAcquirerPackageQuery);
+            if (deleteAcquirerPackageResult.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Package not found"));
             }
-            return wrapper.data(result.rows);
+            return wrapper.data(deleteAcquirerPackageResult.rows);
         }
         catch (error) {
             return wrapper.error(new InternalServerError("Internal server error"));

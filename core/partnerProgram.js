@@ -15,12 +15,12 @@ const insertProgram = async (request, response) => {
         return;
     }
 
-    let currentProgram = await partnerProgram.getActivePartnerProgram(request.body.partnerCode);
-    if (currentProgram.err && currentProgram.err.message !== "Active partner program not found") {
-        wrapper.response(response, false, currentProgram);
+    let currentPartnerProgram = await partnerProgram.getActivePartnerProgram(request.body.partnerCode);
+    if (currentPartnerProgram.err && currentPartnerProgram.err.message !== "Active partner program not found") {
+        wrapper.response(response, false, currentPartnerProgram);
         return;
     } else {
-        if (currentProgram.data.length > 0) {
+        if (currentPartnerProgram.data.length > 0) {
             wrapper.response(response, false, wrapper.error(new ForbiddenError("There is another program currently running")));
             return;
         }
@@ -28,11 +28,11 @@ const insertProgram = async (request, response) => {
 
     request.body.startDate = new Date(request.body.startDate);
     request.body.endDate = new Date(request.body.endDate);
-    let addPartnerResult = await partnerProgram.insertProgram(request.body);
-    if (addPartnerResult.err) {
-        wrapper.response(response, false, addPartnerResult);
+    let insertPartnerProgramResult = await partnerProgram.insertProgram(request.body);
+    if (insertPartnerProgramResult.err) {
+        wrapper.response(response, false, insertPartnerProgramResult);
     } else {
-        wrapper.response(response, true, addPartnerResult, "Partner program added", successCode.CREATED);
+        wrapper.response(response, true, insertPartnerProgramResult, "Partner program added", successCode.CREATED);
     }
     return;
 }
@@ -47,12 +47,12 @@ const softDeleteProgram = async (request, response) => {
     }
 
     let id = parseInt(request.params.id);
-    let result = await partnerProgram.softDeleteProgram(id);
+    let deletePartnerProgramResult = await partnerProgram.softDeleteProgram(id);
 
-    if (result.err) {
-        wrapper.response(response, false, result);
+    if (deletePartnerProgramResult.err) {
+        wrapper.response(response, false, deletePartnerProgramResult);
     } else {
-        wrapper.response(response, true, result, "Partner program deleted", successCode.OK);
+        wrapper.response(response, true, deletePartnerProgramResult, "Partner program deleted", successCode.OK);
     }
     return;
 }
@@ -66,11 +66,11 @@ const getPrograms = async (request, response) => {
         return;
     }
 
-    let result;
+    let getPartnerProgramsResult;
 
     if (request.query.id) {
         let id = parseInt(request.query.id);
-        result = await partnerProgram.getProgramById(id);
+        getPartnerProgramsResult = await partnerProgram.getProgramById(id);
     } else {
         let page = null;
         let limit = null;
@@ -81,13 +81,13 @@ const getPrograms = async (request, response) => {
             offset = limit * (page - 1);
         }
 
-        result = await partnerProgram.getAllProgram(page, limit, offset);
+        getPartnerProgramsResult = await partnerProgram.getAllProgram(page, limit, offset);
     }
 
-    if (result.err) {
-        wrapper.response(response, false, result);
+    if (getPartnerProgramsResult.err) {
+        wrapper.response(response, false, getPartnerProgramsResult);
     } else {
-        wrapper.paginationResponse(response, true, result, "Partner program(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, getPartnerProgramsResult, "Partner program(s) retrieved", successCode.OK);
     }
     return;
 }
@@ -111,12 +111,12 @@ const getPartnerPrograms = async (request, response) => {
     }
 
     let partnerCode = request.params.partnerCode.toUpperCase();
-    let result = await partnerProgram.getPartnerProgram(partnerCode, page, limit, offset);
+    let getPartnerProgramResult = await partnerProgram.getPartnerProgram(partnerCode, page, limit, offset);
 
-    if (result.err) {
-        wrapper.response(response, false, result);
+    if (getPartnerProgramResult.err) {
+        wrapper.response(response, false, getPartnerProgramResult);
     } else {
-        wrapper.paginationResponse(response, true, result, "Partner program(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, getPartnerProgramResult, "Partner program(s) retrieved", successCode.OK);
     }
     return;
 }
