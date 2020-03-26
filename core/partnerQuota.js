@@ -58,14 +58,6 @@ const getRemainingQuota = async (request, response) => {
 }
 
 const getAllRemainingQuota = async (request, response) => {
-    const errors = validationResult(request);
-    if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
-        error.data = errors.array();
-        wrapper.response(response, false, error);
-        return;
-    }
-
     let {page, limit, offset} = request.query;
     let allRemainingQuotaResult = await partnerQuota.getAllQuota(page, limit, offset);
 

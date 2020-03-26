@@ -61,14 +61,6 @@ const deletePartner = async (request, response) => {
 }
 
 const getPartners = async (request, response) => {
-    const errors = validationResult(request);
-    if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
-        error.data = errors.array();
-        wrapper.response(response, false, error);
-        return;
-    }
-
     let getPartnerResult;
 
     if (request.query.code) {
@@ -88,14 +80,6 @@ const getPartners = async (request, response) => {
 }
 
 const getActivePartners = async (request, response) => {
-    const errors = validationResult(request);
-    if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
-        error.data = errors.array();
-        wrapper.response(response, false, error);
-        return;
-    }
-
     let {page, limit, offset} = request.query;
     let getActivePartnerResult = await partner.getAllActivePartner(page, limit, offset);
 
@@ -122,14 +106,6 @@ const getIssuer = async (request, response) => {
 }
 
 const getIssuers = async (request, response) => {
-    const errors = validationResult(request);
-    if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
-        error.data = errors.array();
-        wrapper.response(response, false, error);
-        return;
-    }
-
     let {page, limit, offset} = request.query;
     let getIssuersResult = await partner.getAllIssuers(page, limit, offset);
 
@@ -142,14 +118,6 @@ const getIssuers = async (request, response) => {
 }
 
 const getActiveIssuers = async (request, response) => {
-    const errors = validationResult(request);
-    if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
-        error.data = errors.array();
-        wrapper.response(response, false, error);
-        return;
-    }
-
     let {page, limit, offset} = request.query;
     let getActiveIssuersResult = await partner.getAllActiveIssuers(page, limit, offset);
 
@@ -176,14 +144,6 @@ const getAcquirer = async (request, response) => {
 }
 
 const getAcquirers = async (request, response) => {
-    const errors = validationResult(request);
-    if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
-        error.data = errors.array();
-        wrapper.response(response, false, error);
-        return;
-    }
-
     let {page, limit, offset} = request.query;
     let getAcquirersResult = await partner.getAllAcquirers(page, limit, offset);
 
@@ -196,14 +156,6 @@ const getAcquirers = async (request, response) => {
 }
 
 const getActiveAcquirers = async (request, response) => {
-    const errors = validationResult(request);
-    if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
-        error.data = errors.array();
-        wrapper.response(response, false, error);
-        return;
-    }
-
     let {page, limit, offset} = request.query;
     let getActiveAcquirersResult = await partner.getAllActiveAcquirers(page, limit, offset);
 

@@ -1,7 +1,7 @@
 const wrapper = require('../utilities/wrapper');
 const { validationResult } = require('express-validator');
 const { SUCCESS:successCode } = require('../utilities/httpStatusCode');
-const { BadRequestError, ForbiddenError, NotFoundError } = require('../utilities/error');
+const { BadRequestError, ForbiddenError } = require('../utilities/error');
 const Discount = require('../databases/postgresql/models/discount');
 const discount = new Discount(process.env.POSTGRESQL_DATABASE_PARTNER);
 
@@ -50,14 +50,6 @@ const deleteDiscount = async (request, response) => {
 }
 
 const getDiscounts = async (request, response) => {
-    const errors = validationResult(request);
-    if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
-        error.data = errors.array();
-        wrapper.response(response, false, error);
-        return;
-    }
-
     let result;
 
     if (request.query.code) {
