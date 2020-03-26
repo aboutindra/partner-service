@@ -164,6 +164,82 @@ describe("Get All Partner Quota", _ => {
             done();
         });
     });
+
+    it("Sending get all quota request with valid page query paramater", done => {
+        let queryResult = {
+            rowCount: 2,
+            rows: [
+                {
+                    partnerCode: "IDH",
+                    remainingQuotaPerDay: null,
+                    remainingQuotaPerMonth: null
+                },
+                {
+                    partnerCode: 'BRI',
+                    remainingQuotaPerDay: 1000000,
+                    remainingQuotaPerMonth: 100000000
+                }
+            ]
+        }
+        let countResult = {
+            rowCount: 2,
+            rows: [
+                {
+                    count: 2
+                }
+            ]
+        }
+        let pool = sandbox.stub(pgPool.prototype, 'query')
+        pool.onFirstCall().resolves(queryResult);
+        pool.onSecondCall().resolves(countResult);
+
+        chai.request(server)
+        .get(BASE_URL)
+        .query({ page: 2 })
+        .end((error, response) => {
+            pool.restore();
+            responseValidator.validateResponse(response, "Partner quota(s) retrieved", true, 200);
+            done();
+        });
+    });
+
+    it("Sending get all quota request with valid limit query paramater", done => {
+        let queryResult = {
+            rowCount: 2,
+            rows: [
+                {
+                    partnerCode: "IDH",
+                    remainingQuotaPerDay: null,
+                    remainingQuotaPerMonth: null
+                },
+                {
+                    partnerCode: 'BRI',
+                    remainingQuotaPerDay: 1000000,
+                    remainingQuotaPerMonth: 100000000
+                }
+            ]
+        }
+        let countResult = {
+            rowCount: 2,
+            rows: [
+                {
+                    count: 2
+                }
+            ]
+        }
+        let pool = sandbox.stub(pgPool.prototype, 'query')
+        pool.onFirstCall().resolves(queryResult);
+        pool.onSecondCall().resolves(countResult);
+
+        chai.request(server)
+        .get(BASE_URL)
+        .query({ limit: 10 })
+        .end((error, response) => {
+            pool.restore();
+            responseValidator.validateResponse(response, "Partner quota(s) retrieved", true, 200);
+            done();
+        });
+    });
 });
 
 describe("Get Partner Quota", _ => {
