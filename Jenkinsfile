@@ -10,7 +10,7 @@ pipeline {
 
         string(name: 'DOCKER_IMAGE_NAME',          description: 'Docker Image Name',                    defaultValue: 'inpoin-partner')
 
-        string(name: 'CHAT_ID',                    description: 'chat id of telegram group',            defaultValue: '-383243277')
+        string(name: 'CHAT_ID',                    description: 'chat id of telegram group',            defaultValue: '-1001215679728')
     }
     agent none
     options {
@@ -59,11 +59,12 @@ pipeline {
                     agent { label "nodejs" }
                     steps {
                         unstash 'ws'
-                        echo "Do Unit Test Here"
-                        
-                        // sh "npm install"
-                        // sh "npm run test"
                         script {
+                            echo "Do Unit Test Here"
+                            def node = tool name: 'NodeJS-10.16.3', type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
+                            env.PATH = "${node}/bin:${env.PATH}"
+                            sh "npm install"
+                            sh "npm run test"
                             echo "defining sonar-scanner"
                             def scannerHome = tool 'SonarScanner' ;
                             withSonarQubeEnv('SonarQube') {
