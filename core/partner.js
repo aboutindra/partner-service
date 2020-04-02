@@ -5,6 +5,9 @@ const ResponseMessage = require('../enum/httpResponseMessage');
 const { BadRequestError } = require('../utilities/error');
 const Partner = require('../databases/postgresql/models/partner');
 const partner = new Partner(process.env.POSTGRESQL_DATABASE_PARTNER);
+const PartnerResponseMessage = {
+    PARTNER_RETRIVIED: "Partner(s) retrieved"
+}
 
 const insertPartner = async (request, response) => {
     const errors = validationResult(request);
@@ -75,7 +78,7 @@ const getPartners = async (request, response) => {
     if (getPartnerResult.err) {
         wrapper.response(response, false, getPartnerResult);
     } else {
-        wrapper.paginationResponse(response, true, getPartnerResult, "Partner(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, getPartnerResult, PartnerResponseMessage.PARTNER_RETRIVIED, successCode.OK);
     }
     return;
 }
@@ -87,7 +90,7 @@ const getActivePartners = async (request, response) => {
     if (getActivePartnerResult.err) {
         wrapper.response(response, false, getActivePartnerResult);
     } else {
-        wrapper.paginationResponse(response, true, getActivePartnerResult, "Partner(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, getActivePartnerResult, PartnerResponseMessage.PARTNER_RETRIVIED, successCode.OK);
     }
     return;
 }
@@ -113,7 +116,7 @@ const getIssuers = async (request, response) => {
     if (getIssuersResult.err) {
         wrapper.response(response, false, getIssuersResult);
     } else {
-        wrapper.paginationResponse(response, true, getIssuersResult, "Partner(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, getIssuersResult, PartnerResponseMessage.PARTNER_RETRIVIED, successCode.OK);
     }
     return;
 }
@@ -125,7 +128,7 @@ const getActiveIssuers = async (request, response) => {
     if (getActiveIssuersResult.err) {
         wrapper.response(response, false, getActiveIssuersResult);
     } else {
-        wrapper.paginationResponse(response, true, getActiveIssuersResult, "Partner(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, getActiveIssuersResult, PartnerResponseMessage.PARTNER_RETRIVIED, successCode.OK);
     }
     return;
 }
@@ -151,7 +154,7 @@ const getAcquirers = async (request, response) => {
     if (getAcquirersResult.err) {
         wrapper.response(response, false, getAcquirersResult);
     } else {
-        wrapper.paginationResponse(response, true, getAcquirersResult, "Partner(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, getAcquirersResult, PartnerResponseMessage.PARTNER_RETRIVIED, successCode.OK);
     }
     return;
 }
@@ -163,7 +166,7 @@ const getActiveAcquirers = async (request, response) => {
     if (getActiveAcquirersResult.err) {
         wrapper.response(response, false, getActiveAcquirersResult);
     } else {
-        wrapper.paginationResponse(response, true, getActiveAcquirersResult, "Partner(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, getActiveAcquirersResult, PartnerResponseMessage.PARTNER_RETRIVIED, successCode.OK);
     }
     return;
 }
