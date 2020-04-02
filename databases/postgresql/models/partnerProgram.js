@@ -257,7 +257,6 @@ class PartnerProgram {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            console.log(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }

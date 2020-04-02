@@ -92,7 +92,7 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllPartnerQuery = {
             name: "get-partner-list",
-            text: `SELECT code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPacakgeId",
+            text: `SELECT code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPackageId",
                 name, url_logo AS "urlLogo", unit,
                 CASE WHEN issuer_cost_package_id IS NOT NULL AND acquirer_cost_package_id IS NOT NULL THEN 'Both'
                     WHEN issuer_cost_package_id IS NOT NULL THEN 'Issuer'
@@ -141,7 +141,7 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getPartnerQuery = {
             name: "get-partner",
-            text: `SELECT  code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPacakgeId",
+            text: `SELECT  code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPackageId",
                 name, url_logo AS "urlLogo", unit,
                 CASE WHEN issuer_cost_package_id IS NOT NULL AND acquirer_cost_package_id IS NOT NULL THEN 'Both'
                     WHEN issuer_cost_package_id IS NOT NULL THEN 'Issuer'
@@ -170,7 +170,7 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllActivePartnerQuery = {
             name: "get-active-partner-list",
-            text: `SELECT  code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPacakgeId",
+            text: `SELECT  code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPackageId",
                 name, url_logo AS "urlLogo", unit,
                 is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.partner
@@ -215,7 +215,7 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllIssuersQuery = {
             name: "get-issuer-list",
-            text: `SELECT  code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPacakgeId",
+            text: `SELECT  code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPackageId",
                 name, url_logo AS "urlLogo", unit,
                 is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.partner
@@ -336,7 +336,7 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllAcquirersQuery = {
             name: "get-acquirer-list",
-            text: `SELECT  code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPacakgeId",
+            text: `SELECT  code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPackageId",
                 name, url_logo AS "urlLogo", unit,
                 is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.partner
