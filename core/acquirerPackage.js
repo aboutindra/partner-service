@@ -2,13 +2,14 @@ const wrapper = require('../utilities/wrapper');
 const { validationResult } = require('express-validator');
 const AcquirerPackage = require('../databases/postgresql/models/acquirerPackage');
 const acquirerPackage = new AcquirerPackage(process.env.POSTGRESQL_DATABASE_PARTNER);
-const { SUCCESS:successCode } = require('../utilities/httpStatusCode');
+const { SUCCESS:successCode } = require('../enum/httpStatusCode');
+const ResponseMessage = require('../enum/httpResponseMessage');
 const { BadRequestError } = require('../utilities/error');
 
 const insertAcquirerPackage = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        let error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
@@ -30,7 +31,7 @@ const insertAcquirerPackage = async (request, response) => {
 const updateAcquirerPackage = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        let error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
@@ -53,7 +54,7 @@ const updateAcquirerPackage = async (request, response) => {
 const deleteAcquirerPackage = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        let error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
@@ -74,7 +75,7 @@ const deleteAcquirerPackage = async (request, response) => {
 const getAcquirerPackages = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        let error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;

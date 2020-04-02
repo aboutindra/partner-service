@@ -2,6 +2,10 @@ const { NotFoundError,InternalServerError,ConflictError,BadRequestError,Forbidde
 const wrapper = require('../../../utilities/wrapper');
 const postgresqlWrapper = require('../../postgresql');
 const { ERROR:errorCode } = require('../errorCode');
+const ResponseMessage = require('../../../enum/httpResponseMessage');
+const DiscountResponseMessage = {
+    DISCOUNT_NOT_FOUND: "Discount not found"
+}
 
 class Discount {
     constructor(database) {
@@ -34,7 +38,7 @@ class Discount {
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Code already exist"));
             }
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -51,12 +55,12 @@ class Discount {
         try {
             let result = await dbClient.query(deleteDiscountQuery);
             if (result.rowCount === 0) {
-                return wrapper.error(new NotFoundError("Discount not found"));
+                return wrapper.error(new NotFoundError(DiscountResponseMessage.DISCOUNT_NOT_FOUND));
             }
             return wrapper.data(result.rows);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -100,7 +104,7 @@ class Discount {
             return wrapper.paginationData(getAllDiscountResult.rows, meta);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -119,12 +123,12 @@ class Discount {
         try {
             let result = await dbClient.query(getDiscountQuery);
             if (result.rows.length === 0) {
-                return wrapper.error(new NotFoundError("Discount not found"));
+                return wrapper.error(new NotFoundError(DiscountResponseMessage.DISCOUNT_NOT_FOUND));
             }
             return wrapper.data(result.rows);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -148,7 +152,7 @@ class Discount {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -164,12 +168,12 @@ class Discount {
         try {
             let result = await dbPool.query(updateDiscountQuery);
             if (result.rowCount === 0) {
-                return wrapper.error(new NotFoundError("Discount not found"));
+                return wrapper.error(new NotFoundError(DiscountResponseMessage.DISCOUNT_NOT_FOUND));
             }
             return wrapper.data(result.rows);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 }

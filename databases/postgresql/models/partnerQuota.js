@@ -2,6 +2,7 @@ const { NotFoundError, InternalServerError, ForbiddenError } = require('../../..
 const { ERROR:errorCode } = require('../errorCode');
 const wrapper = require('../../../utilities/wrapper');
 const postgresqlWrapper = require('../../postgresql');
+const ResponseMessage = require('../../../enum/httpResponseMessage');
 
 class PartnerQuota {
     constructor(database) {
@@ -31,7 +32,7 @@ class PartnerQuota {
             if (error.code === errorCode.FOREIGN_KEY_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Partner doesn't exist"));
             }
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -62,7 +63,7 @@ class PartnerQuota {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -105,7 +106,7 @@ class PartnerQuota {
             return wrapper.paginationData(getAllQuotaResult.rows, meta);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -128,7 +129,7 @@ class PartnerQuota {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 }

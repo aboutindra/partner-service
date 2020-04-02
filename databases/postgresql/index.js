@@ -3,8 +3,7 @@ const config = require('config');
 const connectionPool = [];
 
 const connection = () => {
-  const connectionState = { index: null, config: '', db: null };
-  return connectionState;
+    return { index: null, config: '', db: null };
 };
 
 

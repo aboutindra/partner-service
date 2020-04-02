@@ -1,6 +1,7 @@
 const wrapper = require('../utilities/wrapper');
 const { validationResult } = require('express-validator');
-const { SUCCESS:successCode } = require('../utilities/httpStatusCode');
+const { SUCCESS:successCode } = require('../enum/httpStatusCode');
+const ResponseMessage = require('../enum/httpResponseMessage');
 const { BadRequestError,ForbiddenError } = require('../utilities/error');
 const PartnerProgram = require('../databases/postgresql/models/partnerProgram');
 const partnerProgram = new PartnerProgram(process.env.POSTGRESQL_DATABASE_PARTNER);
@@ -9,7 +10,7 @@ const partnerProgram = new PartnerProgram(process.env.POSTGRESQL_DATABASE_PARTNE
 const insertProgram = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        let error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
@@ -40,7 +41,7 @@ const insertProgram = async (request, response) => {
 const softDeleteProgram = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        let error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
@@ -60,7 +61,7 @@ const softDeleteProgram = async (request, response) => {
 const getPrograms = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        let error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;

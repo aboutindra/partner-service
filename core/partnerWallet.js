@@ -1,6 +1,6 @@
 const wrapper = require('../utilities/wrapper');
 const { validationResult } = require('express-validator');
-const { SUCCESS:successCode } = require('../utilities/httpStatusCode');
+const { SUCCESS:successCode } = require('../enum/httpStatusCode');
 const { BadRequestError } = require('../utilities/error');
 const PartnerWallet = require('../databases/postgresql/models/partnerWallet');
 const partnerWallet = new PartnerWallet(process.env.POSTGRESQL_DATABASE_PARTNER);

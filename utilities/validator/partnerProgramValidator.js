@@ -25,4 +25,5 @@ function upperingCase (value) {
     if (value) {
         return value.toUpperCase();
     }
+    return value;
 }

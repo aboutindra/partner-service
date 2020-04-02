@@ -1,6 +1,7 @@
 const wrapper = require('../utilities/wrapper');
 const { validationResult } = require('express-validator');
-const { SUCCESS:successCode } = require('../utilities/httpStatusCode');
+const { SUCCESS:successCode } = require('../enum/httpStatusCode');
+const ResponseMessage = require('../enum/httpResponseMessage');
 const { BadRequestError } = require('../utilities/error');
 const Partner = require('../databases/postgresql/models/partner');
 const partner = new Partner(process.env.POSTGRESQL_DATABASE_PARTNER);
@@ -8,7 +9,7 @@ const partner = new Partner(process.env.POSTGRESQL_DATABASE_PARTNER);
 const insertPartner = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        let error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
@@ -30,7 +31,7 @@ const insertPartner = async (request, response) => {
 const updatePartner = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        let error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;

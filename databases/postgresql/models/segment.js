@@ -2,6 +2,7 @@ const { NotFoundError, InternalServerError, ForbiddenError } = require('../../..
 const wrapper = require('../../../utilities/wrapper');
 const postgresqlWrapper = require('../../postgresql');
 const { ERROR:errorCode } = require('../errorCode');
+const ResponseMessage = require('../../../enum/httpResponseMessage');
 
 class Segment {
     constructor(database) {
@@ -29,7 +30,7 @@ class Segment {
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Segment name already exist"));
             }
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -54,7 +55,7 @@ class Segment {
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Segment name already exist"));
             }
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -75,7 +76,7 @@ class Segment {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -97,7 +98,7 @@ class Segment {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 }

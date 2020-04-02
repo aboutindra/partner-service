@@ -2,7 +2,7 @@ const wrapper = require('../utilities/wrapper');
 const { validationResult } = require('express-validator');
 const Segment = require('../databases/postgresql/models/segment');
 const segment = new Segment(process.env.POSTGRESQL_DATABASE_PARTNER);
-const { SUCCESS:successCode } = require('../utilities/httpStatusCode');
+const { SUCCESS:successCode } = require('../enum/httpStatusCode');
 const { BadRequestError } = require('../utilities/error');
 
 const insertSegment = async (request, response) => {

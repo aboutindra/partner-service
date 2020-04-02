@@ -1,6 +1,6 @@
 const wrapper = require('../utilities/wrapper');
 const { validationResult } = require('express-validator');
-const { SUCCESS:successCode } = require('../utilities/httpStatusCode');
+const { SUCCESS:successCode } = require('../enum/httpStatusCode');
 const { BadRequestError, ForbiddenError } = require('../utilities/error');
 const Discount = require('../databases/postgresql/models/discount');
 const discount = new Discount(process.env.POSTGRESQL_DATABASE_PARTNER);

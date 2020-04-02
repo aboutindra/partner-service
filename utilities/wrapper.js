@@ -1,5 +1,5 @@
 const { NotFoundError, InternalServerError, BadRequestError, ForbiddenError } = require('./error');
-const { ERROR:httpError } = require('./httpStatusCode');
+const { ERROR:httpError } = require('../enum/httpStatusCode');
 
 const checkErrorCode = (error) => {
   /* istanbul ignore next */

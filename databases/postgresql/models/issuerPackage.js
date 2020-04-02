@@ -2,6 +2,7 @@ const { NotFoundError, InternalServerError, BadRequestError, ForbiddenError } = 
 const wrapper = require('../../../utilities/wrapper');
 const postgresqlWrapper = require('../../postgresql');
 const { ERROR:errorCode } = require('../errorCode');
+const ResponseMessage = require('../../../enum/httpResponseMessage');
 
 class IssuerPackage {
     constructor(database) {
@@ -32,7 +33,7 @@ class IssuerPackage {
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Package name already exist"));
             }
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -60,7 +61,7 @@ class IssuerPackage {
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Package name already exist"));
             }
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -102,7 +103,7 @@ class IssuerPackage {
             return wrapper.paginationData(getAllIssuerPackagesResult.rows, meta);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -124,7 +125,7 @@ class IssuerPackage {
             return wrapper.data(getIssuerPackageByIdResult.rows);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -146,7 +147,7 @@ class IssuerPackage {
             return wrapper.data(deleteIssuerPackageResult.rows);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 

@@ -2,6 +2,10 @@ const { NotFoundError, InternalServerError, ForbiddenError } = require('../../..
 const wrapper = require('../../../utilities/wrapper');
 const postgresqlWrapper = require('../../postgresql');
 const { ERROR:errorCode } = require('../errorCode');
+const ResponseMessage = require('../../../enum/httpResponseMessage');
+const PartnerProgramResponseMessage = {
+    PARTNER_PROGRAM_NOT_FOUND: "Partner program not found"
+}
 
 class PartnerProgram {
     constructor(database) {
@@ -59,7 +63,7 @@ class PartnerProgram {
             if (error.code === errorCode.FOREIGN_KEY_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Partner doesn't exist"));
             }
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -76,12 +80,12 @@ class PartnerProgram {
         try {
             let result = await dbPool.query(deletePartnerProgramQuery);
             if (result.rowCount === 0) {
-                return wrapper.error(new NotFoundError("Partner program not found"));
+                return wrapper.error(new NotFoundError(PartnerProgramResponseMessage.PARTNER_PROGRAM_NOT_FOUND));
             }
             return wrapper.data(result.rows);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -125,7 +129,7 @@ class PartnerProgram {
             return wrapper.paginationData(getAllPartnerProgramResult.rows, meta);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -145,12 +149,12 @@ class PartnerProgram {
         try {
             let result = await dbPool.query(getPartnerProgramQuery);
             if (result.rows.length === 0) {
-                return wrapper.error(new NotFoundError("Partner program not found"));
+                return wrapper.error(new NotFoundError(PartnerProgramResponseMessage.PARTNER_PROGRAM_NOT_FOUND));
             }
             return wrapper.data(result.rows);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -197,7 +201,7 @@ class PartnerProgram {
             return wrapper.paginationData(getPartnerProgramResult.rows, meta);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -221,7 +225,7 @@ class PartnerProgram {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -248,13 +252,13 @@ class PartnerProgram {
             await client.query(activateProgram);
             let result = await client.query('COMMIT');
             if (result.rowCount === 0) {
-                return wrapper.error(new NotFoundError("Partner program not found"));
+                return wrapper.error(new NotFoundError(PartnerProgramResponseMessage.PARTNER_PROGRAM_NOT_FOUND));
             }
             return wrapper.data(result.rows);
         }
         catch (error) {
             console.log(error);
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 }

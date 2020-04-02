@@ -2,6 +2,10 @@ const { NotFoundError, InternalServerError, BadRequestError, ForbiddenError } = 
 const wrapper = require('../../../utilities/wrapper');
 const postgresqlWrapper = require('../../postgresql');
 const { ERROR:errorCode } = require('../errorCode');
+const ResponseMessage = require('../../../enum/httpResponseMessage');
+const PartnerResponseMessage = {
+    PARTNER_NOT_FOUND: "Partner(s) not found"
+}
 
 class Partner {
     constructor(database) {
@@ -32,7 +36,7 @@ class Partner {
             if (error.code === errorCode.FOREIGN_KEY_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Id not exist"));
             }
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
 
     }
@@ -58,7 +62,7 @@ class Partner {
             if (error.code === errorCode.FOREIGN_KEY_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Id not exist"));
             }
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -80,7 +84,7 @@ class Partner {
             return wrapper.data(deletePartnerResult.rows);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -110,7 +114,7 @@ class Partner {
         try {
             let getAllPartnersResult = await dbClient.query(getAllPartnerQuery);
             if (getAllPartnersResult.rows.length === 0) {
-                return wrapper.error(new NotFoundError("Partner(s) not found"));
+                return wrapper.error(new NotFoundError(PartnerResponseMessage.PARTNER_NOT_FOUND));
             }
             let countAllPartnersResult = await dbClient.query(countDataQuery);
             let totalData = parseInt(countAllPartnersResult.rows[0].count);
@@ -129,7 +133,7 @@ class Partner {
             return wrapper.paginationData(getAllPartnersResult.rows, meta);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -153,12 +157,12 @@ class Partner {
         try {
             let getPartnerByCodeResult = await dbClient.query(getPartnerQuery);
             if (getPartnerByCodeResult.rows.length === 0) {
-                return wrapper.error(new NotFoundError("Partner(s) not found"));
+                return wrapper.error(new NotFoundError(PartnerResponseMessage.PARTNER_NOT_FOUND));
             }
             return wrapper.data(getPartnerByCodeResult.rows);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -184,7 +188,7 @@ class Partner {
         try {
             let getAllActivePartnerResult = await dbClient.query(getAllActivePartnerQuery);
             if (getAllActivePartnerResult.rows.length === 0) {
-                return wrapper.error(new NotFoundError("Partner(s) not found"));
+                return wrapper.error(new NotFoundError(PartnerResponseMessage.PARTNER_NOT_FOUND));
             }
             let countAllActivePartnerResult = await dbClient.query(countDataQuery);
             let totalData = parseInt(countAllActivePartnerResult.rows[0].count);
@@ -203,7 +207,7 @@ class Partner {
             return wrapper.paginationData(getAllActivePartnerResult.rows, meta);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -229,7 +233,7 @@ class Partner {
         try {
             let getAllIssuersResult = await dbClient.query(getAllIssuersQuery);
             if (getAllIssuersResult.rows.length === 0) {
-                return wrapper.error(new NotFoundError("Partner(s) not found"));
+                return wrapper.error(new NotFoundError(PartnerResponseMessage.PARTNER_NOT_FOUND));
             }
             let countAllIssuersResult = await dbClient.query(countDataQuery);
             let totalData = parseInt(countAllIssuersResult.rows[0].count);
@@ -248,7 +252,7 @@ class Partner {
             return wrapper.paginationData(getAllIssuersResult.rows, meta);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -276,7 +280,7 @@ class Partner {
         try {
             let getAllActiveIssuersResult = await dbClient.query(getAllActiveIssuersQuery);
             if (getAllActiveIssuersResult.rows.length === 0) {
-                return wrapper.error(new NotFoundError("Partner(s) not found"));
+                return wrapper.error(new NotFoundError(PartnerResponseMessage.PARTNER_NOT_FOUND));
             }
             let countAllActiveIssuersResult = await dbClient.query(countActiveIssuersQuery);
             let totalData = parseInt(countAllActiveIssuersResult.rows[0].count);
@@ -295,7 +299,7 @@ class Partner {
             return wrapper.paginationData(getAllActiveIssuersResult.rows, meta);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -324,7 +328,7 @@ class Partner {
             return wrapper.data(getIssuerResult.rows);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -350,7 +354,7 @@ class Partner {
         try {
             let getAllAcquirersResult = await dbClient.query(getAllAcquirersQuery);
             if (getAllAcquirersResult.rows.length === 0) {
-                return wrapper.error(new NotFoundError("Partner(s) not found"));
+                return wrapper.error(new NotFoundError(PartnerResponseMessage.PARTNER_NOT_FOUND));
             }
             let countAllAcquirersResult = await dbClient.query(countDataQuery);
             let totalData = parseInt(countAllAcquirersResult.rows[0].count);
@@ -369,7 +373,7 @@ class Partner {
             return wrapper.paginationData(getAllAcquirersResult.rows, meta);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -397,7 +401,7 @@ class Partner {
         try {
             let getAllActiveAcquirersResult = await dbClient.query(getAllActiveAcquirersQuery);
             if (getAllActiveAcquirersResult.rows.length === 0) {
-                return wrapper.error(new NotFoundError("Partner(s) not found"));
+                return wrapper.error(new NotFoundError(PartnerResponseMessage.PARTNER_NOT_FOUND));
             }
             let count = await dbClient.query(countActiveAcquirersQuery);
             let totalData = parseInt(count.rows[0].count);
@@ -416,7 +420,7 @@ class Partner {
             return wrapper.paginationData(getAllActiveAcquirersResult.rows, meta);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -440,7 +444,7 @@ class Partner {
             return wrapper.data(getAcquireResult.rows);
         }
         catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 

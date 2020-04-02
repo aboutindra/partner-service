@@ -2,6 +2,7 @@ const { NotFoundError, InternalServerError, ForbiddenError } = require('../../..
 const { ERROR:errorCode } = require('../errorCode');
 const wrapper = require('../../../utilities/wrapper');
 const postgresqlWrapper = require('../../postgresql');
+const ResponseMessage = require('../../../enum/httpResponseMessage');
 
 class PartnerWallet{
     constructor(database) {
@@ -29,7 +30,7 @@ class PartnerWallet{
             if (error.code === errorCode.FOREIGN_KEY_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Partner doesn't exist"));
             }
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -48,7 +49,7 @@ class PartnerWallet{
             }
             return wrapper.data(result.rows);
         } catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -68,7 +69,7 @@ class PartnerWallet{
             }
             return wrapper.data(result.rows);
         } catch (error) {
-            return wrapper.error(new InternalServerError("Internal server error"));
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
 }
