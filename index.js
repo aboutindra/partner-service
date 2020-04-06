@@ -8,7 +8,7 @@ const discount = new Discount(process.env.POSTGRESQL_DATABASE_PARTNER);
 const PartnerProgram = require('./databases/postgresql/models/partnerProgram');
 const partnerProgram = new PartnerProgram(process.env.POSTGRESQL_DATABASE_PARTNER);
 
-cron.schedule("0 * * * *", async function() {
+cron.schedule("* * * * *", async function() {
     console.log("Running cron-job: Updating Discount Status and Partner Program");
     await Promise.all([discount.updateDiscountStatus(), partnerProgram.updatePartnerProgramStatus()]);
 });
