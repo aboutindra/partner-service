@@ -8,9 +8,10 @@ const discount = new Discount(process.env.POSTGRESQL_DATABASE_PARTNER);
 const PartnerProgram = require('./databases/postgresql/models/partnerProgram');
 const partnerProgram = new PartnerProgram(process.env.POSTGRESQL_DATABASE_PARTNER);
 
-cron.schedule("* * * * *", async function() {
+cron.schedule("0 * * * *", async function() {
     console.log("Running cron-job: Updating Discount Status and Partner Program");
-    await Promise.all([discount.updateDiscountStatus(), partnerProgram.updatePartnerProgramStatus()]);
+    let response =  await Promise.all([discount.updateDiscountStatus(), partnerProgram.updatePartnerProgramStatus()]);
+    console.log(response);
 });
 
 let listener = appServer.app.listen(port, _ => {
