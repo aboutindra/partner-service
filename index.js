@@ -14,8 +14,8 @@ cron.schedule("0 * * * *", async function() {
     console.log(response);
 });
 
-let listener = appServer.app.listen(port, _ => {
-    logger.info("Service started, listening at " + listener.address().port);
-});
+appServer.app.listen(port, () => {
+    logger.info("Service started, listening at " + port);
+})
 
 module.exports = appServer.app;

@@ -40,7 +40,7 @@ function AppServer() {
     }
 
     this.app.get('/', (request, response) => {
-        responder.sendResponse(response, true, "Service is active", {}, 200);
+        responder.sendResponse(response, true, "Service is active", null, 200);
     })
 
     acquirerPackage.routes(this.app);
