@@ -170,10 +170,13 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllActivePartnerQuery = {
             name: "get-active-partner-list",
-            text: `SELECT  code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPackageId",
-                name, url_logo AS "urlLogo", unit,
-                is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
-                FROM public.partner
+            text: `SELECT  code, segment_id AS "segmentId",
+                CASE WHEN issuer_cost_package_id IS NOT NULL THEN true ELSE false END AS "isIssuer",
+                CASE WHEN acquirer_cost_package_id IS NOT NULL THEN true ELSE false END AS "isAcquirer",
+                CASE WHEN (SELECT true FROM public.partner_program WHERE partner_code = partner.code
+                AND start_date <= NOW() AND NOW() <= end_date AND is_active = true) IS true THEN true ELSE false END AS "isProgramActive",
+                name, url_logo AS "urlLogo", unit, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
+                FROM public.partner AS partner
                 WHERE is_deleted = false
                 ORDER BY name
                 LIMIT $1 OFFSET $2;`,
