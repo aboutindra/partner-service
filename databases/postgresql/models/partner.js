@@ -310,7 +310,7 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getIssuerQuery = {
             name: "get-issuer",
-            text: `SELECT  code, cost_type AS "costType", amount AS "costAmount", exchange_rate AS "exchangeRate",
+            text: `SELECT  code, cost_type AS "costType", amount AS "costAmount", cost_bearer_type AS "costBearerType", exchange_rate AS "exchangeRate",
                 minimum_amount_per_transaction AS "minimumAmountPerTransaction",
                 maximum_amount_per_transaction AS "maximumAmountPerTransaction",
                 remaining_deduction_quota_per_day AS "remainingDeductionQuotaPerDay",
