@@ -5,10 +5,12 @@ const sandbox = require('sinon').createSandbox();
 const BASE_URL = "/api/v1/packages/issuers";
 const pgPool = require('pg-pool');
 const responseValidator = require('./responseValidator');
+const CostType = require('../enum/costType');
+const CostBearerType = require('../enum/costBearerType');
 
 chai.use(chaiHttp);
 
-describe("Get issuer Package", _ => {
+describe("Get Issuer Package", _ => {
     it("Sending get package request with invalid id parameter (negative number)", done => {
         chai.request(server)
         .get(BASE_URL)
@@ -265,7 +267,7 @@ describe("Get Issuer Package", () => {
 
 })
 
-describe("Delete issuer Package", _ => {
+describe("Delete Issuer Package", _ => {
     let PARAMS = 1;
     it("Sending delete issuer package request with invalid package id (alphabet)", done => {
         let PARAMS = 'SYS';
@@ -332,7 +334,7 @@ describe("Delete issuer Package", _ => {
     });
 });
 
-describe("Update issuer Package", _ => {
+describe("Update Issuer Package", _ => {
     let PARAMS = 1;
 
     it("Sending update issuer package request without body parameters", done => {
@@ -347,7 +349,7 @@ describe("Update issuer Package", _ => {
     it("Sending update issuer package request without package name parameter", done => {
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
-        .send({ costType: 'fixed', amount: 100 })
+        .send({ costType: CostType.FIXED, costBearerType: CostBearerType.PARTNER, amount: 100 })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -357,7 +359,17 @@ describe("Update issuer Package", _ => {
     it("Sending update issuer package request without cost type parameter", done => {
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
-        .send({ name: 'BASIC', amount: 100 })
+        .send({ name: 'BASIC', amount: 100, costBearerType: CostBearerType.PARTNER })
+        .end((error, response) => {
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
+            done();
+        });
+    });
+
+    it("Sending update issuer package request without cost bearer type parameter", done => {
+        chai.request(server)
+        .put(BASE_URL + '/' + PARAMS)
+        .send({ costType: CostType.FIXED, name: 'BASIC', amount: 100 })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -367,7 +379,7 @@ describe("Update issuer Package", _ => {
     it("Sending update issuer package request without amount parameter", done => {
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
-        .send({ costType: 'fixed', name: 'BASIC' })
+        .send({ costType: CostType.FIXED, name: 'BASIC', costBearerType: CostBearerType.PARTNER })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -377,7 +389,7 @@ describe("Update issuer Package", _ => {
     it("Sending update issuer package request with invalid amount parameter (negative number)", done => {
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
-        .send({ name: 'BASIC', costType: 'fixed', amount: -1 })
+        .send({ name: 'BASIC', costType: 'fixed', amount: -1, costBearerType: CostBearerType.PARTNER })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -387,7 +399,7 @@ describe("Update issuer Package", _ => {
     it("Sending update issuer package request with invalid amount parameter (alphabet)", done => {
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
-        .send({ name: 'BASIC', costType: 'fixed', amount: 'sys' })
+        .send({ name: 'BASIC', costType: 'fixed', amount: 'sys', costBearerType: CostBearerType.PARTNER })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -397,7 +409,17 @@ describe("Update issuer Package", _ => {
     it("Sending update issuer package request with invalid cost type parameter", done => {
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
-        .send({ name: 'BASIC', costType: 'empty', amount: 100 })
+        .send({ name: 'BASIC', costType: 'empty', amount: 100, costBearerType: CostBearerType.PARTNER })
+        .end((error, response) => {
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
+            done();
+        });
+    });
+
+    it("Sending update issuer package request with invalid cost bearer type parameter", done => {
+        chai.request(server)
+        .put(BASE_URL + '/' + PARAMS)
+        .send({ name: 'BASIC', costType: CostType.FIXED, amount: 100, costBearerType: "empty" })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -412,7 +434,7 @@ describe("Update issuer Package", _ => {
 
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
-        .send({ name: 'BASIC', costType: 'fixed', amount: 100 })
+        .send({ name: 'BASIC', costType: CostType.FIXED, amount: 100, costBearerType: CostBearerType.PARTNER })
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Package name already exist", false, 403);
@@ -428,7 +450,7 @@ describe("Update issuer Package", _ => {
 
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
-        .send({ name: 'BASIC', costType: 'fixed', amount: 100 })
+        .send({ name: 'BASIC', costType: CostType.FIXED, amount: 100, costBearerType: CostBearerType.PARTNER })
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Invalid type value", false, 403);
@@ -441,7 +463,7 @@ describe("Update issuer Package", _ => {
 
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
-        .send({ name: 'BASIC', costType: 'fixed', amount: 100 })
+        .send({ name: 'BASIC', costType: CostType.FIXED, amount: 100, costBearerType: CostBearerType.PARTNER })
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
@@ -458,7 +480,7 @@ describe("Update issuer Package", _ => {
 
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
-        .send({ name: 'BASIC', costType: 'fixed', amount: 100 })
+        .send({ name: 'BASIC', costType: CostType.FIXED, amount: 100, costBearerType: CostBearerType.PARTNER })
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Package(s) not found", false, 404);
@@ -475,7 +497,7 @@ describe("Update issuer Package", _ => {
 
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
-        .send({ name: 'BASIC', costType: 'fixed', amount: 100 })
+        .send({ name: 'BASIC', costType: CostType.FIXED, amount: 100, costBearerType: CostBearerType.PARTNER })
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Package updated", true, 200);
@@ -484,7 +506,7 @@ describe("Update issuer Package", _ => {
     });
 });
 
-describe("Insert issuer Package", _ => {
+describe("Insert Issuer Package", _ => {
     it("Sending insert issuer package request without body parameter", done => {
         chai.request(server)
         .post(BASE_URL)
@@ -497,7 +519,7 @@ describe("Insert issuer Package", _ => {
     it("Sending insert issuer package request without package name parameter", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ costType: 'fixed', amount: 100 })
+        .send({ costType: CostType.FIXED, amount: 100, costBearerType: CostBearerType.PARTNER })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -507,7 +529,17 @@ describe("Insert issuer Package", _ => {
     it("Sending insert issuer package request without cost type parameter", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ name: 'BASIC', amount: 100 })
+        .send({ name: 'BASIC', amount: 100, costBearerType: CostBearerType.PARTNER })
+        .end((error, response) => {
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
+            done();
+        });
+    });
+
+    it("Sending insert issuer package request without cost bearer type parameter", done => {
+        chai.request(server)
+        .post(BASE_URL)
+        .send({ costType: CostType.FIXED ,name: 'BASIC', amount: 100 })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -517,7 +549,7 @@ describe("Insert issuer Package", _ => {
     it("Sending insert issuer package request without amount parameter", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ costType: 'fixed', name: 'BASIC' })
+        .send({ costType: CostType.FIXED, name: 'BASIC', costBearerType: CostBearerType.PARTNER })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -527,7 +559,7 @@ describe("Insert issuer Package", _ => {
     it("Sending insert issuer package request with invalid amount parameter (negative number)", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ name: 'BASIC', costType: 'fixed', amount: -1 })
+        .send({ name: 'BASIC', costType: CostType.FIXED, amount: -1, costBearerType: CostBearerType.PARTNER })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -537,7 +569,7 @@ describe("Insert issuer Package", _ => {
     it("Sending insert issuer package request with invalid amount parameter (alphabet)", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ name: 'BASIC', costType: 'fixed', amount: 'sys' })
+        .send({ name: 'BASIC', costType: CostType.FIXED, amount: 'sys', costBearerType: CostBearerType.PARTNER })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -547,7 +579,17 @@ describe("Insert issuer Package", _ => {
     it("Sending insert issuer package request with invalid cost type parameter", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ name: 'BASIC', costType: 'empty', amount: 100 })
+        .send({ name: 'BASIC', costType: 'empty', amount: 100, costBearerType: CostBearerType.PARTNER })
+        .end((error, response) => {
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
+            done();
+        });
+    });
+
+    it("Sending insert issuer package request with invalid cost bearer type parameter", done => {
+        chai.request(server)
+        .post(BASE_URL)
+        .send({ name: 'BASIC', costType: CostType.FIXED, amount: 100, costBearerType: "empty" })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -562,7 +604,7 @@ describe("Insert issuer Package", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ name: 'BASIC', costType: 'fixed', amount: 100 })
+        .send({ name: 'BASIC', costType: CostType.FIXED, amount: 100, costBearerType: CostBearerType.PARTNER })
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Package name already exist", false, 403);
@@ -578,7 +620,7 @@ describe("Insert issuer Package", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ name: 'BASIC', costType: 'fixed', amount: 100 })
+        .send({ name: 'BASIC', costType: CostType.FIXED, amount: 100, costBearerType: CostBearerType.PARTNER })
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Invalid type value", false, 403);
@@ -591,7 +633,7 @@ describe("Insert issuer Package", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ name: 'BASIC', costType: 'fixed', amount: 100 })
+        .send({ name: 'BASIC', costType: CostType.FIXED, amount: 100, costBearerType: CostBearerType.PARTNER })
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
@@ -608,7 +650,7 @@ describe("Insert issuer Package", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ name: 'BASIC', costType: 'fixed', amount: 100 })
+        .send({ name: 'BASIC', costType: CostType.FIXED, amount: 100, costBearerType: CostBearerType.PARTNER })
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Failed add new package", false, 404);
@@ -625,7 +667,7 @@ describe("Insert issuer Package", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ name: 'BASIC', costType: 'fixed', amount: 100 })
+        .send({ name: 'BASIC', costType: CostType.FIXED, amount: 100, costBearerType: CostBearerType.PARTNER })
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Package added", true, 201);
