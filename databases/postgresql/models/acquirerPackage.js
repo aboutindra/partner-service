@@ -9,14 +9,14 @@ class AcquirerPackage {
        this.database = database
     }
 
-    async insertPackage(name, costType, amount) {
+    async insertPackage(name, costType, costBearerType, amount) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let insertPackageQuery = {
             name: 'add-new-acquirer-package',
             text: `INSERT INTO public.acquirer_cost_package(
-                name, cost_type, amount, is_deleted, created_at, updated_at)
-                VALUES ($1, $2::cost_type, $3, $4, $5, $6);`,
-            values: [name, costType, amount, false, new Date(), new Date()]
+                name, cost_type, cost_bearer_type, amount, is_deleted, created_at, updated_at)
+                VALUES ($1, $2::cost_type, $3::cost_bearer_type, $4, $5, $6, $7);`,
+            values: [name, costType, costBearerType, amount, false, new Date(), new Date()]
         }
 
         try {
@@ -37,14 +37,14 @@ class AcquirerPackage {
         }
     }
 
-    async updatePackageById(id, name, costType, amount) {
+    async updatePackageById(id, name, costType, costBearerType, amount) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let updateAcquirerPackageQuery = {
             name: 'update-acquirer-package',
             text: `UPDATE public.acquirer_cost_package
-                SET name=$2, cost_type=$3::cost_type, amount=$4, updated_at=$5
+                SET name=$2, cost_type=$3::cost_type, cost_bearer_type=$4::cost_bearer_type, amount=$5, updated_at=$6
                 WHERE id = $1;`,
-            values: [id, name, costType, amount, new Date()]
+            values: [id, name, costType, costBearerType, amount, new Date()]
         }
 
         try {
@@ -69,7 +69,8 @@ class AcquirerPackage {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllAcquirerPackagesQuery = {
             name: 'get-acquirer-cost-package-list',
-            text: `SELECT id, name, cost_type AS "costType", amount, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
+            text: `SELECT id, name, cost_type AS "costType", cost_bearer_type AS "costBearerType", amount, is_deleted AS "isDeleted", created_at AS "createdAt",
+                updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.acquirer_cost_package
                 ORDER BY name
                 LIMIT $1 OFFSET $2;`,
@@ -110,7 +111,8 @@ class AcquirerPackage {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAcquirerPackageByIdQuery = {
             name: 'get-acquirer-cost-package',
-            text: `SELECT id, name, cost_type AS "costType", amount, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
+            text: `SELECT id, name, cost_type AS "costType", cost_bearer_type AS "costBearerType", amount, is_deleted AS "isDeleted", created_at AS "createdAt",
+                updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.acquirer_cost_package
                 WHERE id = $1`,
             values: [id]

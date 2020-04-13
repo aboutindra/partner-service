@@ -1,16 +1,21 @@
 const { query, param, body } = require('express-validator');
+const CostType = require('../../enum/costType');
+const CostBearerType = require('../../enum/costBearerType');
+const loweringCaseInput = require('./enumCaseFormatter').LoweringCaseInput;
 
 exports.validateInsertAcquirerPackage = [
     body('name').not().isEmpty().withMessage("Name can not be empty"),
-    body('costType').not().isEmpty().isIn(['fixed', 'percentage', 'FIXED', 'PERCENTAGE']).withMessage("Cost type can only be fixed or percentage"),
-    body('amount').not().isEmpty().isFloat({ min: 0 }).withMessage("Amount must be positive float")
+    body('costType').customSanitizer(loweringCaseInput).isIn(CostType.getEnumValues()).withMessage("Cost type must be valid value"),
+    body('costBearerType').customSanitizer(loweringCaseInput).isIn(CostBearerType.getEnumValues()).withMessage("Cost bearer type must be valid value"),
+    body('amount').isFloat({ min: 0 }).withMessage("Amount must be positive float")
 ]
 
 exports.validateUpdateAcquirerPackage = [
     param('id').isInt().withMessage("Id must be positive integer"),
     body('name').not().isEmpty().withMessage("Name can not be empty"),
-    body('costType').not().isEmpty().isIn(['fixed', 'percentage', 'FIXED', 'PERCENTAGE']).withMessage("Cost type can only be fixed or percentage"),
-    body('amount').not().isEmpty().isFloat({ min: 0 }).withMessage("Amount must be positive integer")
+    body('costType').customSanitizer(loweringCaseInput).isIn(CostType.getEnumValues()).withMessage("Cost type must be valid value"),
+    body('costBearerType').customSanitizer(loweringCaseInput).isIn(CostBearerType.getEnumValues()).withMessage("Cost bearer type must be valid value"),
+    body('amount').isFloat({ min: 0 }).withMessage("Amount must be positive float")
 ]
 
 exports.validateGetAcquirerPackage = [

@@ -15,10 +15,10 @@ const insertIssuerPackage = async (request, response) => {
         return;
     }
 
-    let { name, costType } = request.body;
+    let { name, costType, costBearerType } = request.body;
     let amount = Number(request.body.amount);
 
-    let insertIssuerPackageResult = await issuerPackage.insertPackage(name, costType.toLowerCase(), amount);
+    let insertIssuerPackageResult = await issuerPackage.insertPackage(name, costType, costBearerType, amount);
 
     if (insertIssuerPackageResult.err) {
         wrapper.response(response, false, insertIssuerPackageResult);
@@ -38,10 +38,10 @@ const updateIssuerPackage = async (request, response) => {
     }
 
     let id = parseInt(request.params.id);
-    let { name, costType } = request.body;
+    let { name, costType, costBearerType } = request.body;
     let amount = Number(request.body.amount);
 
-    let updateIssuerPackageResult = await issuerPackage.updatePackageById(id, name, costType.toLowerCase(), amount);
+    let updateIssuerPackageResult = await issuerPackage.updatePackageById(id, name, costType, costBearerType, amount);
 
     if (updateIssuerPackageResult.err) {
         wrapper.response(response, false, updateIssuerPackageResult);

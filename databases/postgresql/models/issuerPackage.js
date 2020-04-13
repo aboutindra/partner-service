@@ -9,14 +9,14 @@ class IssuerPackage {
        this.database = database
     }
 
-    async insertPackage(name, costType, amount) {
+    async insertPackage(name, costType, costBearerType, amount) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let insertPackageQuery = {
             name: 'add-new-issuer-package',
             text: `INSERT INTO public.issuer_cost_package(
-                name, cost_type, amount, is_deleted, created_at, updated_at)
-                VALUES ($1, $2::cost_type, $3, $4, $5, $6);`,
-            values: [name, costType, amount, false, new Date(), new Date()]
+                name, cost_type, cost_bearer_type, amount, is_deleted, created_at, updated_at)
+                VALUES ($1, $2::cost_type, $3::cost_bearer_type, $4, $5, $6, $7);`,
+            values: [name, costType, costBearerType, amount, false, new Date(), new Date()]
         }
 
         try {
@@ -37,14 +37,14 @@ class IssuerPackage {
         }
     }
 
-    async updatePackageById(id, name, costType, amount) {
+    async updatePackageById(id, name, costType, costBearerType, amount) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let updateIssuerPackageQuery = {
             name: 'update-issuer-package',
             text: `UPDATE public.issuer_cost_package
-                SET name=$2, cost_type=$3::cost_type, amount=$4, updated_at=$5
+                SET name=$2, cost_type=$3::cost_type, cost_bearer_type=$4::cost_bearer_type, amount=$5, updated_at=$6
                 WHERE id = $1;`,
-            values: [id, name, costType, amount, new Date()]
+            values: [id, name, costType, costBearerType, amount, new Date()]
         }
 
         try {
@@ -69,7 +69,8 @@ class IssuerPackage {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllIssuerPackagesQuery = {
             name: 'get-issuer-cost-package-list',
-            text: `SELECT id, name, cost_type AS "costType", amount, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
+            text: `SELECT id, name, cost_type AS "costType", cost_bearer_type AS "costBearerType", amount, is_deleted AS "isDeleted", created_at AS "createdAt",
+                updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.issuer_cost_package
                 ORDER BY created_at DESC
                 LIMIT $1 OFFSET $2;`,
@@ -103,6 +104,7 @@ class IssuerPackage {
             return wrapper.paginationData(getAllIssuerPackagesResult.rows, meta);
         }
         catch (error) {
+            console.error(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -111,7 +113,8 @@ class IssuerPackage {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getIssuerPackageByIdQuery = {
             name: 'get-issuer-cost-package',
-            text: `SELECT id, name, cost_type AS "costType", amount, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
+            text: `SELECT id, name, cost_type AS "costType", cost_bearer_type AS "costBearerType", amount, is_deleted AS "isDeleted", created_at AS "createdAt",
+                updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.issuer_cost_package
                 WHERE id = $1`,
             values: [id]
@@ -150,7 +153,6 @@ class IssuerPackage {
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
-
 }
 
 module.exports = IssuerPackage;

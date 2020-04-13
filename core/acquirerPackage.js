@@ -15,10 +15,10 @@ const insertAcquirerPackage = async (request, response) => {
         return;
     }
 
-    let { name, costType } = request.body;
+    let { name, costType, costBearerType } = request.body;
     let amount = Number(request.body.amount);
 
-    let insertAcquirerPackageResult = await acquirerPackage.insertPackage(name, costType.toLowerCase(), amount);
+    let insertAcquirerPackageResult = await acquirerPackage.insertPackage(name, costType, costBearerType, amount);
 
     if (insertAcquirerPackageResult.err) {
         wrapper.response(response, false, insertAcquirerPackageResult);
@@ -38,10 +38,10 @@ const updateAcquirerPackage = async (request, response) => {
     }
 
     let id = parseInt(request.params.id);
-    let { name, costType } = request.body;
+    let { name, costType, costBearerType } = request.body;
     let amount = Number(request.body.amount);
 
-    let updateAcquirerPackageResult = await acquirerPackage.updatePackageById(id, name, costType.toLowerCase(), amount);
+    let updateAcquirerPackageResult = await acquirerPackage.updatePackageById(id, name, costType, costBearerType, amount);
 
     if (updateAcquirerPackageResult.err) {
         wrapper.response(response, false, updateAcquirerPackageResult);
