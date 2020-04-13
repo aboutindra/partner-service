@@ -104,7 +104,6 @@ class IssuerPackage {
             return wrapper.paginationData(getAllIssuerPackagesResult.rows, meta);
         }
         catch (error) {
-            console.error(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
