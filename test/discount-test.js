@@ -48,8 +48,6 @@ describe("Get Active Discount", _ => {
                     "name": "Promo Diskon di Awal Tahun",
                     "deductionDiscountType": "percentage",
                     "deductionDiscountAmount": "50.00",
-                    "additionDiscountType": "percentage",
-                    "additionDiscountAmount": "50.00",
                     "isActive": false,
                     "startDate": "2019-12-31T17:00:00.000Z",
                     "endDate": "2020-02-28T17:00:00.000Z",
@@ -111,8 +109,6 @@ describe("Get Discount(s)", _ => {
                     "name": "Promo Diskon di Awal Tahun",
                     "deductionDiscountType": "percentage",
                     "deductionDiscountAmount": "50.00",
-                    "additionDiscountType": "percentage",
-                    "additionDiscountAmount": "50.00",
                     "isActive": false,
                     "startDate": "2019-12-31T17:00:00.000Z",
                     "endDate": "2020-02-28T17:00:00.000Z",
@@ -193,8 +189,6 @@ describe("Get Discounts", () => {
                     "name": "Promo Diskon di Awal Tahun",
                     "deductionDiscountType": "percentage",
                     "deductionDiscountAmount": "50.00",
-                    "additionDiscountType": "percentage",
-                    "additionDiscountAmount": "50.00",
                     "isActive": false,
                     "startDate": "2019-12-31T17:00:00.000Z",
                     "endDate": "2020-02-28T17:00:00.000Z",
@@ -234,8 +228,6 @@ describe("Get Discounts", () => {
                     "name": "Promo Diskon di Awal Tahun",
                     "deductionDiscountType": "percentage",
                     "deductionDiscountAmount": "50.00",
-                    "additionDiscountType": "percentage",
-                    "additionDiscountAmount": "50.00",
                     "isActive": false,
                     "startDate": "2019-12-31T17:00:00.000Z",
                     "endDate": "2020-02-28T17:00:00.000Z",
@@ -330,8 +322,7 @@ describe("Add Discount with Invalid Parameter", () => {
     it("Sending add discount request without discount code parameter", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, additionDiscountType: "fixed", additionDiscountAmount: 100,
-            startDate: new Date(), endDate: new Date()})
+        .send({ name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -341,8 +332,7 @@ describe("Add Discount with Invalid Parameter", () => {
     it("Sending add discount request without discount name parameter", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEAR5", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, additionDiscountType: "fixed", additionDiscountAmount: 100,
-            startDate: new Date(), endDate: new Date()})
+        .send({ code: "NEWYEAR5", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -352,19 +342,7 @@ describe("Add Discount with Invalid Parameter", () => {
     it("Sending add discount request without deduction discount amount parameter", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', additionDiscountType: "fixed", additionDiscountAmount: 100,
-            startDate: new Date(), endDate: new Date()})
-        .end((error, response) => {
-            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
-            done();
-        });
-    });
-
-    it("Sending add discount request without addition discount amount parameter", done => {
-        chai.request(server)
-        .post(BASE_URL)
-        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, additionDiscountType: "fixed",
-            startDate: new Date(), endDate: new Date()})
+        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -374,19 +352,17 @@ describe("Add Discount with Invalid Parameter", () => {
     it("Sending add discount request with partner code more than 10 characters", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEARDISCOUNT5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, additionDiscountType: "fixed",
-            additionDiscountAmount: 100, startDate: new Date(), endDate: new Date()})
+        .send({ code: "NEWYEARDISCOUNT5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
 
-    it("Sending add discount request with invalid deduction and addition amount", done => {
+    it("Sending add discount request with invalid deduction amount", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: -1, additionDiscountType: "fixed", additionDiscountAmount: -1,
-            startDate: new Date(), endDate: new Date()})
+        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: -1, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -396,8 +372,7 @@ describe("Add Discount with Invalid Parameter", () => {
     it("Sending add discount request with invalid cost type parameter", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'nonfixed', deductionDiscountAmount: 100, additionDiscountType: "zero",
-            additionDiscountAmount: 100, startDate: new Date(), endDate: new Date()})
+        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'nonfixed', deductionDiscountAmount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -407,8 +382,7 @@ describe("Add Discount with Invalid Parameter", () => {
     it("Sending add discount request with invalid date parameter", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'nonfixed', deductionDiscountAmount: 100, additionDiscountType: "zero",
-            additionDiscountAmount: 100, startDate: '', endDate: ''})
+        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'nonfixed', deductionDiscountAmount: 100, startDate: '', endDate: ''})
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -430,8 +404,7 @@ describe("Add Discount", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, additionDiscountType: "percentage",
-            additionDiscountAmount: 10, startDate: new Date(), endDate: new Date()})
+        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "There is another program currently running", false, 403);
@@ -444,8 +417,7 @@ describe("Add Discount", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, additionDiscountType: "percentage",
-            additionDiscountAmount: 10, startDate: new Date(), endDate: new Date()})
+        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
@@ -464,8 +436,7 @@ describe("Add Discount", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, additionDiscountType: "percentage",
-            additionDiscountAmount: 10, startDate: new Date(), endDate: new Date()})
+        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             pool.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
@@ -487,8 +458,7 @@ describe("Add Discount", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, additionDiscountType: "percentage",
-            additionDiscountAmount: 10, startDate: new Date(), endDate: new Date()})
+        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             pool.restore();
             responseValidator.validateResponse(response, "Invalid type value", false, 403);
@@ -510,8 +480,7 @@ describe("Add Discount", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, additionDiscountType: "percentage",
-            additionDiscountAmount: 10, startDate: new Date(), endDate: new Date()})
+        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             pool.restore();
             responseValidator.validateResponse(response, "Code already exist", false, 403);
@@ -534,8 +503,7 @@ describe("Add Discount", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, additionDiscountType: "percentage",
-            additionDiscountAmount: 10, startDate: new Date(), endDate: new Date()})
+        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             pool.restore();
             responseValidator.validateResponse(response, "Failed add new package", false, 404);
@@ -558,8 +526,7 @@ describe("Add Discount", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, additionDiscountType: "percentage",
-            additionDiscountAmount: 10, startDate: new Date(), endDate: new Date()})
+        .send({ code: "NEWYEAR5", name: "New Year Discount", deductionDiscountType: 'fixed', deductionDiscountAmount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             pool.restore();
             responseValidator.validateResponse(response, "Discount added", true, 201);

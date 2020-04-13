@@ -13,15 +13,15 @@ class Discount {
     }
 
     async insertDiscount(params) {
-        let {code, name, deductionDiscountType, deductionDiscountAmount, additionDiscountType, additionDiscountAmount, startDate, endDate} = params;
+        let {code, name, deductionDiscountType, deductionDiscountAmount, startDate, endDate} = params;
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let insertDiscountQuery = {
             name: 'insert-discount',
             text: `INSERT INTO public.discount_program(
-                code, name, deduction_discount_type, deduction_discount_amount, addition_discount_type, addition_discount_amount, is_active, start_date,
+                code, name, deduction_discount_type, deduction_discount_amount, is_active, start_date,
                 end_date, created_at, updated_at)
                 VALUES ($1, $2, LOWER($3)::cost_type, $4, LOWER($5)::cost_type, $6, $7, $8, $9, $10, $11);`,
-            values: [code, name, deductionDiscountType, deductionDiscountAmount, additionDiscountType, additionDiscountAmount, true, startDate, endDate, new Date(), new Date()]
+            values: [code, name, deductionDiscountType, deductionDiscountAmount, true, startDate, endDate, new Date(), new Date()]
         }
 
         try {
@@ -69,7 +69,7 @@ class Discount {
         let getAllDiscountQuery = {
             name: 'get-discount-history',
             text: `SELECT code, name, deduction_discount_type AS "deductionDiscountType", deduction_discount_amount AS "deductionDiscountAmount",
-                addition_discount_type AS "additionDiscountType", addition_discount_amount AS "additionDiscountAmount", is_active AS "isActive", start_date AS "startDate",
+                is_active AS "isActive", start_date AS "startDate",
                 end_date AS "endDate", created_at AS "createdAt", updated_at AS "updatedAt", deactivated_at AS "deactivatedAt"
                 FROM public.discount_program
                 ORDER BY created_at DESC
@@ -113,7 +113,7 @@ class Discount {
         let getDiscountQuery = {
             name: 'get-discount',
             text: `SELECT code, name, deduction_discount_type AS "deductionDiscountType", deduction_discount_amount AS "deductionDiscountAmount",
-                addition_discount_type AS "additionDiscountType", addition_discount_amount AS "additionDiscountAmount", is_active AS "isActive", start_date AS "startDate",
+                is_active AS "isActive", start_date AS "startDate",
                 end_date AS "endDate", created_at AS "createdAt", updated_at AS "updatedAt", deactivated_at AS "deactivatedAt"
                 FROM public.discount_program
                 WHERE code = $1;`,
@@ -137,8 +137,6 @@ class Discount {
         let getActiveDiscountQuery = {
             name: 'get-active-discount-list',
             text: `SELECT code, name, deduction_discount_type AS "deductionDiscountType", deduction_discount_amount AS "deductionDiscountAmount",
-                addition_discount_type AS "additionDiscountType",
-                addition_discount_amount AS "additionDiscountAmount"
                 FROM public.discount_program
                 WHERE start_date <= NOW() AND NOW() <= end_date AND is_active = true
                 FETCH FIRST 1 ROWS ONLY`
