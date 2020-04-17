@@ -101,11 +101,10 @@ const getIssuer = async (request, response) => {
     partnerCode = partnerCode.toUpperCase();
 
     let getIssuerResult = await partner.getIssuer(partnerCode);
-
     if (getIssuerResult.err) {
         wrapper.response(response, false, getIssuerResult);
     } else {
-        wrapper.paginationResponse(response, true, getIssuerResult, "Issuer retrieved", successCode.OK);
+        wrapper.response(response, true, getIssuerResult, "Issuer retrieved", successCode.OK);
     }
 }
 
@@ -139,11 +138,10 @@ const getAcquirer = async (request, response) => {
     partnerCode = partnerCode.toUpperCase();
 
     let getAcquirerResult = await partner.getAcquirer(partnerCode);
-
     if (getAcquirerResult.err) {
         wrapper.response(response, false, getAcquirerResult);
     } else {
-        wrapper.paginationResponse(response, true, getAcquirerResult, "Acquirer retrieved", successCode.OK);
+        wrapper.response(response, true, getAcquirerResult, "Acquirer retrieved", successCode.OK);
     }
 }
 
