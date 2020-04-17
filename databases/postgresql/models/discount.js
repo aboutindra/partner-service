@@ -19,7 +19,7 @@ class Discount {
             name: 'insert-discount',
             text: `INSERT INTO public.discount_program(
                 code, name, discount_type, amount, is_active, start_date, end_date, created_at, updated_at)
-                VALUES ($1, $2, LOWER($3)::cost_type, $4, LOWER($5)::cost_type, $6, $7, $8, $9, $10, $11);`,
+                VALUES ($1, $2, LOWER($3)::cost_type, $4, $5, $6, $7, $8, $9);`,
             values: [code, name, discountType, amount, true, startDate, endDate, new Date(), new Date()]
         }
 
@@ -31,6 +31,7 @@ class Discount {
             return wrapper.data(insertDiscountResult.rows);
         }
         catch (error) {
+            console.log(error);
             if (error.code === errorCode.INVALID_ENUM) {
                 return wrapper.error(new ForbiddenError("Invalid type value"));
             }
