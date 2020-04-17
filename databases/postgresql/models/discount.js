@@ -31,7 +31,6 @@ class Discount {
             return wrapper.data(insertDiscountResult.rows);
         }
         catch (error) {
-            console.log(error);
             if (error.code === errorCode.INVALID_ENUM) {
                 return wrapper.error(new ForbiddenError("Invalid type value"));
             }
