@@ -628,6 +628,16 @@ describe("Insert Issuer Package", _ => {
         });
     });
 
+    it("Sending insert issuer package request with invalid cost type parameter (cost bearer is user and cost type is percentage)", done => {
+        chai.request(server)
+        .post(BASE_URL)
+        .send({ name: 'BASIC', costType: CostType.PERCENTAGE, amount: 100, costBearerType: CostBearerType.USER })
+        .end((error, response) => {
+            responseValidator.validateResponse(response, "Can not set percentage cost type to user cost bearer", false, 403);
+            done();
+        });
+    });
+
     it("Sending insert issuer package request with database connection failure", done => {
         sandbox.stub(pgPool.prototype, 'query').rejects();
 

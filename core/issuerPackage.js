@@ -4,7 +4,9 @@ const IssuerPackage = require('../databases/postgresql/models/issuerPackage');
 const issuerPackage = new IssuerPackage(process.env.POSTGRESQL_DATABASE_PARTNER);
 const { SUCCESS:successCode } = require('../enum/httpStatusCode');
 const ResponseMessage = require('../enum/httpResponseMessage');
-const { BadRequestError } = require('../utilities/error');
+const { BadRequestError, ForbiddenError } = require('../utilities/error');
+const CostBearerType = require('../enum/costBearerType');
+const CostType = require('../enum/costType');
 
 const insertIssuerPackage = async (request, response) => {
     const errors = validationResult(request);
@@ -17,6 +19,11 @@ const insertIssuerPackage = async (request, response) => {
 
     let { name, costType, costBearerType } = request.body;
     let amount = Number(request.body.amount);
+
+    if (costBearerType === CostBearerType.USER && costType === CostType.PERCENTAGE) {
+        wrapper.response(response, false, wrapper.error(new ForbiddenError("Can not set percentage cost type to user cost bearer")));
+        return;
+    }
 
     let insertIssuerPackageResult = await issuerPackage.insertPackage(name, costType, costBearerType, amount);
 

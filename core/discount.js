@@ -14,7 +14,7 @@ const insertDiscount = async (request, response) => {
         return;
     }
 
-    let { code, name, deductionDiscountType, deductionDiscountAmount, startDate, endDate } = request.body;
+    let { code, name, discountType, amount, startDate, endDate } = request.body;
     code = code.toUpperCase();
 
     let currentProgram = await discount.getActiveDiscount();
@@ -28,7 +28,7 @@ const insertDiscount = async (request, response) => {
         }
     }
 
-    let params = {code, name, deductionDiscountType, deductionDiscountAmount, startDate, endDate};
+    let params = {code, name, discountType, amount, startDate, endDate};
     let result = await discount.insertDiscount(params);
     if (result.err) {
         wrapper.response(response, false, result);
