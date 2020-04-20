@@ -122,7 +122,7 @@ class Discount {
             if (result.rows.length === 0) {
                 return wrapper.error(new NotFoundError(DiscountResponseMessage.DISCOUNT_NOT_FOUND));
             }
-            return wrapper.data(result.rows);
+            return wrapper.data(result.rows[0]);
         }
         catch (error) {
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
@@ -144,7 +144,7 @@ class Discount {
             if (result.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Active discount not found"));
             }
-            return wrapper.data(result.rows);
+            return wrapper.data(result.rows[0]);
         }
         catch (error) {
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));

@@ -159,7 +159,7 @@ class Partner {
             if (getPartnerByCodeResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError(PartnerResponseMessage.PARTNER_NOT_FOUND));
             }
-            return wrapper.data(getPartnerByCodeResult.rows);
+            return wrapper.data(getPartnerByCodeResult.rows[0]);
         }
         catch (error) {
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
@@ -328,7 +328,7 @@ class Partner {
             if (getIssuerResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Issuer not found"));
             }
-            return wrapper.data(getIssuerResult.rows);
+            return wrapper.data(getIssuerResult.rows[0]);
         }
         catch (error) {
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
@@ -444,7 +444,7 @@ class Partner {
             if (getAcquireResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Acquirer not found"));
             }
-            return wrapper.data(getAcquireResult.rows);
+            return wrapper.data(getAcquireResult.rows[0]);
         }
         catch (error) {
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
