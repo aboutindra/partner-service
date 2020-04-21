@@ -22,7 +22,7 @@ const insertDiscount = async (request, response) => {
         wrapper.response(response, false, currentProgram);
         return;
     } else {
-        if (currentProgram.data.length > 0) {
+        if (currentProgram.data) {
             wrapper.response(response, false, wrapper.error(new ForbiddenError("There is another program currently running")));
             return;
         }
