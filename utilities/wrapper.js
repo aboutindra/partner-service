@@ -21,12 +21,12 @@ const data = (data) => ({ err: null, data});
 
 const paginationData = (data, meta) => ({ err: null, data, meta});
 
-const error = (err) => ({ err, data: [] });
+const error = (err) => ({ err, data: null });
 
 const response = (res, status, result, message = '', code = 200) => {
   let data = result.data;
   if(status === false){
-    data = data || [];
+    data = data || null;
     message = result.err.message || message;
     code = checkErrorCode(result.err);
   }
@@ -43,7 +43,7 @@ const paginationResponse = (res, status, result, message = '', code = 200) => {
   let data = result.data;
   /* istanbul ignore next */
   if(status === false){
-    data = data || [];
+    data = data || null;
     message = result.err.message || message;
     code = checkErrorCode(result.err);
   }
