@@ -5,9 +5,8 @@ const bodyParser = require('body-parser');
 const responder = require('../utilities/responder');
 const logger = require('../utilities/logger');
 const postgreWrapper = require('../databases/postgresql/index');
-const acquirerPackage = require('./controllers/acquirerPackage');
 const discount = require('./controllers/discount');
-const issuerPackage = require('./controllers/issuerPackage');
+const costPackage = require('./controllers/costPackage');
 const partner = require('./controllers/partner');
 const partnerProgram = require('./controllers/partnerProgram');
 const segment = require('./controllers/segment');
@@ -43,9 +42,8 @@ function AppServer() {
         responder.sendResponse(response, true, "Service is active", null, 200);
     })
 
-    acquirerPackage.routes(this.app);
+    costPackage.routes(this.app);
     discount.routes(this.app);
-    issuerPackage.routes(this.app);
     partner.routes(this.app);
     partnerProgram.routes(this.app);
     segment.routes(this.app);
