@@ -12,14 +12,14 @@ class Partner {
         this.database = database;
     }
 
-    async insertPartner(code, name, issuerCostPackageId, acquirerCostPackageId, segmentId, urlLogo, unit) {
+    async insertPartner({ code, name, costPackageId, isAcquirer, isIssuer, segmentId, urlLogo, unit }) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let insertPartnerQuery = {
             name: "add-new-partner",
             text: `INSERT INTO public.partner(
-                code, segment_id, issuer_cost_package_id, acquirer_cost_package_id, name, url_logo, unit, is_deleted, created_at, updated_at)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);`,
-            values: [code, segmentId, issuerCostPackageId, acquirerCostPackageId, name, urlLogo, unit, false, new Date(), new Date()]
+                code, segment_id, cost_package_id, name, is_acquirer, is_issuer, url_logo, unit, is_deleted, created_at, updated_at)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);`,
+            values: [code, segmentId, costPackageId, name, isAcquirer, isIssuer, urlLogo, unit, false, new Date(), new Date()]
         }
 
         try {
@@ -41,14 +41,14 @@ class Partner {
 
     }
 
-    async updatePartner(code, name, issuerCostPackageId, acquirerCostPackageId, segmentId, url_logo, unit) {
+    async updatePartner({ code, name, costPackageId, isAcquirer, isIssuer, segmentId, urlLogo, unit }) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let updatePartnerQuery = {
             name: "update-partner",
             text: `UPDATE public.partner
-                SET name = $2, issuer_cost_package_id = $3, acquirer_cost_package_id = $4, segment_id = $5, url_logo = $6, updated_at = $7, unit = $8
+                SET segment_id = $2, cost_package_id = $3, name = $4, is_acquirer = $5, is_issuer = $6, url_logo = $7, unit = $8, updated_at = $9
                 WHERE code = $1;`,
-            values: [code, name, issuerCostPackageId, acquirerCostPackageId, segmentId, url_logo, new Date(), unit]
+            values: [code, segmentId, costPackageId, name, isAcquirer, isIssuer, urlLogo, unit, new Date()]
         }
 
         try {
@@ -92,11 +92,10 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllPartnerQuery = {
             name: "get-partner-list",
-            text: `SELECT code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPackageId",
-                name, url_logo AS "urlLogo", unit,
-                CASE WHEN issuer_cost_package_id IS NOT NULL AND acquirer_cost_package_id IS NOT NULL THEN 'Both'
-                    WHEN issuer_cost_package_id IS NOT NULL THEN 'Issuer'
-                    WHEN acquirer_cost_package_id IS NOT NULL THEN 'Acquirer'
+            text: `SELECT code, segment_id AS "segmentId", cost_package_id AS "costPackageId", name, url_logo AS "urlLogo", unit,
+                CASE WHEN is_acquirer IS true AND is_issuer IS true THEN 'Both'
+                    WHEN is_acquirer IS true THEN 'Acquirer'
+                    WHEN is_issuer IS true THEN 'Issuer'
                     ELSE 'Not defined'
                 END AS "partnerType",
                 is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
@@ -141,11 +140,10 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getPartnerQuery = {
             name: "get-partner",
-            text: `SELECT  code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPackageId",
-                name, url_logo AS "urlLogo", unit,
-                CASE WHEN issuer_cost_package_id IS NOT NULL AND acquirer_cost_package_id IS NOT NULL THEN 'Both'
-                    WHEN issuer_cost_package_id IS NOT NULL THEN 'Issuer'
-                    WHEN acquirer_cost_package_id IS NOT NULL THEN 'Acquirer'
+            text: `SELECT code, segment_id AS "segmentId", cost_package_id AS "costPackageId", name, url_logo AS "urlLogo", unit,
+                CASE WHEN is_acquirer IS true AND is_issuer IS true THEN 'Both'
+                    WHEN is_acquirer IS true THEN 'Acquirer'
+                    WHEN is_issuer IS true THEN 'Issuer'
                     ELSE 'Not defined'
                 END AS "partnerType",
                 is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
@@ -170,9 +168,7 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllActivePartnerQuery = {
             name: "get-active-partner-list",
-            text: `SELECT  code, segment_id AS "segmentId",
-                CASE WHEN issuer_cost_package_id IS NOT NULL THEN true ELSE false END AS "isIssuer",
-                CASE WHEN acquirer_cost_package_id IS NOT NULL THEN true ELSE false END AS "isAcquirer",
+            text: `SELECT  code, segment_id AS "segmentId", is_acquirer AS "isAcquirer", is_issuer AS "isIssuer",
                 CASE WHEN (SELECT true FROM public.partner_program WHERE partner_code = partner.code
                 AND start_date <= NOW() AND NOW() <= end_date AND is_active = true) IS true THEN true ELSE false END AS "isProgramActive",
                 name, url_logo AS "urlLogo", unit, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
@@ -218,11 +214,10 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllIssuersQuery = {
             name: "get-issuer-list",
-            text: `SELECT  code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPackageId",
-                name, url_logo AS "urlLogo", unit,
+            text: `SELECT code, segment_id AS "segmentId", cost_package_id AS "costPackageId", name, url_logo AS "urlLogo", unit,
                 is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.partner
-                WHERE issuer_cost_package_id IS NOT NULL
+                WHERE is_issuer IS true
                 ORDER BY name
                 LIMIT $1 OFFSET $2;`,
                 values: [limit, offset]
@@ -231,7 +226,7 @@ class Partner {
             name: 'count-issuer-list',
             text: `SELECT COUNT(*)
                 FROM public.partner
-                WHERE issuer_cost_package_id IS NOT NULL;`
+                WHERE is_issuer IS true;`
         }
         try {
             let getAllIssuersResult = await dbClient.query(getAllIssuersQuery);
@@ -263,11 +258,11 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllActiveIssuersQuery = {
             name: "get-active-issuer-list",
-            text: `SELECT code, name, url_logo AS logo, unit
+            text: `SELECT code, name, url_logo AS "urlLogo", unit
                 FROM public.partner as partners
                 WHERE EXISTS (SELECT 1 FROM public.partner_program WHERE partners.code = partner_code
                 AND start_date <= NOW() AND NOW() <= end_date AND is_active = true)
-                AND partners.issuer_cost_package_id IS NOT NULL AND partners.is_deleted = false
+                AND partners.is_issuer IS true AND partners.is_deleted = false
                 ORDER BY name
                 LIMIT $1 OFFSET $2;`,
                 values: [limit, offset]
@@ -278,7 +273,7 @@ class Partner {
                 FROM public.partner as partners
                 WHERE EXISTS (SELECT 1 FROM public.partner_program WHERE partners.code = partner_code
                 AND start_date <= NOW() AND NOW() <= end_date AND is_active = true)
-                AND partners.issuer_cost_package_id IS NOT NULL AND partners.is_deleted = false`
+                AND partners.is_issuer IS true AND partners.is_deleted = false`
         }
         try {
             let getAllActiveIssuersResult = await dbClient.query(getAllActiveIssuersQuery);
@@ -310,7 +305,7 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getIssuerQuery = {
             name: "get-issuer",
-            text: `SELECT  code, cost_type AS "costType", amount AS "costAmount", cost_bearer_type AS "costBearerType", exchange_rate AS "exchangeRate",
+            text: `SELECT  code, amount AS "costAmount", cost_bearer_type AS "costBearerType", exchange_rate AS "exchangeRate",
                 minimum_amount_per_transaction AS "minimumAmountPerTransaction",
                 maximum_amount_per_transaction AS "maximumAmountPerTransaction",
                 remaining_deduction_quota_per_day AS "remainingDeductionQuotaPerDay",
@@ -339,11 +334,10 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllAcquirersQuery = {
             name: "get-acquirer-list",
-            text: `SELECT  code, segment_id AS "segmentId", issuer_cost_package_id AS "issuerCostPackageId", acquirer_cost_package_id AS "acquirerCostPackageId",
-                name, url_logo AS "urlLogo", unit,
+            text: `SELECT  code, segment_id AS "segmentId", cost_package_id AS "costPackageId", name, url_logo AS "urlLogo", unit,
                 is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.partner
-                WHERE acquirer_cost_package_id IS NOT NULL AND is_deleted = false
+                WHERE is_acquirer IS true
                 ORDER BY name
                 LIMIT $1 OFFSET $2;`,
                 values: [limit, offset]
@@ -352,7 +346,7 @@ class Partner {
             name: 'count-acquirer-list',
             text: `SELECT COUNT(*)
                 FROM public.partner
-                WHERE acquirer_cost_package_id IS NOT NULL;`
+                WHERE is_acquirer IS true;`
         }
         try {
             let getAllAcquirersResult = await dbClient.query(getAllAcquirersQuery);
@@ -384,11 +378,11 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllActiveAcquirersQuery = {
             name: "get-active-acquirer-list",
-            text: `SELECT code, name, url_logo AS logo, unit
+            text: `SELECT code, name, url_logo AS "urlLogo", unit
                 FROM public.partner as partners
                 WHERE EXISTS (SELECT 1 FROM public.partner_program WHERE partners.code = partner_code
                 AND start_date <= NOW() AND NOW() <= end_date AND is_active = true)
-                AND partners.acquirer_cost_package_id IS NOT NULL AND partners.is_deleted = false
+                AND partners.is_acquirer IS true AND partners.is_deleted = false
                 ORDER BY name
                 LIMIT $1 OFFSET $2;`,
                 values: [limit, offset]
@@ -399,7 +393,7 @@ class Partner {
                 FROM public.partner as partners
                 WHERE EXISTS (SELECT 1 FROM public.partner_program WHERE partners.code = partner_code
                 AND start_date <= NOW() AND NOW() <= end_date AND is_active = true)
-                AND partners.acquirer_cost_package_id IS NOT NULL AND partners.is_deleted = false`
+                AND partners.is_acquirer IS true AND partners.is_deleted = false`
         }
         try {
             let getAllActiveAcquirersResult = await dbClient.query(getAllActiveAcquirersQuery);
@@ -431,9 +425,8 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAcquirerQuery = {
             name: "get-acquirer",
-            text: `SELECT  code, cost_type AS "costType", amount AS "costAmount", exchange_rate AS "exchangeRate"
+            text: `SELECT  code, exchange_rate AS "exchangeRate"
                 FROM public.partner
-                INNER JOIN public.acquirer_cost_package AS package ON (id = acquirer_cost_package_id)
                 INNER JOIN public.partner_program AS programs ON (code = programs.partner_code)
                 WHERE code = $1 AND package.is_deleted = false AND programs.is_active = true
                 AND programs.start_date <= NOW() AND programs.end_date > NOW();`,

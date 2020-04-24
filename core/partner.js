@@ -18,10 +18,10 @@ const insertPartner = async (request, response) => {
         return;
     }
 
-    let { code, name, issuerCostPackageId, acquirerCostPackageId, segmentId, urlLogo, unit } = request.body;
+    let { code, name, costPackageId, isAcquirer, isIssuer, segmentId, urlLogo, unit } = request.body;
     code = code.toUpperCase();
 
-    let insertPartnerResult = await partner.insertPartner(code, name, issuerCostPackageId, acquirerCostPackageId, segmentId, urlLogo, unit);
+    let insertPartnerResult = await partner.insertPartner({ code, name, costPackageId, isAcquirer, isIssuer, segmentId, urlLogo, unit });
 
     if (insertPartnerResult.err) {
         wrapper.response(response, false, insertPartnerResult);
@@ -40,10 +40,10 @@ const updatePartner = async (request, response) => {
         return;
     }
 
-    let { name, issuerCostPackageId, acquirerCostPackageId, segmentId, urlLogo, unit } = request.body;
+    let { name, costPackageId, isAcquirer, isIssuer, segmentId, urlLogo, unit } = request.body;
     let code = request.params.code.toUpperCase();
 
-    let updatePartnerResult = await partner.updatePartner(code, name, issuerCostPackageId, acquirerCostPackageId, segmentId, urlLogo, unit);
+    let updatePartnerResult = await partner.updatePartner({ code, name, costPackageId, isAcquirer, isIssuer, segmentId, urlLogo, unit });
 
     if (updatePartnerResult.err) {
         wrapper.response(response, false, updatePartnerResult);
