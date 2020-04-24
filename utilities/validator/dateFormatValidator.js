@@ -1,9 +1,10 @@
 const moment = require('moment');
 
 exports.validateDate = function(dateString) {
-    let date = moment(dateString);
+    if (!dateString)
+        return false;
 
-    return date.isValid();
+    return moment(dateString).isValid();
 }
 
 exports.validateDateRange = function (_, { req }) {

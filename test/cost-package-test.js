@@ -5,8 +5,6 @@ const sandbox = require('sinon').createSandbox();
 const BASE_URL = "/api/v1/packages/";
 const pgPool = require('pg-pool');
 const responseValidator = require('./responseValidator');
-const CostType = require('../enum/costType');
-const CostBearerType = require('../enum/costBearerType');
 
 chai.use(chaiHttp);
 
