@@ -5,6 +5,7 @@ const sandbox = require('sinon').createSandbox();
 const BASE_URL = "/api/v1/programs";
 const pgPool = require('pg-pool');
 const responseValidator = require('./responseValidator');
+const CostBearerType = require('../enum/costBearerType');
 
 chai.use(chaiHttp);
 
@@ -569,7 +570,7 @@ describe("Add Partner Program", _ => {
     it("Sending add partner program request without partner code parameter", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ exchangeRate: 10, startDate: new Date(), endDate: new Date(Date.now() + 1000 * 1000) })
+        .send({ exchangeRate: 10, costBearerType: CostBearerType.PARTNER, startDate: new Date(), endDate: new Date(Date.now() + 1000 * 1000) })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -579,7 +580,17 @@ describe("Add Partner Program", _ => {
     it("Sending add partner program request without exchange rate parameter", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ partnerCode: "AEST", startDate: new Date(), endDate: new Date(Date.now() + 1000 * 1000) })
+        .send({ partnerCode: "AEST", costBearerType: CostBearerType.PARTNER, startDate: new Date(), endDate: new Date(Date.now() + 1000 * 1000) })
+        .end((error, response) => {
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
+            done();
+        });
+    });
+
+    it("Sending add partner program request without cost bearer type parameter", done => {
+        chai.request(server)
+        .post(BASE_URL)
+        .send({ partnerCode: "AESTK", exchangeRate: 10, startDate: new Date(), endDate: new Date(Date.now() + 1000 * 1000) })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -589,7 +600,7 @@ describe("Add Partner Program", _ => {
     it("Sending add partner program request without start date parameter", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ partnerCode: "AEST", exchangeRate: 10, endDate: new Date(Date.now() + 1000 * 1000) })
+        .send({ partnerCode: "AEST", costBearerType: CostBearerType.PARTNER, exchangeRate: 10, endDate: new Date(Date.now() + 1000 * 1000) })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -599,7 +610,7 @@ describe("Add Partner Program", _ => {
     it("Sending add partner program request without end date parameter", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ partnerCode: "AEST", exchangeRate: 10, startDate: new Date() })
+        .send({ partnerCode: "AEST", exchangeRate: 10, costBearerType: CostBearerType.PARTNER, startDate: new Date() })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -609,7 +620,7 @@ describe("Add Partner Program", _ => {
     it("Sending add partner program request with invalid partner code length", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ partnerCode: "AESTRIK", exchangeRate: 10, startDate: new Date(), endDate: new Date(Date.now() + 1000 * 1000) })
+        .send({ partnerCode: "AESTRIK", exchangeRate: 10, costBearerType: CostBearerType.PARTNER, startDate: new Date(), endDate: new Date(Date.now() + 1000 * 1000) })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -619,7 +630,7 @@ describe("Add Partner Program", _ => {
     it("Sending add partner program request with invalid exchange rate value", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ partnerCode: "AEST", exchangeRate: 0, startDate: new Date(), endDate: new Date(Date.now() + 1000 * 1000) })
+        .send({ partnerCode: "AEST", exchangeRate: 0, costBearerType: CostBearerType.PARTNER, startDate: new Date(), endDate: new Date(Date.now() + 1000 * 1000) })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -630,7 +641,7 @@ describe("Add Partner Program", _ => {
         chai.request(server)
         .post(BASE_URL)
         .send({ partnerCode: "AEST", exchangeRate: 10, startDate: new Date(), endDate: new Date(Date.now() + 1000 * 1000), minAmountPerTransaction: 0, maxAmountPerTransaction: 0,
-        maxTransactionAmountPerDay: 0, maxTransactionAmountPerMonth: 0 })
+        maxTransactionAmountPerDay: 0, maxTransactionAmountPerMonth: 0,  costBearerType: CostBearerType.PARTNER })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -640,7 +651,7 @@ describe("Add Partner Program", _ => {
     it("Sending add partner program request with invalid date range parameters", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ partnerCode: "AEST", exchangeRate: 10, startDate: new Date(), endDate: new Date() })
+        .send({ partnerCode: "AEST", exchangeRate: 10, costBearerType: CostBearerType.PARTNER, startDate: new Date(), endDate: new Date() })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -652,7 +663,7 @@ describe("Add Partner Program", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ partnerCode: "AEST", exchangeRate: 10, startDate: new Date(), endDate: new Date(Date.now() + 1000 * 1000) })
+        .send({ partnerCode: "AEST", exchangeRate: 10, costBearerType: CostBearerType.PARTNER, startDate: new Date(), endDate: new Date(Date.now() + 1000 * 1000) })
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
@@ -686,7 +697,7 @@ describe("Add Partner Program", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ partnerCode: "AEST", exchangeRate: 10, startDate: new Date(), endDate: new Date(Date.now() + 1000 * 1000) })
+        .send({ partnerCode: "AEST", exchangeRate: 10, costBearerType: CostBearerType.PARTNER, startDate: new Date(), endDate: new Date(Date.now() + 1000 * 1000) })
         .end((error, response) => {
             poolStub.restore();
             responseValidator.validateResponse(response, "There is another program currently running", false, 403);

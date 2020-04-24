@@ -1,15 +1,18 @@
 const { query, param, body } = require('express-validator');
 const dateValidator = require('./dateFormatValidator');
+const CostBearerType = require('../../enum/costBearerType');
+const loweringCase = require('./enumCaseFormatter').LoweringCaseInput;
 
 exports.validateInsertPartnerProgram = [
-    body('partnerCode').not().isEmpty().isLength({ max: 5 }).customSanitizer(upperingCase).withMessage("Partner code must be maximum 5 characters"),
+    body('partnerCode').isLength({ min: 1, max: 5 }).customSanitizer(upperingCase).withMessage("Partner code must be maximum 5 characters"),
     body('exchangeRate').isInt({ gt: 0 }).withMessage("Exchange rate must be positive integer greater than 0"),
+    body('costBearerType').customSanitizer(loweringCase).isIn(CostBearerType.getEnumValues()).withMessage("Cost bearer must be valid type"),
     body('minAmountPerTransaction').optional({ nullable: true }).isInt({ gt: 0 }).withMessage("Minimum amount per transaction must be positive integer greater than 0"),
     body('maxAmountPerTransaction').optional({ nullable: true }).isInt({ gt: 0 }).withMessage("Maximum amount per transaction must be positive integer greater than 0"),
     body('maxTransactionAmountPerDay').optional({ nullable: true }).isInt({ gt: 0 }).withMessage("Maximum transaction amount per day must be positive integer greater than 0"),
     body('maxTransactionAmountPerMonth').optional({ nullable: true }).isInt({ gt: 0 }).withMessage("Maximum transaction amount per month must be positive integer greater than 0"),
-    body('startDate').not().isEmpty().custom(dateValidator.validateDate).withMessage("Start date must be in UTC, ISO-8601, or RFC 2822 format"),
-    body('endDate').not().isEmpty().custom(dateValidator.validateDate).custom(dateValidator.validateDateRange)
+    body('startDate').custom(dateValidator.validateDate).withMessage("Start date must be in UTC, ISO-8601, or RFC 2822 format"),
+    body('endDate').custom(dateValidator.validateDate).custom(dateValidator.validateDateRange)
     .withMessage("End date must be in UTC, ISO-8601, or RFC 2822 format and must be higher than start date")
 ]
 
