@@ -1,4 +1,4 @@
-const { query, body } = require('express-validator');
+const { body } = require('express-validator');
 
 exports.validateInsertPartnerQuota = [
     body("partnerCode").not().isEmpty().withMessage("Partner code can not be empty"),

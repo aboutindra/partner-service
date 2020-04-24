@@ -1,7 +1,4 @@
 const { query, param, body } = require('express-validator');
-const CostType = require('../../enum/costType');
-const CostBearerType = require('../../enum/costBearerType');
-const loweringCaseInput = require('./enumCaseFormatter').LoweringCaseInput;
 
 exports.validateInsertCostPackage = [
     body('name').not().isEmpty().withMessage("Name can not be empty"),
