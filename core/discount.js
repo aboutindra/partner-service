@@ -14,10 +14,7 @@ const insertDiscount = async (request, response) => {
         return;
     }
 
-    let { code, name, discountType, amount, startDate, endDate } = request.body;
-    code = code.toUpperCase();
-
-    let currentProgram = await discount.getActiveDiscount();
+    let currentProgram = await discount.getActiveDiscount(request.body.partnerCode);
     if (currentProgram.err && currentProgram.err.message !== "Active discount not found") {
         wrapper.response(response, false, currentProgram);
         return;
@@ -28,8 +25,7 @@ const insertDiscount = async (request, response) => {
         }
     }
 
-    let params = {code, name, discountType, amount, startDate, endDate};
-    let result = await discount.insertDiscount(params);
+    let result = await discount.insertDiscount(request.body);
     if (result.err) {
         wrapper.response(response, false, result);
     } else {
@@ -39,7 +35,15 @@ const insertDiscount = async (request, response) => {
 }
 
 const deleteDiscount = async (request, response) => {
-    let code = request.params.code.toUpperCase();
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        error.data = errors.array();
+        wrapper.response(response, false, error);
+        return;
+    }
+
+    let { code } = request.params;
 
     let result = await discount.softDeleteDiscount(code);
     if (result.err) {
@@ -69,7 +73,16 @@ const getDiscounts = async (request, response) => {
 }
 
 const getActiveDiscounts = async (request, response) => {
-    let result = await discount.getActiveDiscount();
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        error.data = errors.array();
+        wrapper.response(response, false, error);
+        return;
+    }
+
+    let { partnerCode } = request.params;
+    let result = await discount.getActiveDiscount(partnerCode);
 
     if (result.err) {
         wrapper.response(response, false, result);

@@ -9,13 +9,26 @@ const responseValidator = require('./responseValidator');
 chai.use(chaiHttp);
 
 describe("Get Active Discount", _ => {
-    let BASE_URL = "/api/v1/active-discount";
+    let BASE_URL = "/api/v1/active-discount/";
+    let PARTNER_CODE = "AESTR";
+
+    it("Sending get active discount request with invalid partner code", done => {
+        sandbox.stub(pgPool.prototype, 'query').rejects();
+
+        chai.request(server)
+        .get(BASE_URL + "ALJABAR")
+        .end((error, response) => {
+            sandbox.restore();
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
+            done();
+        });
+    });
 
     it("Sending get active discount request with database connection failure", done => {
         sandbox.stub(pgPool.prototype, 'query').rejects();
 
         chai.request(server)
-        .get(BASE_URL)
+        .get(BASE_URL + PARTNER_CODE)
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
@@ -31,7 +44,7 @@ describe("Get Active Discount", _ => {
         sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
 
         chai.request(server)
-        .get(BASE_URL)
+        .get(BASE_URL + PARTNER_CODE)
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Active discount not found", false, 404);
@@ -60,7 +73,7 @@ describe("Get Active Discount", _ => {
         sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
 
         chai.request(server)
-        .get(BASE_URL)
+        .get(BASE_URL + PARTNER_CODE)
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Active discount retrieved", true, 200);
@@ -263,12 +276,20 @@ describe("Get Discounts", () => {
 describe("Delete Discount", _ => {
     let PARAMS = 'NEWYEAR5';
 
+    it("Sending delete discount request with invalid discount code parameter", done => {
+        chai.request(server)
+        .delete(BASE_URL + '/' + 'ANONYMOUSDISCOUNTCODE')
+        .end((error, response) => {
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
+            done();
+        });
+    });
+
     it("Sending delete discount request with internal server error response", done => {
         sandbox.stub(pgPool.prototype, 'query').rejects();
 
         chai.request(server)
         .delete(BASE_URL + '/' + PARAMS)
-        .query({ code: 'NEWYEAR5'})
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
@@ -322,7 +343,7 @@ describe("Add Discount with Invalid Parameter", () => {
     it("Sending add discount request without discount code parameter", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ name: "New Year Discount", discountType: 'fixed', amount: 100, startDate: new Date(), endDate: new Date()})
+        .send({ partnerCode: "AFK", name: "New Year Discount", amount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -332,27 +353,27 @@ describe("Add Discount with Invalid Parameter", () => {
     it("Sending add discount request without discount name parameter", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEAR5", discountType: 'fixed', amount: 100, startDate: new Date(), endDate: new Date()})
+        .send({ code: "NEWYEAR5", partnerCode: "AFK", amount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
 
-    it("Sending add discount request without deduction discount amount parameter", done => {
+    it("Sending add discount request without discount amount parameter", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEAR5", name: "New Year Discount", discountType: 'fixed', startDate: new Date(), endDate: new Date()})
+        .send({ code: "NEWYEAR5", partnerCode: "AFK", name: "New Year Discount", startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
 
-    it("Sending add discount request with partner code more than 10 characters", done => {
+    it("Sending add discount request with discount code more than 10 characters", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEARDISCOUNT5", name: "New Year Discount", discountType: 'fixed', amount: 100, startDate: new Date(), endDate: new Date()})
+        .send({ code: "NEWYEARDISCOUNT5", partnerCode: "AFK", name: "New Year Discount", amount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -362,17 +383,7 @@ describe("Add Discount with Invalid Parameter", () => {
     it("Sending add discount request with invalid deduction amount", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEAR5", name: "New Year Discount", discountType: 'fixed', amount: -1, startDate: new Date(), endDate: new Date()})
-        .end((error, response) => {
-            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
-            done();
-        });
-    });
-
-    it("Sending add discount request with invalid cost type parameter", done => {
-        chai.request(server)
-        .post(BASE_URL)
-        .send({ code: "NEWYEAR5", name: "New Year Discount", discountType: 'nonfixed', amount: 100, startDate: new Date(), endDate: new Date()})
+        .send({ code: "NEWYEAR5", partnerCode: "AFK", name: "New Year Discount", amount: -1, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -382,7 +393,7 @@ describe("Add Discount with Invalid Parameter", () => {
     it("Sending add discount request with invalid date parameter", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEAR5", name: "New Year Discount", discountType: 'nonfixed', amount: 100, startDate: '', endDate: ''})
+        .send({ code: "NEWYEAR5", partnerCode: "AFK", name: "New Year Discount", amount: 100, startDate: '', endDate: ''})
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -404,7 +415,7 @@ describe("Add Discount", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEAR5", name: "New Year Discount", discountType: 'fixed', amount: 100, startDate: new Date(), endDate: new Date()})
+        .send({ code: "NEWYEAR5", partnerCode: "AFK", name: "New Year Discount", amount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "There is another program currently running", false, 403);
@@ -417,7 +428,7 @@ describe("Add Discount", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEAR5", name: "New Year Discount", discountType: 'fixed', amount: 100, startDate: new Date(), endDate: new Date()})
+        .send({ code: "NEWYEAR5", partnerCode: "AFK", name: "New Year Discount", amount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
@@ -436,7 +447,7 @@ describe("Add Discount", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEAR5", name: "New Year Discount", discountType: 'fixed', amount: 100, startDate: new Date(), endDate: new Date()})
+        .send({ code: "NEWYEAR5", partnerCode: "AFK", name: "New Year Discount", amount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             pool.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
@@ -458,7 +469,7 @@ describe("Add Discount", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEAR5", name: "New Year Discount", discountType: 'fixed', amount: 100, startDate: new Date(), endDate: new Date()})
+        .send({ code: "NEWYEAR5", partnerCode: "AFK", name: "New Year Discount", amount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             pool.restore();
             responseValidator.validateResponse(response, "Invalid type value", false, 403);
@@ -480,7 +491,7 @@ describe("Add Discount", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEAR5", name: "New Year Discount", discountType: 'fixed', amount: 100, startDate: new Date(), endDate: new Date()})
+        .send({ code: "NEWYEAR5", partnerCode: "AFK", name: "New Year Discount", amount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             pool.restore();
             responseValidator.validateResponse(response, "Code already exist", false, 403);
@@ -503,7 +514,7 @@ describe("Add Discount", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEAR5", name: "New Year Discount", discountType: 'fixed', amount: 100, startDate: new Date(), endDate: new Date()})
+        .send({ code: "NEWYEAR5", partnerCode: "AFK", name: "New Year Discount", amount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             pool.restore();
             responseValidator.validateResponse(response, "Failed add new package", false, 404);
@@ -526,7 +537,7 @@ describe("Add Discount", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: "NEWYEAR5", name: "New Year Discount", discountType: 'fixed', amount: 100, startDate: new Date(), endDate: new Date()})
+        .send({ code: "NEWYEAR5", partnerCode: "AFK", name: "New Year Discount", amount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
             pool.restore();
             responseValidator.validateResponse(response, "Discount added", true, 201);

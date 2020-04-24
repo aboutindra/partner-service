@@ -12,15 +12,14 @@ class Discount {
         this.database = database
     }
 
-    async insertDiscount(params) {
-        let {code, name, discountType, amount, startDate, endDate} = params;
+    async insertDiscount({code, partnerCode, name, amount, startDate, endDate}) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let insertDiscountQuery = {
             name: 'insert-discount',
             text: `INSERT INTO public.discount_program(
-                code, name, discount_type, amount, is_active, start_date, end_date, created_at, updated_at)
-                VALUES ($1, $2, LOWER($3)::cost_type, $4, $5, $6, $7, $8, $9);`,
-            values: [code, name, discountType, amount, true, startDate, endDate, new Date(), new Date()]
+                code, partner_code, name, amount, is_active, start_date, end_date, created_at, updated_at)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);`,
+            values: [code, partnerCode, name, amount, true, startDate, endDate, new Date(), new Date()]
         }
 
         try {
@@ -67,7 +66,7 @@ class Discount {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllDiscountQuery = {
             name: 'get-discount-history',
-            text: `SELECT code, name, discount_type AS "discountType", amount, is_active AS "isActive", start_date AS "startDate",
+            text: `SELECT code, partner_code AS "partnerCode", name, amount, is_active AS "isActive", start_date AS "startDate",
                 end_date AS "endDate", created_at AS "createdAt", updated_at AS "updatedAt", deactivated_at AS "deactivatedAt"
                 FROM public.discount_program
                 ORDER BY created_at DESC
@@ -110,7 +109,7 @@ class Discount {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getDiscountQuery = {
             name: 'get-discount',
-            text: `SELECT code, name, discount_type AS "discountType", amount, is_active AS "isActive", start_date AS "startDate",
+            text: `SELECT code, partner_code AS "partnerCode", name, amount, is_active AS "isActive", start_date AS "startDate",
                 end_date AS "endDate", created_at AS "createdAt", updated_at AS "updatedAt", deactivated_at AS "deactivatedAt"
                 FROM public.discount_program
                 WHERE code = $1;`,
@@ -129,14 +128,15 @@ class Discount {
         }
     }
 
-    async getActiveDiscount() {
+    async getActiveDiscount(partnerCode) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getActiveDiscountQuery = {
             name: 'get-active-discount-list',
-            text: `SELECT code, name, discount_type AS "discountType", amount
+            text: `SELECT code, partner_code AS "partnerCode", name, amount
                 FROM public.discount_program
-                WHERE start_date <= NOW() AND NOW() <= end_date AND is_active = true
-                FETCH FIRST 1 ROWS ONLY`
+                WHERE start_date <= NOW() AND NOW() <= end_date AND is_active = true AND partner_code = $1
+                FETCH FIRST 1 ROWS ONLY`,
+            values: [partnerCode]
         }
 
         try {
@@ -157,8 +157,8 @@ class Discount {
         let updateDiscountQuery = {
             name: 'update-discount-status',
             text: `UPDATE public.discount_program
-                SET is_active=false, deactivated_at=NOW()
-                WHERE (NOW() < start_date OR end_date < NOW()) AND is_active=true;`
+                SET is_active = false, deactivated_at = NOW()
+                WHERE (NOW() < start_date OR end_date < NOW()) AND is_active = true;`
         }
         try {
             let result = await dbPool.query(updateDiscountQuery);
