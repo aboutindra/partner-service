@@ -1,7 +1,8 @@
 const { body } = require('express-validator');
+const CaseFormatter = require('./caseFormatter');
 
 exports.validateInsertPartnerQuota = [
-    body("partnerCode").not().isEmpty().withMessage("Partner code can not be empty"),
+    body('partnerCode').isLength({ min: 1, max: 5 }).customSanitizer(CaseFormatter.upperingCaseInput).withMessage("Partner code can not be empty"),
     body("remainingQuotaPerDay").optional({ nullable: true }).isInt({ gt: 0 }).withMessage("Daily quota reduction must be positive integer greater than 0"),
     body("remainingQuotaPerMonth").optional({ nullable: true }).isInt({ gt: 0 }).withMessage("Monthly quota reduction must be positive integer greater than 0")
 ]
