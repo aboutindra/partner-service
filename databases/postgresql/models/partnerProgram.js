@@ -35,11 +35,11 @@ class PartnerProgram {
         let inserQuotaQuery = {
             name: 'upsert-quota',
             text: `INSERT INTO public.partner_quota(
-                partner_code, remaining_deduction_quota_per_day, remaining_deduction_quota_per_month)
-                VALUES ($1, $2, $3)
+                partner_code, remaining_deduction_quota_per_day, remaining_deduction_quota_per_month, is_deleted, created_at, updated_at)
+                VALUES ($1, $2, $3, $4, $5, $6)
                 ON CONFLICT (partner_code) DO UPDATE
                 SET remaining_deduction_quota_per_day = $2, remaining_deduction_quota_per_month = $3;`,
-            values: [partnerCode, maxTransactionAmountPerDay, maxTransactionAmountPerMonth]
+            values: [partnerCode, maxTransactionAmountPerDay, maxTransactionAmountPerMonth, false, new Date(), new Date()]
         }
 
         let client = await dbPool.connect();
@@ -55,6 +55,7 @@ class PartnerProgram {
             return wrapper.data(result.rows);
         }
         catch (error) {
+            console.error(error);
             await client.query('ROLLBACK');
             client.release();
             if (error.code === errorCode.UNIQUE_VIOLATION) {
@@ -93,13 +94,14 @@ class PartnerProgram {
         let dbPool = postgresqlWrapper.getConnection(this.database);
         let getAllPartnerProgramQuery = {
             name: 'get-partner-program-list',
-            text: `SELECT id, partner_code AS "partnerCode", exchange_rate AS "exchangeRate", cost_bearer_type AS "costBearerType",
+            text: `SELECT id, partner_code AS "partnerCode", name AS "partnerName", exchange_rate AS "exchangeRate", cost_bearer_type AS "costBearerType",
                 minimum_amount_per_transaction AS "minimumAmountPerTransaction", maximum_amount_per_transaction as "maximumAmountPerTransaction",
                 maximum_transaction_amount_per_day AS "maximumTransactionAmountPerDay", maximum_transaction_amount_per_month AS "maximumTransactionAmountPerMonth",
                 is_active AS "isActive", start_date AS "startDate", end_date AS "endDate",
-                created_at AS "createdAt", updated_at AS "updatedAt", deactivated_at AS "deactivatedAt"
-                FROM public.partner_program
-                ORDER BY created_at DESC
+                program.created_at AS "createdAt", program.updated_at AS "updatedAt", program.deactivated_at AS "deactivatedAt"
+                FROM public.partner_program AS program
+                INNER JOIN public.partner AS partner ON (partner_code = code)
+                ORDER BY program.created_at DESC
                 LIMIT $1 OFFSET $2;`,
                 values: [limit, offset]
         }
@@ -130,6 +132,7 @@ class PartnerProgram {
             return wrapper.paginationData(getAllPartnerProgramResult.rows, meta);
         }
         catch (error) {
+            console.error(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -215,7 +218,7 @@ class PartnerProgram {
             text: `SELECT partner_code, exchange_rate, cost_bearer_type, minimum_amount_per_transaction, maximum_amount_per_transaction,
                 maximum_transaction_amount_per_day, maximum_transaction_amount_per_month
                 FROM public.partner_program
-                WHERE start_date <= NOW() AND NOW() <= end_date AND is_active = true AND partner_code = $1
+                WHERE start_date <= NOW()::date AND NOW()::date <= end_date AND is_active = true AND partner_code = $1
                 FETCH FIRST 1 ROWS ONLY`,
             values: [partnerCode]
         }
@@ -228,6 +231,7 @@ class PartnerProgram {
             return wrapper.data(result.rows);
         }
         catch (error) {
+            console.error(error)
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -239,13 +243,13 @@ class PartnerProgram {
             name: 'deactivate-partner-program',
             text: `UPDATE public.partner_program
                 SET is_active=false, deactivated_at=NOW()
-                WHERE end_date < NOW() AND is_active=true;`
+                WHERE end_date < NOW()::date AND is_active=true;`
         }
         let activateProgram = {
             name: 'activate-partner-program',
             text: `UPDATE public.partner_program
                 SET is_active=true
-                WHERE start_date <= NOW() AND NOW() <= end_date AND is_active=false AND deactivated_at IS NULL;`
+                WHERE start_date <= NOW()::date AND NOW()::date <= end_date AND is_active=false AND deactivated_at IS NULL;`
         }
 
         let client = await dbPool.connect();

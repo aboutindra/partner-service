@@ -100,7 +100,7 @@ class Partner {
                 END AS "partnerType",
                 is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.partner
-                ORDER BY name
+                ORDER BY created_at
                 LIMIT $1 OFFSET $2;`,
                 values: [limit, offset]
         }
@@ -170,7 +170,7 @@ class Partner {
             name: "get-active-partner-list",
             text: `SELECT  code, segment_id AS "segmentId", is_acquirer AS "isAcquirer", is_issuer AS "isIssuer",
                 CASE WHEN (SELECT true FROM public.partner_program WHERE partner_code = partner.code
-                AND start_date <= NOW() AND NOW() <= end_date AND is_active = true) IS true THEN true ELSE false END AS "isProgramActive",
+                AND start_date <= NOW()::date AND NOW()::date <= end_date AND is_active = true) IS true THEN true ELSE false END AS "isProgramActive",
                 name, url_logo AS "urlLogo", unit, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.partner AS partner
                 WHERE is_deleted = false
@@ -261,7 +261,7 @@ class Partner {
             text: `SELECT code, name, url_logo AS "urlLogo", unit
                 FROM public.partner as partners
                 WHERE EXISTS (SELECT 1 FROM public.partner_program WHERE partners.code = partner_code
-                AND start_date <= NOW() AND NOW() <= end_date AND is_active = true)
+                AND start_date <= NOW()::date AND NOW()::date <= end_date AND is_active = true)
                 AND partners.is_issuer IS true AND partners.is_deleted = false
                 ORDER BY name
                 LIMIT $1 OFFSET $2;`,
@@ -272,7 +272,7 @@ class Partner {
             text: `SELECT COUNT(*)
                 FROM public.partner as partners
                 WHERE EXISTS (SELECT 1 FROM public.partner_program WHERE partners.code = partner_code
-                AND start_date <= NOW() AND NOW() <= end_date AND is_active = true)
+                AND start_date <= NOW()::date AND NOW()::date <= end_date AND is_active = true)
                 AND partners.is_issuer IS true AND partners.is_deleted = false`
         }
         try {
@@ -310,12 +310,12 @@ class Partner {
                 maximum_amount_per_transaction AS "maximumAmountPerTransaction",
                 remaining_deduction_quota_per_day AS "remainingDeductionQuotaPerDay",
                 remaining_deduction_quota_per_month AS "remainingDeductionQuotaPerMonth"
-                FROM public.partner
-                INNER JOIN public.issuer_cost_package AS package ON (id = issuer_cost_package_id)
+                FROM public.partner AS partner
+                INNER JOIN public.cost_package AS package ON (id = cost_package_id)
                 INNER JOIN public.partner_quota AS quota ON (code = quota.partner_code)
                 INNER JOIN public.partner_program AS programs ON (code = programs.partner_code)
-                WHERE code = $1 AND package.is_deleted = false AND programs.is_active = true
-                AND programs.start_date <= NOW() AND programs.end_date > NOW();`,
+                WHERE code = $1 AND partner.is_deleted = false AND programs.is_active = true
+                AND programs.start_date <= NOW()::date AND NOW()::date <= programs.end_date;`,
             values: [partnerCode]
         }
         try {
@@ -326,6 +326,7 @@ class Partner {
             return wrapper.data(getIssuerResult.rows[0]);
         }
         catch (error) {
+            console.error(error)
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -381,7 +382,7 @@ class Partner {
             text: `SELECT code, name, url_logo AS "urlLogo", unit
                 FROM public.partner as partners
                 WHERE EXISTS (SELECT 1 FROM public.partner_program WHERE partners.code = partner_code
-                AND start_date <= NOW() AND NOW() <= end_date AND is_active = true)
+                AND start_date <= NOW()::date AND NOW()::date <= end_date AND is_active = true)
                 AND partners.is_acquirer IS true AND partners.is_deleted = false
                 ORDER BY name
                 LIMIT $1 OFFSET $2;`,
@@ -392,7 +393,7 @@ class Partner {
             text: `SELECT COUNT(*)
                 FROM public.partner as partners
                 WHERE EXISTS (SELECT 1 FROM public.partner_program WHERE partners.code = partner_code
-                AND start_date <= NOW() AND NOW() <= end_date AND is_active = true)
+                AND start_date <= NOW()::date AND NOW()::date <= end_date AND is_active = true)
                 AND partners.is_acquirer IS true AND partners.is_deleted = false`
         }
         try {
@@ -428,8 +429,8 @@ class Partner {
             text: `SELECT  code, exchange_rate AS "exchangeRate"
                 FROM public.partner
                 INNER JOIN public.partner_program AS programs ON (code = programs.partner_code)
-                WHERE code = $1 AND package.is_deleted = false AND programs.is_active = true
-                AND programs.start_date <= NOW() AND programs.end_date > NOW();`,
+                WHERE code = $1 AND is_deleted = false AND programs.is_active = true
+                AND programs.start_date <= NOW()::date AND NOW()::date <= programs.end_date;`,
             values: [partnerCode]
         }
         try {
@@ -440,6 +441,7 @@ class Partner {
             return wrapper.data(getAcquireResult.rows[0]);
         }
         catch (error) {
+            console.error(error)
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }

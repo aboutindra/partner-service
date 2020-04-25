@@ -134,7 +134,7 @@ class Discount {
             name: 'get-active-discount-list',
             text: `SELECT code, partner_code AS "partnerCode", name, amount
                 FROM public.discount_program
-                WHERE start_date <= NOW() AND NOW() <= end_date AND is_active = true AND partner_code = $1
+                WHERE start_date <= NOW()::date AND NOW()::date <= end_date AND is_active = true AND partner_code = $1
                 FETCH FIRST 1 ROWS ONLY`,
             values: [partnerCode]
         }
@@ -158,7 +158,7 @@ class Discount {
             name: 'update-discount-status',
             text: `UPDATE public.discount_program
                 SET is_active = false, deactivated_at = NOW()
-                WHERE (NOW() < start_date OR end_date < NOW()) AND is_active = true;`
+                WHERE (NOW()::date < start_date OR end_date < NOW()::date) AND is_active = true;`
         }
         try {
             let result = await dbPool.query(updateDiscountQuery);
