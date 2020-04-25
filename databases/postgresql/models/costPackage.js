@@ -72,7 +72,7 @@ class CostPackage {
             text: `SELECT id, name, amount, is_deleted AS "isDeleted", created_at AS "createdAt",
                 updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.cost_package
-                ORDER BY created_at DESC
+                ORDER BY created_at ASC
                 LIMIT $1 OFFSET $2;`,
                 values: [limit, offset]
         }
