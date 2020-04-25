@@ -68,7 +68,7 @@ class Discount {
     async getAllDiscount(page, limit, offset) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllDiscountQuery = {
-            name: 'get-discount-history',
+            name: 'get-discounts',
             text: `SELECT code, partner_code AS "partnerCode", name, amount, is_active AS "isActive", start_date AS "startDate",
                 end_date AS "endDate", created_at AS "createdAt", updated_at AS "updatedAt", deactivated_at AS "deactivatedAt"
                 FROM public.discount_program
@@ -77,9 +77,9 @@ class Discount {
             values: [limit, offset]
         }
         let countDataQuery = {
-            name: 'count-acquirer-cost-package-list',
+            name: 'count-discounts',
             text: `SELECT COUNT(*)
-                FROM public.acquirer_cost_package`
+                FROM public.discount_program`
         }
 
         try {
@@ -104,6 +104,7 @@ class Discount {
             return wrapper.paginationData(getAllDiscountResult.rows, meta);
         }
         catch (error) {
+            console.error(error)
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -127,6 +128,7 @@ class Discount {
             return wrapper.data(result.rows[0]);
         }
         catch (error) {
+            console.error(error)
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }

@@ -67,7 +67,7 @@ const getDiscounts = async (request, response) => {
     if (result.err) {
         wrapper.response(response, false, result);
     } else {
-        wrapper.response(response, true, result, "Discount(s) retrieved", successCode.OK);
+        wrapper.paginationResponse(response, true, result, "Discount(s) retrieved", successCode.OK);
     }
     return;
 }
