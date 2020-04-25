@@ -4,7 +4,8 @@ const CostBearerType = require('../../enum/costBearerType');
 const CaseFormatter = require('./caseFormatter');
 
 exports.validateInsertPartnerProgram = [
-    body('partnerCode').isLength({ min: 1, max: 5 }).customSanitizer(CaseFormatter.upperingCaseInput).withMessage("Partner code must be maximum 5 characters"),
+    body('partnerCode').isLength({ min: 1, max: 5 }).customSanitizer(CaseFormatter.upperingCaseInput)
+    .withMessage("Partner code should be at least 1 character and maximum 5 characters"),
     body('exchangeRate').isInt({ gt: 0 }).withMessage("Exchange rate must be positive integer greater than 0"),
     body('costBearerType').customSanitizer(CaseFormatter.loweringCaseInput).isIn(CostBearerType.getEnumValues()).withMessage("Cost bearer must be valid type"),
     body('minAmountPerTransaction').optional({ nullable: true }).isInt({ gt: 0 }).withMessage("Minimum amount per transaction must be positive integer greater than 0"),

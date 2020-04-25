@@ -2,22 +2,23 @@ const { body } = require('express-validator');
 const CaseFormatter = require('./caseFormatter');
 
 exports.validateInsertPartner = [
-    body('code').isLength({ min: 1, max: 5 }).customSanitizer(CaseFormatter.upperingCaseInput).withMessage("Code must be maximum 5 characters"),
-    body('name').isLength({ min: 1, max: 255 }).withMessage("Name can not be empty"),
+    body('code').isLength({ min: 1, max: 5 }).customSanitizer(CaseFormatter.upperingCaseInput)
+    .withMessage("Code should be at least 1 character and maximum 5 characters"),
+    body('name').isLength({ min: 1, max: 50 }).withMessage("Name should be at least 1 character and maximum 50 characters"),
     body('segmentId').isInt({ min: 1 }).withMessage("Segment id can not be empty"),
     body('costPackageId').isInt({ min: 1 }).withMessage("Cost package id can not be empty"),
     body('isAcquirer').isBoolean().withMessage("Acquirer status can not be empty"),
     body('isIssuer').isBoolean().withMessage("Issuer status can not be empty"),
-    body('urlLogo').isLength({ min: 1, max: 255 }).withMessage("Url logo can not be empty"),
-    body('unit').isLength({ min: 1, max: 50 }).withMessage("Unit can not be empty")
+    body('urlLogo').isLength({ min: 1, max: 255 }).withMessage("Url logo should be at least 1 character and maximum 255 characters"),
+    body('unit').isLength({ min: 1, max: 25 }).withMessage("Unit should be at least 1 character and maximum 25 characters")
 ]
 
 exports.validateUpdatePartner = [
-    body('name').isLength({ min: 1, max: 255 }).withMessage("Name can not be empty"),
+    body('name').isLength({ min: 1, max: 50 }).withMessage("Name should be at least 1 character and maximum 50 characters"),
     body('segmentId').isInt({ min: 1 }).withMessage("Segment id can not be empty"),
     body('costPackageId').isInt({ min: 1 }).withMessage("Cost package id can not be empty"),
     body('isAcquirer').isBoolean().withMessage("Acquirer status can not be empty"),
     body('isIssuer').isBoolean().withMessage("Issuer status can not be empty"),
-    body('urlLogo').isLength({ min: 1, max: 255 }).withMessage("Url logo can not be empty"),
-    body('unit').isLength({ min: 1, max: 50 }).withMessage("Unit can not be empty")
+    body('urlLogo').isLength({ min: 1, max: 255 }).withMessage("Url logo should be at least 1 character and maximum 255 characters"),
+    body('unit').isLength({ min: 1, max: 25 }).withMessage("Unit should be at least 1 character and maximum 25 characters")
 ]
