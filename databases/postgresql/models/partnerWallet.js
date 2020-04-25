@@ -14,11 +14,11 @@ class PartnerWallet{
         let upsertWalletQuery = {
             name: 'upsert-wallet',
             text: `INSERT INTO public.partner_wallet(
-                partner_code, wallet_code, created_at, updated_at)
-                VALUES ($1, $2, $3, $4)
+                partner_code, wallet_code, is_deleted, created_at, updated_at)
+                VALUES ($1, $2, $3, $4, $5)
                 ON CONFLICT (partner_code) DO UPDATE
-                SET wallet_code = $2, updated_at = $3;`,
-            values: [partnerCode, walletCode, new Date(), new Date()]
+                SET wallet_code = $2, updated_at = $4;`,
+            values: [partnerCode, walletCode, false, new Date(), new Date()]
         }
         try {
             let result = await dbPool.query(upsertWalletQuery);
@@ -27,6 +27,7 @@ class PartnerWallet{
             }
             return wrapper.data(result.rows);
         } catch (error) {
+            console.error(error);
             if (error.code === errorCode.FOREIGN_KEY_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Partner doesn't exist"));
             }
@@ -38,9 +39,10 @@ class PartnerWallet{
         let dbPool = postgresqlWrapper.getConnection(this.database);
         let deleteWalletQuery = {
             name: 'delete-wallet',
-            text: `DELETE FROM public.partner_wallet
+            text: `UPDATE public.partner_wallet
+                SET is_deleted = true, updated_at = $2, deleted_at = $3
                 WHERE partner_code = $1;`,
-            values: [partnerCode]
+            values: [partnerCode, new Date(), new Date()]
         }
         try {
             let result = await dbPool.query(deleteWalletQuery);
@@ -67,7 +69,7 @@ class PartnerWallet{
             if (result.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Partner wallet not found"));
             }
-            return wrapper.data(result.rows);
+            return wrapper.data(result.rows[0]);
         } catch (error) {
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }

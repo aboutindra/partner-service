@@ -14,9 +14,9 @@ class Segment {
         let insertSegmentQuery = {
             name: 'insert-segment',
             text: `INSERT INTO public.segment(
-                name, created_at, updated_at)
-                VALUES ($1, $2, $3)`,
-            values: [name, new Date(), new Date()]
+                name, is_deleted, created_at, updated_at)
+                VALUES ($1, $2, $3, $4)`,
+            values: [name, false, new Date(), new Date()]
         }
 
         try {
@@ -63,7 +63,7 @@ class Segment {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getSegmentQuery = {
             name: 'get-segment-list',
-            text: `SELECT id, name, created_at AS "createdAt", updated_at AS "updatedAt"
+            text: `SELECT id, name, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.segment
                 ORDER BY id;`
         }
@@ -84,7 +84,7 @@ class Segment {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getSegmentByIdQuery = {
             name: 'get-segment',
-            text: `SELECT id, name, created_at AS "createdAt", updated_at AS "updatedAt"
+            text: `SELECT id, name, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.segment
                 WHERE id = $1`,
             values: [id]
@@ -95,7 +95,7 @@ class Segment {
             if (result.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Segment not found"));
             }
-            return wrapper.data(result.rows);
+            return wrapper.data(result.rows[0]);
         }
         catch (error) {
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
