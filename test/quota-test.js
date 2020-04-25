@@ -478,7 +478,7 @@ describe("Insert or Update Partner Quota", _ => {
         });
     });
 
-    it("Sending insert or update request with partner quota not found response", done => {
+    it("Sending insert or update request with partner code not exist response", done => {
         let error = {
             code: '23503'
         }

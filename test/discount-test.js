@@ -522,6 +522,28 @@ describe("Add Discount", _ => {
         });
     });
 
+    it("Sending add discount request with partner code not exist response", done => {
+        let existingDiscount = {
+            rowCount: 0,
+            rows: []
+        }
+        let error = {
+            code: '23503'
+        }
+        let pool = sandbox.stub(pgPool.prototype, 'query')
+        pool.onFirstCall().resolves(existingDiscount);
+        pool.onSecondCall().rejects(error);
+
+        chai.request(server)
+        .post(BASE_URL)
+        .send({ code: "NEWYEAR5", partnerCode: "AFK", name: "New Year Discount", amount: 100, startDate: new Date(), endDate: new Date()})
+        .end((error, response) => {
+            pool.restore();
+            responseValidator.validateResponse(response, "Partner doesn't exist", false, 403);
+            done();
+        });
+    });
+
     it("Sending add discount request with valid parameter", done => {
         let existingDiscount = {
             rowCount: 0,
