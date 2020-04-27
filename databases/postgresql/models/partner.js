@@ -305,16 +305,20 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getIssuerQuery = {
             name: "get-issuer",
-            text: `SELECT  code, amount AS "costAmount", cost_bearer_type AS "costBearerType", exchange_rate AS "exchangeRate",
-                minimum_amount_per_transaction AS "minimumAmountPerTransaction",
-                maximum_amount_per_transaction AS "maximumAmountPerTransaction",
-                remaining_deduction_quota_per_day AS "remainingDeductionQuotaPerDay",
-                remaining_deduction_quota_per_month AS "remainingDeductionQuotaPerMonth"
-                FROM public.partner AS partner
+            text: `SELECT partner.code, partner.name, programs.cost_bearer_type AS "costBearerType", programs.exchange_rate AS "exchangeRate",
+                CASE WHEN discount.amount IS NOT NULL THEN (package.amount + 1) * (100 - discount.amount) / 100 ELSE package.amount END AS "costAmount",
+                programs.minimum_amount_per_transaction AS "minimumAmountPerTransaction",
+                programs.maximum_amount_per_transaction AS "maximumAmountPerTransaction",
+                quota.remaining_deduction_quota_per_day AS "remainingDeductionQuotaPerDay",
+                quota.remaining_deduction_quota_per_month AS "remainingDeductionQuotaPerMonth"
+                FROM public.partner as partner
                 INNER JOIN public.cost_package AS package ON (id = cost_package_id)
-                INNER JOIN public.partner_quota AS quota ON (code = quota.partner_code)
+                LEFT JOIN public.partner_quota AS quota ON (code = quota.partner_code)
                 INNER JOIN public.partner_program AS programs ON (code = programs.partner_code)
-                WHERE code = $1 AND partner.is_deleted = false AND programs.is_active = true
+                LEFT JOIN LATERAL (SELECT code, amount FROM public.discount_program
+                WHERE start_date <= NOW()::date AND NOW()::date <= end_date AND is_active = true AND partner_code = partner.code
+                FETCH FIRST 1 ROWS ONLY) AS discount ON true
+                WHERE partner.code = $1 AND partner.is_deleted = false AND programs.is_active = true
                 AND programs.start_date <= NOW()::date AND NOW()::date <= programs.end_date;`,
             values: [partnerCode]
         }
