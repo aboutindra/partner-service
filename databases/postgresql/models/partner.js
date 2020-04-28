@@ -309,7 +309,7 @@ class Partner {
         let getIssuerQuery = {
             name: "get-issuer",
             text: `SELECT partner.code, partner.name, partner.cost_bearer_type AS "costBearerType", programs.exchange_rate AS "exchangeRate",
-                CASE WHEN discount.amount IS NOT NULL THEN (package.amount + 1) * (100 - discount.amount) / 100 ELSE package.amount END AS "costAmount",
+                CASE WHEN discount.amount IS NOT NULL THEN CEIL(package.amount::NUMERIC * (100 - discount.amount) / 100) ELSE package.amount END AS "costAmount",
                 programs.minimum_amount_per_transaction AS "minimumAmountPerTransaction",
                 programs.maximum_amount_per_transaction AS "maximumAmountPerTransaction",
                 quota.remaining_deduction_quota_per_day AS "remainingDeductionQuotaPerDay",
