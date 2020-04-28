@@ -5,6 +5,7 @@ const sandbox = require('sinon').createSandbox();
 const BASE_URL = "/api/v1/partners";
 const pgPool = require('pg-pool');
 const responseValidator = require('./responseValidator');
+const CostBearerType = require('../enum/costBearerType');
 
 chai.use(chaiHttp);
 
@@ -454,7 +455,7 @@ describe("Update Partner", _ => {
     it("Sending update partner request without name parameters", done => {
         chai.request(server)
         .put(BASE_URL + PARAMS)
-        .send({ segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
+        .send({ segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -464,7 +465,7 @@ describe("Update Partner", _ => {
     it("Sending update partner request without segment id parameters", done => {
         chai.request(server)
         .put(BASE_URL + PARAMS)
-        .send({ name: 'indihome', costPackageId: 1, isAcquirer: true, isIssuer: true, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
+        .send({ name: 'indihome', costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -474,7 +475,7 @@ describe("Update Partner", _ => {
     it("Sending update partner request without url logo parameters", done => {
         chai.request(server)
         .put(BASE_URL + PARAMS)
-        .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, unit: 'Poin' })
+        .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, unit: 'Poin' })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -484,7 +485,7 @@ describe("Update Partner", _ => {
     it("Sending update partner request without unit parameters", done => {
         chai.request(server)
         .put(BASE_URL + PARAMS)
-        .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, urlLogo: 'partner/logo/idh-logo.png' })
+        .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png' })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -496,7 +497,7 @@ describe("Update Partner", _ => {
 
         chai.request(server)
         .put(BASE_URL + PARAMS)
-        .send({ name: 'indihome', segmentId: 1, isAcquirer: true, isAcquirer: true, isIssuer: true, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
+        .send({ name: 'indihome', segmentId: 1, isAcquirer: true, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
@@ -509,7 +510,7 @@ describe("Update Partner", _ => {
 
         chai.request(server)
         .put(BASE_URL + PARAMS)
-        .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isIssuer: true, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
+        .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
@@ -522,7 +523,18 @@ describe("Update Partner", _ => {
 
         chai.request(server)
         .put(BASE_URL + PARAMS)
-        .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
+        .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
+        .end((error, response) => {
+            sandbox.restore();
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
+            done();
+        });
+    });
+
+    it("Sending update partner request without cost bearer type parameter", done => {
+        chai.request(server)
+        .put(BASE_URL + PARAMS)
+        .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
@@ -535,7 +547,7 @@ describe("Update Partner", _ => {
 
         chai.request(server)
         .put(BASE_URL + PARAMS)
-        .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
+        .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
@@ -551,7 +563,7 @@ describe("Update Partner", _ => {
 
         chai.request(server)
         .put(BASE_URL + PARAMS)
-        .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
+        .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Id not exist", false, 403);
@@ -568,7 +580,7 @@ describe("Update Partner", _ => {
 
         chai.request(server)
         .put(BASE_URL + PARAMS)
-        .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
+        .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Partner not found", false, 404);
@@ -585,7 +597,7 @@ describe("Update Partner", _ => {
 
         chai.request(server)
         .put(BASE_URL + PARAMS)
-        .send({ name: 'Indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
+        .send({ name: 'Indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Partner updated", true, 200);
@@ -607,7 +619,7 @@ describe("Add New Partner", _ => {
     it("Sending add new partner request without code parameters", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
+        .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -617,7 +629,7 @@ describe("Add New Partner", _ => {
     it("Sending add new partner request without name parameters", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: 'IDH', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
+        .send({ code: 'IDH', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -627,7 +639,7 @@ describe("Add New Partner", _ => {
     it("Sending add new partner request without segment id parameters", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: 'IDH', name: 'indihome', costPackageId: 1, isAcquirer: true, isIssuer: true, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
+        .send({ code: 'IDH', name: 'indihome', costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -637,7 +649,7 @@ describe("Add New Partner", _ => {
     it("Sending add new partner request without url logo parameters", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: 'IDH', name: 'indihome', costPackageId: 1, isAcquirer: true, isIssuer: true, segmentId: 1, unit: 'Poin' })
+        .send({ code: 'IDH', name: 'indihome', costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, segmentId: 1, unit: 'Poin' })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -647,7 +659,27 @@ describe("Add New Partner", _ => {
     it("Sending add new partner request without unit parameters", done => {
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: 'IDH', name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, urlLogo: 'partner/logo/idh-logo.png' })
+        .send({ code: 'IDH', name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png' })
+        .end((error, response) => {
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
+            done();
+        });
+    });
+
+    it("Sending add new partner request without cost bearer type parameters", done => {
+        chai.request(server)
+        .post(BASE_URL)
+        .send({ code: 'IDH', name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, urlLogo: 'partner/logo/idh-logo.png', unit: 'Coins' })
+        .end((error, response) => {
+            responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
+            done();
+        });
+    });
+
+    it("Sending add new partner request with invalid cost bearer type", done => {
+        chai.request(server)
+        .post(BASE_URL)
+        .send({ code: 'IDH', name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: 'unknown', urlLogo: 'partner/logo/idh-logo.png', unit: 'Coins' })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
@@ -659,7 +691,7 @@ describe("Add New Partner", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: 'IDH', name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
+        .send({ code: 'IDH', name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
@@ -675,7 +707,7 @@ describe("Add New Partner", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: 'IDH', name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
+        .send({ code: 'IDH', name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Id not exist", false, 403);
@@ -691,7 +723,7 @@ describe("Add New Partner", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: 'IDH', name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
+        .send({ code: 'IDH', name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Code already exist", false, 403);
@@ -708,7 +740,7 @@ describe("Add New Partner", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: 'IDH', name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
+        .send({ code: 'IDH', name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Failed add new partner", false, 404);
@@ -725,7 +757,7 @@ describe("Add New Partner", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ code: 'IDH', name: 'Indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
+        .send({ code: 'IDH', name: 'Indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
             sandbox.restore();
             responseValidator.validateResponse(response, "Partner added", true, 200);
