@@ -25,10 +25,10 @@ class PartnerProgram {
         let insertPartnerProgramQuery = {
             name: 'add-new-partner-program',
             text: `INSERT INTO public.partner_program(
-                partner_code, exchange_rate, cost_bearer_type, start_date, end_date, minimum_amount_per_transaction, maximum_amount_per_transaction,
+                partner_code, exchange_rate, start_date, end_date, minimum_amount_per_transaction, maximum_amount_per_transaction,
                 maximum_transaction_amount_per_day, maximum_transaction_amount_per_month, is_active, created_at, updated_at)
-                VALUES ($1, $2, $3::cost_bearer_type, $4, $5, $6, $7, $8, $9, $10, $11, $12);`,
-            values: [partnerCode, exchangeRate, costBearerType, startDate, endDate, minAmountPerTransaction, maxAmountPerTransaction, maxTransactionAmountPerDay,
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);`,
+            values: [partnerCode, exchangeRate, startDate, endDate, minAmountPerTransaction, maxAmountPerTransaction, maxTransactionAmountPerDay,
                 maxTransactionAmountPerMonth, status, timestamp, timestamp]
         }
 
@@ -94,7 +94,7 @@ class PartnerProgram {
         let dbPool = postgresqlWrapper.getConnection(this.database);
         let getAllPartnerProgramQuery = {
             name: 'get-partner-program-list',
-            text: `SELECT id, partner_code AS "partnerCode", name AS "partnerName", exchange_rate AS "exchangeRate", cost_bearer_type AS "costBearerType",
+            text: `SELECT id, partner_code AS "partnerCode", name AS "partnerName", exchange_rate AS "exchangeRate",
                 minimum_amount_per_transaction AS "minimumAmountPerTransaction", maximum_amount_per_transaction as "maximumAmountPerTransaction",
                 maximum_transaction_amount_per_day AS "maximumTransactionAmountPerDay", maximum_transaction_amount_per_month AS "maximumTransactionAmountPerMonth",
                 is_active AS "isActive", start_date AS "startDate", end_date AS "endDate",
@@ -141,7 +141,7 @@ class PartnerProgram {
         let dbPool = postgresqlWrapper.getConnection(this.database);
         let getPartnerProgramQuery = {
             name: 'get-partner-program',
-            text: `SELECT id, partner_code AS "partnerCode", exchange_rate AS "exchangeRate", cost_bearer_type AS "costBearerType",
+            text: `SELECT id, partner_code AS "partnerCode", exchange_rate AS "exchangeRate",
                 minimum_amount_per_transaction AS "minimumAmountPerTransaction", maximum_amount_per_transaction as "maximumAmountPerTransaction",
                 maximum_transaction_amount_per_day AS "maximumTransactionAmountPerDay", maximum_transaction_amount_per_month AS "maximumTransactionAmountPerMonth",
                 is_active AS "isActive", start_date AS "startDate", end_date AS "endDate",
@@ -167,7 +167,7 @@ class PartnerProgram {
         let dbPool = postgresqlWrapper.getConnection(this.database);
         let getPartnerProgramQuery = {
             name: 'get-program-of-partner',
-            text: `SELECT id, partner_code AS "partnerCode", exchange_rate AS "exchangeRate", cost_bearer_type AS "costBearerType",
+            text: `SELECT id, partner_code AS "partnerCode", exchange_rate AS "exchangeRate",
                 minimum_amount_per_transaction AS "minimumAmountPerTransaction", maximum_amount_per_transaction as "maximumAmountPerTransaction",
                 maximum_transaction_amount_per_day AS "maximumTransactionAmountPerDay", maximum_transaction_amount_per_month AS "maximumTransactionAmountPerMonth",
                 is_active AS "isActive", start_date AS "startDate", end_date AS "endDate",
@@ -215,7 +215,7 @@ class PartnerProgram {
         let dbPool = postgresqlWrapper.getConnection(this.database);
         let getActiveDiscountQuery = {
             name: 'get-active-program',
-            text: `SELECT partner_code, exchange_rate, cost_bearer_type, minimum_amount_per_transaction, maximum_amount_per_transaction,
+            text: `SELECT partner_code, exchange_rate, minimum_amount_per_transaction, maximum_amount_per_transaction,
                 maximum_transaction_amount_per_day, maximum_transaction_amount_per_month
                 FROM public.partner_program
                 WHERE start_date <= NOW()::date AND NOW()::date <= end_date AND is_active = true AND partner_code = $1
