@@ -1,4 +1,4 @@
-const {Client, Pool} = require('pg');
+const {Pool} = require('pg');
 const config = require('config');
 const connectionPool = [];
 
