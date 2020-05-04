@@ -15,11 +15,13 @@ process.on('SIGTERM', () => {
 	//close server connection
 	server.close(() => {
 		console.log('Http server closed.');
-        let pgPool = postgresqlWrapper.getConnection(process.env.POSTGRESQL_DATABASE_PARTNER);
-		pgPool.end(() => {
-            console.log("Database connection closed");
-            process.exit(0);
-        });
+		setTimeout(() => {
+			let pgPool = postgresqlWrapper.getConnection(process.env.POSTGRESQL_DATABASE_PARTNER);
+			pgPool.end(() => {
+				console.log("Database connection closed");
+				process.exit(0);
+			});
+		}, 5000).unref();
 	});
 });
 
