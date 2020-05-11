@@ -675,7 +675,7 @@ describe("Add Partner Program", _ => {
                     "maximumTransactionAmountPerMonth": null,
                     "isActive": true,
                     "startDate": "2020-01-09T17:00:00.000Z",
-                    "endDate": "2020-02-29T17:00:00.000Z",
+                    "endDate": "2099-02-29T17:00:00.000Z",
                     "createdAt": "2020-01-10T07:22:51.255Z",
                     "updatedAt": "2020-01-10T07:22:51.255Z",
                     "deactivatedAt": null

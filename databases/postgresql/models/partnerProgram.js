@@ -14,7 +14,7 @@ class PartnerProgram {
 
     /* istanbul ignore next */
     async insertProgram(params) {
-        let {partnerCode, exchangeRate, costBearerType, minAmountPerTransaction, maxAmountPerTransaction, maxTransactionAmountPerDay,
+        let {partnerCode, exchangeRate, minAmountPerTransaction, maxAmountPerTransaction, maxTransactionAmountPerDay,
             maxTransactionAmountPerMonth, startDate, endDate} = params;
         let status = false;
         let timestamp = new Date();
@@ -215,8 +215,9 @@ class PartnerProgram {
         let dbPool = postgresqlWrapper.getConnection(this.database);
         let getActiveDiscountQuery = {
             name: 'get-active-program',
-            text: `SELECT partner_code, exchange_rate, minimum_amount_per_transaction, maximum_amount_per_transaction,
-                maximum_transaction_amount_per_day, maximum_transaction_amount_per_month
+            text: `SELECT partner_code AS "partnerCode", exchange_rate AS "exchangeRate", minimum_amount_per_transaction AS "minimumAmountPerTransaction",
+                maximum_amount_per_transaction AS "maximumAmountPerTransaction", maximum_transaction_amount_per_day AS "maximumTransactionAmountPerDay",
+                maximum_transaction_amount_per_month AS "maximumTransactionAmountPerMonth", start_date AS "startDate", end_date AS "endDate"
                 FROM public.partner_program
                 WHERE start_date <= NOW()::date AND NOW()::date <= end_date AND is_active = true AND partner_code = $1
                 FETCH FIRST 1 ROWS ONLY`,
@@ -228,7 +229,7 @@ class PartnerProgram {
             if (result.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Active partner program not found"));
             }
-            return wrapper.data(result.rows);
+            return wrapper.data(result.rows[0]);
         }
         catch (error) {
             console.error(error)

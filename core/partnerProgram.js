@@ -21,7 +21,7 @@ const insertProgram = async (request, response) => {
         wrapper.response(response, false, currentPartnerProgram);
         return;
     } else {
-        if (currentPartnerProgram.data) {
+        if (new Date(request.body.startDate).getTime() < new Date(currentPartnerProgram.data.endDate).getTime()) {
             wrapper.response(response, false, wrapper.error(new ForbiddenError("There is another program currently running")));
             return;
         }
