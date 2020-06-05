@@ -15,20 +15,19 @@ const insertProgram = async (request, response) => {
         wrapper.response(response, false, error);
         return;
     }
+    request.body.startDate = new Date(request.body.startDate);
+    request.body.endDate = new Date(request.body.endDate);
 
-    let currentPartnerProgram = await partnerProgram.getActivePartnerProgram(request.body.partnerCode);
+    let currentPartnerProgram = await partnerProgram.getActivePartnerProgram(request.body.partnerCode, request.body.startDate, request.body.endDate);
+    console.log(currentPartnerProgram);
     if (currentPartnerProgram.err && currentPartnerProgram.err.message !== "Active partner program not found") {
         wrapper.response(response, false, currentPartnerProgram);
         return;
-    } else {
-        if (new Date(request.body.startDate).getTime() < new Date(currentPartnerProgram.data.endDate).getTime()) {
-            wrapper.response(response, false, wrapper.error(new ForbiddenError("There is another program currently running")));
-            return;
-        }
+    } else if (currentPartnerProgram.data) {
+        wrapper.response(response, false, wrapper.error(new ForbiddenError("There is another program currently running")));
+        return;
     }
 
-    request.body.startDate = new Date(request.body.startDate);
-    request.body.endDate = new Date(request.body.endDate);
     let insertPartnerProgramResult = await partnerProgram.insertProgram(request.body);
     if (insertPartnerProgramResult.err) {
         wrapper.response(response, false, insertPartnerProgramResult);
@@ -67,14 +66,14 @@ const getPrograms = async (request, response) => {
         return;
     }
 
+    let { id, page, limit, offset, search } = request.query;
     let getPartnerProgramsResult;
 
-    if (request.query.id) {
+    if (id) {
         let id = parseInt(request.query.id);
         getPartnerProgramsResult = await partnerProgram.getProgramById(id);
     } else {
-        let {page, limit, offset} = request.query;
-        getPartnerProgramsResult = await partnerProgram.getAllProgram(page, limit, offset);
+        getPartnerProgramsResult = await partnerProgram.getAllProgram(page, limit, offset, search);
     }
 
     if (getPartnerProgramsResult.err) {

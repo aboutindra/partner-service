@@ -90,7 +90,7 @@ class PartnerProgram {
         }
     }
 
-    async getAllProgram(page, limit, offset) {
+    async getAllProgram(page, limit, offset, search) {
         let dbPool = postgresqlWrapper.getConnection(this.database);
         let getAllPartnerProgramQuery = {
             name: 'get-partner-program-list',
@@ -101,15 +101,20 @@ class PartnerProgram {
                 program.created_at AS "createdAt", program.updated_at AS "updatedAt", program.deactivated_at AS "deactivatedAt"
                 FROM public.partner_program AS program
                 INNER JOIN public.partner AS partner ON (partner_code = code)
-                ORDER BY program.created_at DESC
+                WHERE partner_code = $3 OR $3 IS NULL OR lower(name) LIKE lower('%' || $3 || '%')
+                ORDER BY program.created_at ASC
                 LIMIT $1 OFFSET $2;`,
-                values: [limit, offset]
+                values: [limit, offset, search]
         }
         let countDataQuery = {
             name: 'count-partner-program-list',
             text: `SELECT COUNT(*)
-                FROM public.partner_program;`
+                FROM public.partner_program
+                INNER JOIN public.partner AS partner ON (partner_code = code)
+                WHERE partner_code = $1 OR $1 IS NULL OR lower(name) LIKE lower('%' || $1 || '%');`,
+            values: [search]
         }
+
         try {
             let getAllPartnerProgramResult = await dbPool.query(getAllPartnerProgramQuery);
             if (getAllPartnerProgramResult.rows.length === 0) {
@@ -211,7 +216,7 @@ class PartnerProgram {
         }
     }
 
-    async getActivePartnerProgram(partnerCode) {
+    async getActivePartnerProgram(partnerCode, startDate, endDate) {
         let dbPool = postgresqlWrapper.getConnection(this.database);
         let getActiveDiscountQuery = {
             name: 'get-active-program',
@@ -219,9 +224,11 @@ class PartnerProgram {
                 maximum_amount_per_transaction AS "maximumAmountPerTransaction", maximum_transaction_amount_per_day AS "maximumTransactionAmountPerDay",
                 maximum_transaction_amount_per_month AS "maximumTransactionAmountPerMonth", start_date AS "startDate", end_date AS "endDate"
                 FROM public.partner_program
-                WHERE start_date <= NOW()::date AND NOW()::date <= end_date AND is_active = true AND partner_code = $1
+                /* WHERE start_date <= NOW()::date AND NOW()::date <= end_date AND is_active = true AND partner_code = $1 */
+                WHERE (($2::date <= start_date AND start_date <= $3::date) OR ($2::date <= end_date AND end_date <= $3::date))
+                AND (is_active = true OR (is_active = false AND deactivated_at IS NULL)) AND partner_code = $1
                 FETCH FIRST 1 ROWS ONLY`,
-            values: [partnerCode]
+            values: [partnerCode, startDate, endDate]
         }
 
         try {
