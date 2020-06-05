@@ -224,7 +224,6 @@ class PartnerProgram {
                 maximum_amount_per_transaction AS "maximumAmountPerTransaction", maximum_transaction_amount_per_day AS "maximumTransactionAmountPerDay",
                 maximum_transaction_amount_per_month AS "maximumTransactionAmountPerMonth", start_date AS "startDate", end_date AS "endDate"
                 FROM public.partner_program
-                /* WHERE start_date <= NOW()::date AND NOW()::date <= end_date AND is_active = true AND partner_code = $1 */
                 WHERE (($2::date <= start_date AND start_date <= $3::date) OR ($2::date <= end_date AND end_date <= $3::date))
                 AND (is_active = true OR (is_active = false AND deactivated_at IS NULL)) AND partner_code = $1
                 FETCH FIRST 1 ROWS ONLY`,
@@ -244,37 +243,6 @@ class PartnerProgram {
         }
     }
 
-    /* istanbul ignore next */
-    async updatePartnerProgramStatus() {
-        let dbPool = postgresqlWrapper.getConnection(this.database);
-        let deactivateProgram = {
-            name: 'deactivate-partner-program',
-            text: `UPDATE public.partner_program
-                SET is_active=false, deactivated_at=NOW()
-                WHERE end_date < NOW()::date AND is_active=true;`
-        }
-        let activateProgram = {
-            name: 'activate-partner-program',
-            text: `UPDATE public.partner_program
-                SET is_active=true
-                WHERE start_date <= NOW()::date AND NOW()::date <= end_date AND is_active=false AND deactivated_at IS NULL;`
-        }
-
-        let client = await dbPool.connect();
-        try {
-            await client.query('BEGIN');
-            await client.query(deactivateProgram);
-            await client.query(activateProgram);
-            let result = await client.query('COMMIT');
-            if (result.rowCount === 0) {
-                return wrapper.error(new NotFoundError(PartnerProgramResponseMessage.PARTNER_PROGRAM_NOT_FOUND));
-            }
-            return wrapper.data(result.rows);
-        }
-        catch (error) {
-            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
-        }
-    }
 }
 
 module.exports = PartnerProgram;
