@@ -29,3 +29,8 @@ exports.validateUpdatePartner = [
     body('urlLogo').isLength({ min: 1, max: 255 }).withMessage("Url logo should be at least 1 character and maximum 255 characters"),
     body('unit').isLength({ min: 1, max: 25 }).withMessage("Unit should be at least 1 character and maximum 25 characters")
 ]
+
+exports.validateGetPartner = [
+    param('code').optional({ nullable: true }).isLength({ min: 1, max: 5 }).customSanitizer(CaseFormatter.upperingCaseInput)
+    .withMessage("Code should be at least 1 character and maximum 5 characters")
+]

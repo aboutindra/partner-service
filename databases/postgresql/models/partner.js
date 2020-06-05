@@ -89,7 +89,7 @@ class Partner {
         }
     }
 
-    async getAllPartner(page, limit, offset) {
+    async getAllPartner(page, limit, offset, search) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllPartnerQuery = {
             name: "get-partner-list",
@@ -102,14 +102,17 @@ class Partner {
                 END AS "partnerType",
                 is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.partner
+                WHERE code = $3 OR $3 IS NULL OR lower(name) LIKE lower('%' || $3 || '%')
                 ORDER BY created_at
                 LIMIT $1 OFFSET $2;`,
-                values: [limit, offset]
+                values: [limit, offset, search]
         }
         let countDataQuery = {
             name: 'count-partner-list',
             text: `SELECT COUNT(*)
-                FROM public.partner;`
+                FROM public.partner
+                WHERE code = $1 OR $1 IS NULL OR lower(name) LIKE lower('%' || $1 || '%');`,
+            values: [search]
         }
 
         try {
@@ -134,6 +137,7 @@ class Partner {
             return wrapper.paginationData(getAllPartnersResult.rows, meta);
         }
         catch (error) {
+            console.error(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }

@@ -66,12 +66,12 @@ const deletePartner = async (request, response) => {
 const getPartners = async (request, response) => {
     let getPartnerResult;
 
-    if (request.query.code) {
-        let code = request.query.code.toUpperCase();
+    let { code, page, limit, offset, search } = request.query;
+
+    if (code) {
         getPartnerResult = await partner.getPartnerByCode(code);
     } else {
-        let {page, limit, offset} = request.query;
-        getPartnerResult = await partner.getAllPartner(page, limit, offset);
+        getPartnerResult = await partner.getAllPartner(page, limit, offset, search);
     }
 
     if (getPartnerResult.err) {
