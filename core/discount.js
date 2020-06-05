@@ -14,15 +14,16 @@ const insertDiscount = async (request, response) => {
         return;
     }
 
-    let currentProgram = await discount.getActiveDiscount(request.body.partnerCode);
+    request.body.startDate = new Date(request.body.startDate);
+    request.body.endDate = new Date(request.body.endDate);
+
+    let currentProgram = await discount.getRunningDiscount(request.body.partnerCode, request.body.startDate, request.body.endDate);
     if (currentProgram.err && currentProgram.err.message !== "Active discount not found") {
         wrapper.response(response, false, currentProgram);
         return;
-    } else {
-        if (currentProgram.data) {
-            wrapper.response(response, false, wrapper.error(new ForbiddenError("There is another program currently running")));
-            return;
-        }
+    } else if (currentProgram.data) {
+        wrapper.response(response, false, wrapper.error(new ForbiddenError("There is another program currently running")));
+        return;
     }
 
     let result = await discount.insertDiscount(request.body);
@@ -55,13 +56,13 @@ const deleteDiscount = async (request, response) => {
 
 const getDiscounts = async (request, response) => {
     let result;
+    let { code, page, limit, offset, search } = request.query;
 
-    if (request.query.code) {
-        let code = request.query.code.toUpperCase();
+    if (code) {
+        code = code.toUpperCase();
         result = await discount.getDiscountByCode(code);
     } else {
-        let {page, limit, offset} = request.query;
-        result = await discount.getAllDiscount(page, limit, offset);
+        result = await discount.getAllDiscount(page, limit, offset, search);
     }
 
     if (result.err) {

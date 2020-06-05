@@ -13,13 +13,18 @@ class Discount {
     }
 
     async insertDiscount({code, partnerCode, name, amount, startDate, endDate}) {
+        let status = false;
+        let timestamp = new Date();
+        if (startDate.getTime() <= timestamp.getTime() && timestamp.getTime() < endDate.getTime()) {
+            status = true;
+        }
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let insertDiscountQuery = {
             name: 'insert-discount',
             text: `INSERT INTO public.discount_program(
                 code, partner_code, name, amount, is_active, start_date, end_date, created_at, updated_at)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);`,
-            values: [code, partnerCode, name, amount, true, startDate, endDate, new Date(), new Date()]
+            values: [code, partnerCode, name, amount, status, startDate, endDate, new Date(), new Date()]
         }
 
         try {
@@ -65,21 +70,24 @@ class Discount {
         }
     }
 
-    async getAllDiscount(page, limit, offset) {
+    async getAllDiscount(page, limit, offset, search) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAllDiscountQuery = {
             name: 'get-discounts',
             text: `SELECT code, partner_code AS "partnerCode", name, amount, is_active AS "isActive", start_date AS "startDate",
                 end_date AS "endDate", created_at AS "createdAt", updated_at AS "updatedAt", deactivated_at AS "deactivatedAt"
                 FROM public.discount_program
+                WHERE partner_code = $3 OR $3 IS NULL OR code = $3 OR lower(name) LIKE lower('%' || $3 || '%')
                 ORDER BY created_at DESC
                 LIMIT $1 OFFSET $2;`,
-            values: [limit, offset]
+            values: [limit, offset, search]
         }
         let countDataQuery = {
             name: 'count-discounts',
             text: `SELECT COUNT(*)
-                FROM public.discount_program`
+                FROM public.discount_program
+                WHERE partner_code = $1 OR $1 IS NULL OR code = $1 OR lower(name) LIKE lower('%' || $1 || '%');`,
+            values: [search]
         }
 
         try {
@@ -156,26 +164,30 @@ class Discount {
         }
     }
 
-    /* istanbul ignore next */
-    async updateDiscountStatus() {
-        let dbPool = postgresqlWrapper.getConnection(this.database);
-        let updateDiscountQuery = {
-            name: 'update-discount-status',
-            text: `UPDATE public.discount_program
-                SET is_active = false, deactivated_at = NOW()
-                WHERE (NOW()::date < start_date OR end_date < NOW()::date) AND is_active = true;`
+    async getRunningDiscount(partnerCode, startDate, endDate) {
+        let dbClient = postgresqlWrapper.getConnection(this.database);
+        let getActiveDiscountQuery = {
+            name: 'get-active-discount-list',
+            text: `SELECT code, partner_code AS "partnerCode", name, amount
+                FROM public.discount_program
+                WHERE (($2::date <= start_date AND start_date <= $3::date) OR ($2::date <= end_date AND end_date <= $3::date))
+                AND (is_active = true OR (is_active = false AND deactivated_at IS NULL)) AND partner_code = $1
+                FETCH FIRST 1 ROWS ONLY`,
+            values: [partnerCode, startDate, endDate]
         }
+
         try {
-            let result = await dbPool.query(updateDiscountQuery);
-            if (result.rowCount === 0) {
-                return wrapper.error(new NotFoundError(DiscountResponseMessage.DISCOUNT_NOT_FOUND));
+            let result = await dbClient.query(getActiveDiscountQuery);
+            if (result.rows.length === 0) {
+                return wrapper.error(new NotFoundError("Active discount not found"));
             }
-            return wrapper.data(result.rows);
+            return wrapper.data(result.rows[0]);
         }
         catch (error) {
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
+
 }
 
 module.exports = Discount;
