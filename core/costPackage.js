@@ -82,13 +82,13 @@ const getCostPackages = async (request, response) => {
     }
 
     let getPackagesResult = null;
+    let { id, page, limit, offset, search } = request.query;
 
-    if (request.query.id) {
-        let id = parseInt(request.query.id);
+    if (id) {
+        id = parseInt(id);
         getPackagesResult = await costPackage.getPackageById(id);
     } else {
-        let {page, limit, offset} = request.query;
-        getPackagesResult = await costPackage.getPackages(page, limit, offset);
+        getPackagesResult = await costPackage.getPackages(page, limit, offset, search);
     }
 
     if (getPackagesResult.err) {

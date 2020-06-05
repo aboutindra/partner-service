@@ -65,21 +65,24 @@ class CostPackage {
         }
     }
 
-    async getPackages(page, limit, offset) {
+    async getPackages(page, limit, offset, search) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getCostPackagesQuery = {
             name: 'get-cost-packages',
             text: `SELECT id, name, amount, is_deleted AS "isDeleted", created_at AS "createdAt",
                 updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.cost_package
+                WHERE lower(name) LIKE lower('%' || $3 || '%') OR $3 IS NULL
                 ORDER BY created_at ASC
                 LIMIT $1 OFFSET $2;`,
-                values: [limit, offset]
+                values: [limit, offset, search]
         }
         let countDataQuery = {
             name: 'count-cost-packages',
             text: `SELECT COUNT(*)
-                FROM public.cost_package`
+                FROM public.cost_package
+                WHERE lower(name) LIKE lower('%' || $1 || '%') OR $1 IS NULL`,
+            values: [search]
         }
         try {
             let costPackages = await dbClient.query(getCostPackagesQuery);
@@ -104,6 +107,7 @@ class CostPackage {
             return wrapper.paginationData(costPackages.rows, meta);
         }
         catch (error) {
+            console.error(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
