@@ -19,7 +19,6 @@ const insertProgram = async (request, response) => {
     request.body.endDate = new Date(request.body.endDate);
 
     let currentPartnerProgram = await partnerProgram.getActivePartnerProgram(request.body.partnerCode, request.body.startDate, request.body.endDate);
-    console.log(currentPartnerProgram);
     if (currentPartnerProgram.err && currentPartnerProgram.err.message !== "Active partner program not found") {
         wrapper.response(response, false, currentPartnerProgram);
         return;
