@@ -85,6 +85,7 @@ class Partner {
             return wrapper.data(deletePartnerResult.rows);
         }
         catch (error) {
+            console.error(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -457,6 +458,73 @@ class Partner {
         }
     }
 
+    async getCounts() {
+        let dbClient = postgresqlWrapper.getConnection(this.database);
+        let getCountQuery = {
+            name: "get-partner-count",
+            text: `SELECT COUNT(CASE WHEN is_acquirer = true THEN partner.code END) AS "isAcquirer",
+                COUNT(CASE WHEN is_issuer = true THEN partner.code END) AS "isIssuer",
+                COUNT(CASE WHEN is_acquirer = true AND is_issuer = true THEN partner.code END) AS "isBoth",
+                COUNT (*) AS "total"
+                FROM public.partner AS partner;`
+        }
+        try {
+            let getCountResult = await dbClient.query(getCountQuery);
+            if (getCountResult.rows.length === 0) {
+                return wrapper.error(new NotFoundError("Partner count not found"));
+            }
+            return wrapper.data(getCountResult.rows[0]);
+        }
+        catch (error) {
+            console.error(error)
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
+        }
+    }
+
+    async getImages(page, limit, offset, search) {
+        let dbClient = postgresqlWrapper.getConnection(this.database);
+        let getImagesQuery = {
+            name: "get-partner-images",
+            text: `SELECT code, url_logo AS "urlLogo"
+                FROM public.partner AS partner
+                WHERE code = $3 OR $3 IS NULL OR lower(name) LIKE lower('%' || $3 || '%')
+                ORDER BY code
+                LIMIT $1 OFFSET $2;;`,
+            values: [limit, offset, search]
+        }
+        let countImages = {
+            name: 'count-partner-images',
+            text: `SELECT COUNT(*)
+                FROM public.partner AS partner
+                WHERE code = $1 OR $1 IS NULL OR lower(name) LIKE lower('%' || $1 || '%');`,
+            values: [search]
+        }
+        try {
+            let getImagesResult = await dbClient.query(getImagesQuery);
+            if (getImagesResult.rows.length === 0) {
+                return wrapper.error(new NotFoundError(PartnerResponseMessage.PARTNER_NOT_FOUND));
+            }
+            let count = await dbClient.query(countImages);
+            let totalData = parseInt(count.rows[0].count);
+            let totalPage = Math.ceil(totalData / limit);
+            if (limit === null) {
+                totalPage = 1;
+            }
+            let totalDataOnPage = getImagesResult.rows.length;
+            let meta = {
+                page: page || 1,
+                totalData,
+                totalPage,
+                totalDataOnPage
+            }
+
+            return wrapper.paginationData(getImagesResult.rows, meta);
+        }
+        catch (error) {
+            console.error(error)
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
+        }
+    }
 }
 
 module.exports = Partner;

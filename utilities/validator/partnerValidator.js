@@ -1,4 +1,4 @@
-const { body, param } = require('express-validator');
+const { body, param, query } = require('express-validator');
 const CaseFormatter = require('./caseFormatter');
 const CostBearerType = require('../../enum/costBearerType');
 
@@ -31,6 +31,6 @@ exports.validateUpdatePartner = [
 ]
 
 exports.validateGetPartner = [
-    param('code').optional({ nullable: true }).isLength({ min: 1, max: 5 }).customSanitizer(CaseFormatter.upperingCaseInput)
+    query('code').optional({ nullable: true }).isLength({ min: 1, max: 5 }).customSanitizer(CaseFormatter.upperingCaseInput)
     .withMessage("Code should be at least 1 character and maximum 5 characters")
 ]

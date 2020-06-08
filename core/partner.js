@@ -6,7 +6,9 @@ const { BadRequestError } = require('../utilities/error');
 const Partner = require('../databases/postgresql/models/partner');
 const partner = new Partner(process.env.POSTGRESQL_DATABASE_PARTNER);
 const PartnerResponseMessage = {
-    PARTNER_RETRIVIED: "Partner(s) retrieved"
+    PARTNER_RETRIVIED: "Partner(s) retrieved",
+    PARTNER_COUNTS_RETRIVIED: "Partner counts retrieved",
+    PARTNER_IMAGES_RETRIVIED: "Partner images retrieved"
 }
 
 const insertPartner = async (request, response) => {
@@ -168,6 +170,29 @@ const getActiveAcquirers = async (request, response) => {
     return;
 }
 
+const getPartnerCounts = async (request, response) => {
+    let partnerCountResult = await partner.getCounts();
+
+    if (partnerCountResult.err) {
+        wrapper.response(response, false, partnerCountResult);
+    } else {
+        wrapper.paginationResponse(response, true, partnerCountResult, PartnerResponseMessage.PARTNER_COUNTS_RETRIVIED, successCode.OK);
+    }
+    return;
+}
+
+const getPartnerImages = async (request, response) => {
+    let {page, limit, offset, search} = request.query;
+    let partnerImagesResult = await partner.getImages(page, limit, offset, search);
+
+    if (partnerImagesResult.err) {
+        wrapper.response(response, false, partnerImagesResult);
+    } else {
+        wrapper.paginationResponse(response, true, partnerImagesResult, PartnerResponseMessage.PARTNER_IMAGES_RETRIVIED, successCode.OK);
+    }
+    return;
+}
+
 module.exports = {
     insertPartner,
     updatePartner,
@@ -179,5 +204,7 @@ module.exports = {
     getIssuers,
     getActiveIssuers,
     getAcquirers,
-    getActiveAcquirers
+    getActiveAcquirers,
+    getPartnerCounts,
+    getPartnerImages
 }
