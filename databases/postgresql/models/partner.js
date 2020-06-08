@@ -70,10 +70,10 @@ class Partner {
     async softDeletePartner(code) {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let deleteDiscountQuery = {
-            name: 'soft-delete-partner-program-by-partner-code',
-            text: `UPDATE public.partner_program
-                SET is_active = false, updated_at = $2, deleted_at = $3
-                WHERE partner_code = $1`,
+            name: 'soft-delete-partner-by-partner-code',
+            text: `UPDATE public.partner
+                SET is_deleted = true, updated_at = $2, deleted_at = $3
+                WHERE code = $1`,
             values: [code, new Date(), new Date()]
         }
 
