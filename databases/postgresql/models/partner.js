@@ -326,7 +326,7 @@ class Partner {
                 LEFT JOIN LATERAL (SELECT code, amount FROM public.discount_program
                 WHERE start_date <= NOW()::date AND NOW()::date <= end_date AND is_active = true AND partner_code = partner.code
                 FETCH FIRST 1 ROWS ONLY) AS discount ON true
-                WHERE partner.code = $1 AND partner.is_deleted = false AND programs.is_active = true
+                WHERE partner.code = $1 AND partner.is_deleted = false AND programs.is_active = true AND partner.is_issuer = true
                 AND programs.start_date <= NOW()::date AND NOW()::date <= programs.end_date;`,
             values: [partnerCode]
         }
@@ -438,10 +438,10 @@ class Partner {
         let dbClient = postgresqlWrapper.getConnection(this.database);
         let getAcquirerQuery = {
             name: "get-acquirer",
-            text: `SELECT  code, exchange_rate AS "exchangeRate"
+            text: `SELECT  code, name, exchange_rate AS "exchangeRate"
                 FROM public.partner
                 INNER JOIN public.partner_program AS programs ON (code = programs.partner_code)
-                WHERE code = $1 AND is_deleted = false AND programs.is_active = true
+                WHERE code = $1 AND is_deleted = false AND programs.is_active = true AND is_acquirer = true
                 AND programs.start_date <= NOW()::date AND NOW()::date <= programs.end_date;`,
             values: [partnerCode]
         }
