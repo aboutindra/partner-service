@@ -765,3 +765,235 @@ describe("Add New Partner", _ => {
         });
     });
 });
+
+describe("Get Partner Counts", _ => {
+    const PATH = '/counts';
+
+    it("Sending get partner count request with database connection failure response", done => {
+        sandbox.stub(pgPool.prototype, 'query').rejects();
+
+        chai.request(server)
+        .get(BASE_URL + PATH)
+        .end((error, response) => {
+            sandbox.restore();
+            responseValidator.validateResponse(response, "Internal server error", false, 500);
+            done();
+        });
+    });
+
+    it("Sending get partner count request with empty partner response", done => {
+        let queryResult = {
+            rowCount: 0,
+            rows: []
+        }
+        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+
+        chai.request(server)
+        .get(BASE_URL + PATH)
+        .end((error, response) => {
+            sandbox.restore();
+            responseValidator.validateResponse(response, "Partner count not found", false, 404);
+            done();
+        });
+    });
+
+    it("Sending get partner count request with partner detail response", done => {
+        let queryResult = {
+            rowCount: 1,
+            rows: [
+                {
+                    "code": "IDH",
+                    "segmentId": 6,
+                    "issuerCostPackageId": 2,
+                    "acquirerCostPackageId": null,
+                    "name": "indihome",
+                    "urlLogo": "partner/logo-myindihome.svg",
+                    "unit": "Poin",
+                    "partnerType": "Issuer",
+                    "isDeleted": false,
+                    "createdAt": "2019-12-04T02:28:26.181Z",
+                    "updatedAt": "2019-12-04T03:21:21.990Z",
+                    "deletedAt": null
+                }
+            ]
+        }
+        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+
+        chai.request(server)
+        .get(BASE_URL + PATH)
+        .end((error, response) => {
+            sandbox.restore();
+            responseValidator.validateResponse(response, "Partner counts retrieved", true, 200);
+            done();
+        });
+    });
+});
+
+describe("Get Partner Images", _ => {
+    const PATH = '/images';
+
+    it("Sending get all partners image request with invalid page query parameter", done => {
+        chai.request(server)
+        .get(BASE_URL + PATH)
+        .query({ page: 0, limit: 100 })
+        .end((error, response) => {
+            responseValidator.validateResponse(response, "Page & Limit must be positive integer value", false, 400);
+            done();
+        });
+    });
+
+    it("Sending get all partners image request with invalid limit query parameter", done => {
+        chai.request(server)
+        .get(BASE_URL + PATH)
+        .query({ page: 1, limit: 0 })
+        .end((error, response) => {
+            responseValidator.validateResponse(response, "Page & Limit must be positive integer value", false, 400);
+            done();
+        });
+    });
+
+    it("Sending get all partners image request with connection failure response", done => {
+        sandbox.stub(pgPool.prototype, 'query').rejects();
+
+        chai.request(server)
+        .get(BASE_URL + PATH)
+        .end((error, response) => {
+            sandbox.restore();
+            responseValidator.validateResponse(response, "Internal server error", false, 500);
+            done();
+        });
+    });
+
+    it("Sending get all partners image request with empty partner list", done => {
+        let poolStub = sandbox.stub(pgPool.prototype, 'query');
+        let queryResult = {
+            rowCount: 0,
+            rows: []
+        }
+        poolStub.resolves(queryResult);
+
+        chai.request(server)
+        .get(BASE_URL + PATH)
+        .end((error, response) => {
+            poolStub.restore();
+            responseValidator.validateResponse(response, "Partner(s) not found", false, 404);
+            done();
+        });
+    });
+
+    it("Sending get all partners image request with valid query parameter", done => {
+        let poolStub = sandbox.stub(pgPool.prototype, 'query');
+        let queryResult = {
+            rowCount: 1,
+            rows: [
+                {
+                    "code": "IDH",
+                    "segmentId": 6,
+                    "issuerCostPackageId": 2,
+                    "acquirerCostPackageId": null,
+                    "name": "indihome",
+                    "urlLogo": "partner/logo-myindihome.svg",
+                    "unit": "Poin",
+                    "isDeleted": false,
+                    "createdAt": "2019-12-04T02:28:26.181Z",
+                    "updatedAt": "2019-12-04T03:21:21.990Z",
+                    "deletedAt": null
+                }
+            ]
+        }
+        let countResult = {
+            rowCount: 1,
+            rows: [
+                {
+                    "code": "ELM",
+                    "urlLogo": "partner/Elang%20Miles.png"
+                }
+            ]
+        }
+        poolStub.onFirstCall().resolves(queryResult);
+        poolStub.onSecondCall().resolves(countResult);
+
+        chai.request(server)
+        .get(BASE_URL + PATH)
+        .query({ page: 1, limit: 1 })
+        .end((error, response) => {
+            poolStub.restore();
+            responseValidator.validateResponse(response, "Partner images retrieved", true, 200);
+            done();
+        });
+    });
+
+    it("Sending get all partners image request without query parameter", done => {
+        let poolStub = sandbox.stub(pgPool.prototype, 'query');
+        let queryResult = {
+            rowCount: 2,
+            rows: [
+                {
+                    "code": "IDH",
+                    "segmentId": 6,
+                    "issuerCostPackageId": 2,
+                    "acquirerCostPackageId": null,
+                    "name": "indihome",
+                    "urlLogo": "partner/logo-myindihome.svg",
+                    "unit": "Poin",
+                    "isDeleted": false,
+                    "createdAt": "2019-12-04T02:28:26.181Z",
+                    "updatedAt": "2019-12-04T03:21:21.990Z",
+                    "deletedAt": null
+                },
+                {
+                    "code": "INP",
+                    "segmentId": 7,
+                    "issuerCostPackageId": null,
+                    "acquirerCostPackageId": 2,
+                    "name": "inpoin",
+                    "urlLogo": "partner/inpoin_logo.png",
+                    "unit": "Saldo Inpoin",
+                    "isDeleted": false,
+                    "createdAt": "2019-12-04T02:49:57.828Z",
+                    "updatedAt": "2019-12-04T04:03:57.156Z",
+                    "deletedAt": null
+                }
+            ]
+        }
+        let countResult = {
+            rowCount: 6,
+            rows: [
+                {
+                    "code": "ELM",
+                    "urlLogo": "partner/Elang%20Miles.png"
+                },
+                {
+                    "code": "IDH",
+                    "urlLogo": "partner/logo-myindihome.svg"
+                },
+                {
+                    "code": "INP",
+                    "urlLogo": "partner/inpoin_logo.png"
+                },
+                {
+                    "code": "LKJ",
+                    "urlLogo": "partner/logo-linkaja.svg"
+                },
+                {
+                    "code": "OMO",
+                    "urlLogo": "partner/Omo%20Points.png"
+                },
+                {
+                    "code": "TKS",
+                    "urlLogo": "partner/logo-telkomsel-poin.svg"
+                }
+            ]
+        }
+        poolStub.onFirstCall().resolves(queryResult);
+        poolStub.onSecondCall().resolves(countResult);
+
+        chai.request(server)
+        .get(BASE_URL + PATH)
+        .end((error, response) => {
+            poolStub.restore();
+            responseValidator.validateResponse(response, "Partner images retrieved", true, 200);
+            done();
+        });
+    });
+});

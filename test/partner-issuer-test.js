@@ -352,3 +352,129 @@ describe("Get Issuers", _ => {
         });
     });
 });
+
+describe("Get Active Issuers Config", _ => {
+    let PARAMS = '/active-issuers-config';
+
+    it("Sending get all active issuers config request with invalid page query parameter", done => {
+        chai.request(server)
+        .get(BASE_URL + PARAMS)
+        .query({ page: 0, limit: 100 })
+        .end((error, response) => {
+            responseValidator.validateResponse(response, "Page & Limit must be positive integer value", false, 400);
+            done();
+        });
+    });
+
+    it("Sending get all active issuers config request with invalid limit query parameter", done => {
+        chai.request(server)
+        .get(BASE_URL + PARAMS)
+        .query({ page: 1, limit: 0 })
+        .end((error, response) => {
+            responseValidator.validateResponse(response, "Page & Limit must be positive integer value", false, 400);
+            done();
+        });
+    });
+
+    it("Sending get all active issuers config request with connection failure response", done => {
+        sandbox.stub(pgPool.prototype, 'query').rejects();
+
+        chai.request(server)
+        .get(BASE_URL + PARAMS)
+        .end((error, response) => {
+            sandbox.restore();
+            responseValidator.validateResponse(response, "Internal server error", false, 500);
+            done();
+        });
+    });
+
+    it("Sending get all active issuers config request with empty partner list", done => {
+        let poolStub = sandbox.stub(pgPool.prototype, 'query');
+        let queryResult = {
+            rowCount: 0,
+            rows: []
+        }
+        poolStub.resolves(queryResult);
+
+        chai.request(server)
+        .get(BASE_URL + PARAMS)
+        .end((error, response) => {
+            poolStub.restore();
+            responseValidator.validateResponse(response, "Partner(s) not found", false, 404);
+            done();
+        });
+    });
+
+    it("Sending get all active issuers config request with valid query parameter", done => {
+        let poolStub = sandbox.stub(pgPool.prototype, 'query');
+        let queryResult = {
+            rowCount: 1,
+            rows: [
+                {
+                    "code": "IDH",
+                    "name": "indihome",
+                    "logo": "partner/logo-myindihome.svg",
+                    "unit": "Poin"
+                }
+            ]
+        }
+        let countResult = {
+            rowCount: 1,
+            rows: [
+                {
+                    count: 10
+                }
+            ]
+        }
+        poolStub.onFirstCall().resolves(queryResult);
+        poolStub.onSecondCall().resolves(countResult);
+
+        chai.request(server)
+        .get(BASE_URL + PARAMS)
+        .query({ page: 1, limit: 1 })
+        .end((error, response) => {
+            poolStub.restore();
+            responseValidator.validateResponse(response, "Partner(s) retrieved", true, 200);
+            done();
+        });
+    });
+
+    it("Sending get all active issuers config request without query parameter", done => {
+        let poolStub = sandbox.stub(pgPool.prototype, 'query');
+        let queryResult = {
+            rowCount: 2,
+            rows: [
+                {
+                    "code": "IDH",
+                    "name": "indihome",
+                    "logo": "partner/logo-myindihome.svg",
+                    "unit": "Poin"
+                },
+                {
+                    "code": "TKS",
+                    "name": "telkomsel",
+                    "logo": "partner/logo-telkomsel-poin.svg",
+                    "unit": "Poin"
+                }
+            ]
+        }
+        let countResult = {
+            rowCount: 1,
+            rows: [
+                {
+                    count: 2
+                }
+            ]
+        }
+        poolStub.onFirstCall().resolves(queryResult);
+        poolStub.onSecondCall().resolves(countResult);
+
+        chai.request(server)
+        .get(BASE_URL + PARAMS)
+        .end((error, response) => {
+            poolStub.restore();
+            responseValidator.validateResponse(response, "Partner(s) retrieved", true, 200);
+            done();
+        });
+    });
+});

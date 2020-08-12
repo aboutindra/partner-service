@@ -525,6 +525,70 @@ class Partner {
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
+
+    async getAllActiveIssuersConfig(page, limit, offset) {
+        let dbClient = postgresqlWrapper.getConnection(this.database);
+        let getAllActiveIssuersConfigQuery = {
+            name: "get-active-issuers-config",
+            text: `SELECT partners.code, partners.name, partners.cost_bearer_type AS "costBearerType", programs.exchange_rate AS "exchangeRate",
+                partners.url_logo AS "urlLogo", partners.unit,
+                CASE WHEN discount.amount IS NOT NULL THEN CEIL(package.amount::NUMERIC * (100 - discount.amount) / 100) ELSE package.amount END AS "costAmount",
+                programs.minimum_amount_per_transaction AS "minimumAmountPerTransaction",
+                programs.maximum_amount_per_transaction AS "maximumAmountPerTransaction",
+                quota.remaining_deduction_quota_per_day AS "remainingDeductionQuotaPerDay",
+                quota.remaining_deduction_quota_per_month AS "remainingDeductionQuotaPerMonth"
+                FROM public.partner as partners
+                INNER JOIN public.cost_package AS package ON (id = cost_package_id)
+                INNER JOIN public.partner_program AS programs ON (code = programs.partner_code)
+                LEFT JOIN public.partner_quota AS quota ON (code = quota.partner_code)
+                LEFT JOIN LATERAL (SELECT code, amount FROM public.discount_program
+                WHERE start_date <= NOW()::date AND NOW()::date <= end_date AND is_active = true AND partner_code = partners.code
+                FETCH FIRST 1 ROWS ONLY) AS discount ON true
+                WHERE programs.start_date <= NOW()::date AND NOW()::date <= programs.end_date AND programs.is_active = true
+                AND partners.is_issuer IS true AND partners.is_deleted = false
+                ORDER BY name
+                LIMIT $1 OFFSET $2;`,
+                values: [limit, offset]
+        }
+        let countActiveIssuersConfigQuery = {
+            name: 'count-active-issuers-config',
+            text: `SELECT COUNT(*)
+                FROM public.partner as partners
+                INNER JOIN public.cost_package AS package ON (id = cost_package_id)
+                INNER JOIN public.partner_program AS programs ON (code = programs.partner_code)
+                LEFT JOIN public.partner_quota AS quota ON (code = quota.partner_code)
+                LEFT JOIN LATERAL (SELECT code, amount FROM public.discount_program
+                WHERE start_date <= NOW()::date AND NOW()::date <= end_date AND is_active = true AND partner_code = partners.code
+                FETCH FIRST 1 ROWS ONLY) AS discount ON true
+                WHERE programs.start_date <= NOW()::date AND NOW()::date <= programs.end_date AND programs.is_active = true
+                AND partners.is_issuer IS true AND partners.is_deleted = false`
+        }
+        try {
+            let getAllActiveIssuersConfigResult = await dbClient.query(getAllActiveIssuersConfigQuery);
+            if (getAllActiveIssuersConfigResult.rows.length === 0) {
+                return wrapper.error(new NotFoundError(PartnerResponseMessage.PARTNER_NOT_FOUND));
+            }
+            let countAllActiveIssuersConfigResult = await dbClient.query(countActiveIssuersConfigQuery);
+            let totalData = parseInt(countAllActiveIssuersConfigResult.rows[0].count);
+            let totalPage = Math.ceil(totalData / limit);
+            if (limit === null) {
+                totalPage = 1;
+            }
+            let totalDataOnPage = getAllActiveIssuersConfigResult.rows.length;
+            let meta = {
+                page: page || 1,
+                totalData,
+                totalPage,
+                totalDataOnPage
+            }
+
+            return wrapper.paginationData(getAllActiveIssuersConfigResult.rows, meta);
+        }
+        catch (error) {
+            console.error(error)
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
+        }
+    }
 }
 
 module.exports = Partner;

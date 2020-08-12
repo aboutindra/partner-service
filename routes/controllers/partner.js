@@ -12,6 +12,7 @@ const routes = (server) => {
     server.get('/api/v1/partners/acquirers', [paginationValidator], partnerHandler.getAcquirers);
     server.get('/api/v1/partners/active-acquirers', [paginationValidator], partnerHandler.getActiveAcquirers);
     server.get('/api/v1/partners/active-issuers', [paginationValidator], partnerHandler.getActiveIssuers);
+    server.get('/api/v1/partners/active-issuers-config', [paginationValidator], partnerHandler.getActiveIssuersConfig);
     server.get('/api/v1/partners/active-issuers/:partnerCode', [], partnerHandler.getIssuer);
     server.get('/api/v1/partners/active-acquirers/:partnerCode', [], partnerHandler.getAcquirer);
     server.get('/api/v1/partners/counts', [], partnerHandler.getPartnerCounts);

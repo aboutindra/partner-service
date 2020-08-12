@@ -4,6 +4,8 @@ const { SUCCESS:successCode } = require('../enum/httpStatusCode');
 const ResponseMessage = require('../enum/httpResponseMessage');
 const { BadRequestError } = require('../utilities/error');
 const Partner = require('../databases/postgresql/models/partner');
+const { request } = require('chai');
+const { response } = require('../utilities/wrapper');
 const partner = new Partner(process.env.POSTGRESQL_DATABASE_PARTNER);
 const PartnerResponseMessage = {
     PARTNER_RETRIVIED: "Partner(s) retrieved",
@@ -193,6 +195,18 @@ const getPartnerImages = async (request, response) => {
     return;
 }
 
+const getActiveIssuersConfig = async (request, response) => {
+    let {page, limit, offset} = request.query;
+    let getActiveIssuersResult = await partner.getAllActiveIssuersConfig(page, limit, offset);
+
+    if (getActiveIssuersResult.err) {
+        wrapper.response(response, false, getActiveIssuersResult);
+    } else {
+        wrapper.paginationResponse(response, true, getActiveIssuersResult, PartnerResponseMessage.PARTNER_RETRIVIED, successCode.OK);
+    }
+    return;
+}
+
 module.exports = {
     insertPartner,
     updatePartner,
@@ -206,5 +220,6 @@ module.exports = {
     getAcquirers,
     getActiveAcquirers,
     getPartnerCounts,
-    getPartnerImages
+    getPartnerImages,
+    getActiveIssuersConfig
 }
