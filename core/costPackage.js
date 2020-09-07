@@ -89,7 +89,6 @@ const getCostPackages = async (request, response) => {
 
     if (getPackagesResult.err) {
         wrapper.response(response, false, getPackagesResult);
-        return;
     } else {
         wrapper.paginationResponse(response, true, getPackagesResult, "Package(s) retrieved", successCode.OK);
     }

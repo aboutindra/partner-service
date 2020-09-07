@@ -4,11 +4,12 @@ const { SUCCESS:successCode } = require('../enum/httpStatusCode');
 const { BadRequestError, ForbiddenError } = require('../utilities/error');
 const Discount = require('../databases/postgresql/models/discount');
 const discount = new Discount(process.env.POSTGRESQL_DATABASE_PARTNER);
+const ResponseMessage = require('../enum/httpResponseMessage');
 
 const insertDiscount = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        const error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        const error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
@@ -37,7 +38,7 @@ const insertDiscount = async (request, response) => {
 const deleteDiscount = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        const error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        const error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
@@ -74,7 +75,7 @@ const getDiscounts = async (request, response) => {
 const getActiveDiscounts = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        const error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        const error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
