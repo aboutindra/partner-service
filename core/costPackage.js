@@ -25,7 +25,6 @@ const insertCostPackage = async (request, response) => {
     } else {
         wrapper.response(response, true, insertPackageResult, "Package added", successCode.CREATED);
     }
-    return;
 }
 
 const updateCostPackage = async (request, response) => {
@@ -48,7 +47,6 @@ const updateCostPackage = async (request, response) => {
     } else {
         wrapper.response(response, true, updatePackageResult, "Package updated", successCode.OK);
     }
-    return;
 }
 
 const deleteCostPackage = async (request, response) => {
@@ -69,7 +67,6 @@ const deleteCostPackage = async (request, response) => {
     } else {
         wrapper.response(response, true, deletePackageResult, "Package deleted", successCode.OK);
     }
-    return;
 }
 
 const getCostPackages = async (request, response) => {
@@ -96,7 +93,6 @@ const getCostPackages = async (request, response) => {
     } else {
         wrapper.paginationResponse(response, true, getPackagesResult, "Package(s) retrieved", successCode.OK);
     }
-    return;
 }
 
 module.exports = {

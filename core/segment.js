@@ -23,7 +23,6 @@ const insertSegment = async (request, response) => {
     } else {
         wrapper.response(response, true, result, "Segment added", successCode.CREATED);
     }
-    return;
 }
 
 const updateSegment = async (request, response) => {
@@ -45,7 +44,6 @@ const updateSegment = async (request, response) => {
     } else {
         wrapper.response(response, true, result, "Segment updated", successCode.OK);
     }
-    return;
 }
 
 const getSegments = async (request, response) => {
@@ -67,7 +65,6 @@ const getSegments = async (request, response) => {
     } else {
         wrapper.response(response, true, result, "Segment(s) retrieved", successCode.OK);
     }
-    return;
 }
 
 module.exports = {

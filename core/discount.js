@@ -32,7 +32,6 @@ const insertDiscount = async (request, response) => {
     } else {
         wrapper.response(response, true, result, "Discount added", successCode.CREATED);
     }
-    return;
 }
 
 const deleteDiscount = async (request, response) => {
@@ -70,7 +69,6 @@ const getDiscounts = async (request, response) => {
     } else {
         wrapper.paginationResponse(response, true, result, "Discount(s) retrieved", successCode.OK);
     }
-    return;
 }
 
 const getActiveDiscounts = async (request, response) => {

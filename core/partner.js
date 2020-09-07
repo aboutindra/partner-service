@@ -29,7 +29,6 @@ const insertPartner = async (request, response) => {
     } else {
         wrapper.response(response, true, insertPartnerResult, "Partner added", successCode.OK);
     }
-    return;
 }
 
 const updatePartner = async (request, response) => {
@@ -53,7 +52,6 @@ const updatePartner = async (request, response) => {
     } else {
         wrapper.response(response, true, updatePartnerResult, "Partner updated", successCode.OK);
     }
-    return;
 }
 
 const deletePartner = async (request, response) => {
@@ -83,7 +81,6 @@ const getPartners = async (request, response) => {
     } else {
         wrapper.paginationResponse(response, true, getPartnerResult, PartnerResponseMessage.PARTNER_RETRIVIED, successCode.OK);
     }
-    return;
 }
 
 const getActivePartners = async (request, response) => {
@@ -95,7 +92,6 @@ const getActivePartners = async (request, response) => {
     } else {
         wrapper.paginationResponse(response, true, getActivePartnerResult, PartnerResponseMessage.PARTNER_RETRIVIED, successCode.OK);
     }
-    return;
 }
 
 const getIssuer = async (request, response) => {
@@ -118,7 +114,6 @@ const getIssuers = async (request, response) => {
     } else {
         wrapper.paginationResponse(response, true, getIssuersResult, PartnerResponseMessage.PARTNER_RETRIVIED, successCode.OK);
     }
-    return;
 }
 
 const getActiveIssuers = async (request, response) => {
@@ -130,7 +125,6 @@ const getActiveIssuers = async (request, response) => {
     } else {
         wrapper.paginationResponse(response, true, getActiveIssuersResult, PartnerResponseMessage.PARTNER_RETRIVIED, successCode.OK);
     }
-    return;
 }
 
 const getAcquirer = async (request, response) => {
@@ -153,7 +147,6 @@ const getAcquirers = async (request, response) => {
     } else {
         wrapper.paginationResponse(response, true, getAcquirersResult, PartnerResponseMessage.PARTNER_RETRIVIED, successCode.OK);
     }
-    return;
 }
 
 const getActiveAcquirers = async (request, response) => {
@@ -165,7 +158,6 @@ const getActiveAcquirers = async (request, response) => {
     } else {
         wrapper.paginationResponse(response, true, getActiveAcquirersResult, PartnerResponseMessage.PARTNER_RETRIVIED, successCode.OK);
     }
-    return;
 }
 
 const getPartnerCounts = async (request, response) => {
@@ -176,7 +168,6 @@ const getPartnerCounts = async (request, response) => {
     } else {
         wrapper.paginationResponse(response, true, partnerCountResult, PartnerResponseMessage.PARTNER_COUNTS_RETRIVIED, successCode.OK);
     }
-    return;
 }
 
 const getPartnerImages = async (request, response) => {
@@ -188,7 +179,6 @@ const getPartnerImages = async (request, response) => {
     } else {
         wrapper.paginationResponse(response, true, partnerImagesResult, PartnerResponseMessage.PARTNER_IMAGES_RETRIVIED, successCode.OK);
     }
-    return;
 }
 
 const getActiveIssuersConfig = async (request, response) => {
@@ -200,7 +190,6 @@ const getActiveIssuersConfig = async (request, response) => {
     } else {
         wrapper.paginationResponse(response, true, getActiveIssuersResult, PartnerResponseMessage.PARTNER_RETRIVIED, successCode.OK);
     }
-    return;
 }
 
 module.exports = {

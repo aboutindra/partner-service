@@ -22,7 +22,6 @@ const upsertWallet = async (request, response) => {
     } else {
         wrapper.response(response, true, result, "Partner wallet added", successCode.CREATED);
     }
-    return;
 }
 
 const deleteWallet = async (request, response) => {
