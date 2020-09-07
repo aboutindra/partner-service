@@ -10,8 +10,8 @@ class Segment {
     }
 
     async insertSegment(name) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let insertSegmentQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const insertSegmentQuery = {
             name: 'insert-segment',
             text: `INSERT INTO public.segment(
                 name, is_deleted, created_at, updated_at)
@@ -20,7 +20,7 @@ class Segment {
         }
 
         try {
-            let result = await dbClient.query(insertSegmentQuery);
+            const result = await dbClient.query(insertSegmentQuery);
             if (result.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Failed add new segment"));
             }
@@ -35,8 +35,8 @@ class Segment {
     }
 
     async updateSegment(id, name) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let updateSegmentQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const updateSegmentQuery = {
             name: 'update-segment',
             text: `UPDATE public.segment
                 SET name = $2, updated_at = $3
@@ -45,7 +45,7 @@ class Segment {
         }
 
         try {
-            let result = await dbClient.query(updateSegmentQuery);
+            const result = await dbClient.query(updateSegmentQuery);
             if (result.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Segment not found"));
             }
@@ -60,8 +60,8 @@ class Segment {
     }
 
     async getAllSegment() {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getSegmentQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const getSegmentQuery = {
             name: 'get-segment-list',
             text: `SELECT id, name, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.segment
@@ -69,7 +69,7 @@ class Segment {
         }
 
         try {
-            let result = await dbClient.query(getSegmentQuery);
+            const result = await dbClient.query(getSegmentQuery);
             if (result.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Segment(s) not found"));
             }
@@ -81,8 +81,8 @@ class Segment {
     }
 
     async getSegmentById(id) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getSegmentByIdQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const getSegmentByIdQuery = {
             name: 'get-segment',
             text: `SELECT id, name, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.segment
@@ -91,7 +91,7 @@ class Segment {
         }
 
         try {
-            let result = await dbClient.query(getSegmentByIdQuery);
+            const result = await dbClient.query(getSegmentByIdQuery);
             if (result.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Segment not found"));
             }

@@ -9,16 +9,16 @@ const { BadRequestError } = require('../utilities/error');
 const insertCostPackage = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
+        const error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
     }
 
-    let { name } = request.body;
-    let amount = Number(request.body.amount);
+    const { name } = request.body;
+    const amount = Number(request.body.amount);
 
-    let insertPackageResult = await costPackage.insertPackage(name, amount);
+    const insertPackageResult = await costPackage.insertPackage(name, amount);
 
     if (insertPackageResult.err) {
         wrapper.response(response, false, insertPackageResult);
@@ -31,17 +31,17 @@ const insertCostPackage = async (request, response) => {
 const updateCostPackage = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
+        const error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
     }
 
-    let id = parseInt(request.params.id);
-    let { name } = request.body;
-    let amount = Number(request.body.amount);
+    const id = parseInt(request.params.id);
+    const { name } = request.body;
+    const amount = Number(request.body.amount);
 
-    let updatePackageResult = await costPackage.updatePackageById(id, name, amount);
+    const updatePackageResult = await costPackage.updatePackageById(id, name, amount);
 
     if (updatePackageResult.err) {
         wrapper.response(response, false, updatePackageResult);
@@ -54,15 +54,15 @@ const updateCostPackage = async (request, response) => {
 const deleteCostPackage = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
+        const error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
     }
 
-    let id = parseInt(request.params.id);
+    const id = parseInt(request.params.id);
 
-    let deletePackageResult = await costPackage.softDeletePackageById(id);
+    const deletePackageResult = await costPackage.softDeletePackageById(id);
 
     if (deletePackageResult.err) {
         wrapper.response(response, false, deletePackageResult);
@@ -75,18 +75,17 @@ const deleteCostPackage = async (request, response) => {
 const getCostPackages = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
+        const error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
     }
 
     let getPackagesResult = null;
-    let { id, page, limit, offset, search } = request.query;
+    const { id, page, limit, offset, search } = request.query;
 
     if (id) {
-        id = parseInt(id);
-        getPackagesResult = await costPackage.getPackageById(id);
+        getPackagesResult = await costPackage.getPackageById(parseInt(id));
     } else {
         getPackagesResult = await costPackage.getPackages(page, limit, offset, search);
     }

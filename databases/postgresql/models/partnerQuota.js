@@ -10,8 +10,8 @@ class PartnerQuota {
     }
 
     async upsertQuota(partnerCode, remainingQuotaPerDay, remainingQuotaPerMonth) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let inserQuotaQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const inserQuotaQuery = {
             name: 'upsert-quota',
             text: `INSERT INTO public.partner_quota(
                 partner_code, remaining_deduction_quota_per_day, remaining_deduction_quota_per_month, is_deleted, created_at, updated_at)
@@ -22,7 +22,7 @@ class PartnerQuota {
         }
 
         try {
-            let updateQuotaResult = await dbClient.query(inserQuotaQuery);
+            const updateQuotaResult = await dbClient.query(inserQuotaQuery);
             if (updateQuotaResult.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Failed add new partner quota"));
             }
@@ -37,8 +37,8 @@ class PartnerQuota {
     }
 
     async deductQuota(partnerCode, dailyQuotaDeduction, monthlyQuotaDeduction) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let updateQuotaQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const updateQuotaQuery = {
             name: 'update-quota',
             text: `UPDATE public.partner_quota
                 SET remaining_deduction_quota_per_day = (CASE
@@ -57,7 +57,7 @@ class PartnerQuota {
         }
 
         try {
-            let result = await dbClient.query(updateQuotaQuery);
+            const result = await dbClient.query(updateQuotaQuery);
             if (result.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Partner quota not found"));
             }
@@ -69,8 +69,8 @@ class PartnerQuota {
     }
 
     async getAllQuota(page, limit, offset) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getAllQuotaQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const getAllQuotaQuery = {
             name: 'get-all-quota',
             text: `SELECT partner_code AS "partnerCode", remaining_deduction_quota_per_day AS "remainingQuotaPerDay",
                 remaining_deduction_quota_per_month AS "remainingQuotaPerMonth", is_deleted AS "isDeleted",
@@ -80,25 +80,25 @@ class PartnerQuota {
                 LIMIT $1 OFFSET $2;`,
                 values: [limit, offset]
         }
-        let countDataQuery = {
+        const countDataQuery = {
             name: 'count-all-quota',
             text: `SELECT COUNT(*)
                 FROM public.partner_quota`
         }
 
         try {
-            let getAllQuotaResult = await dbClient.query(getAllQuotaQuery);
+            const getAllQuotaResult = await dbClient.query(getAllQuotaQuery);
             if (getAllQuotaResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Partner(s) not found"));
             }
-            let countAllQuotaResult = await dbClient.query(countDataQuery);
-            let totalData = parseInt(countAllQuotaResult.rows[0].count);
+            const countAllQuotaResult = await dbClient.query(countDataQuery);
+            const totalData = parseInt(countAllQuotaResult.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = getAllQuotaResult.rows.length;
-            let meta = {
+            const totalDataOnPage = getAllQuotaResult.rows.length;
+            const meta = {
                 page: page || 1,
                 totalData,
                 totalPage,
@@ -113,8 +113,8 @@ class PartnerQuota {
     }
 
     async getQuotaByPartnerCode(partnerCode) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getPartnerQuotaQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const getPartnerQuotaQuery = {
             name: 'get-quota-partner',
             text: `SELECT partner_code AS "partnerCode", remaining_deduction_quota_per_day AS "remainingQuotaPerDay",
                 remaining_deduction_quota_per_month AS "remainingQuotaPerMonth"
@@ -124,7 +124,7 @@ class PartnerQuota {
         }
 
         try {
-            let result = await dbClient.query(getPartnerQuotaQuery);
+            const result = await dbClient.query(getPartnerQuotaQuery);
             if (result.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Partner quota not found"));
             }

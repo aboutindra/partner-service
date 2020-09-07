@@ -8,7 +8,7 @@ const discount = new Discount(process.env.POSTGRESQL_DATABASE_PARTNER);
 const insertDiscount = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        const error = wrapper.error(new BadRequestError("Invalid input parameter"));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
@@ -17,7 +17,7 @@ const insertDiscount = async (request, response) => {
     request.body.startDate = new Date(request.body.startDate);
     request.body.endDate = new Date(request.body.endDate);
 
-    let currentProgram = await discount.getRunningDiscount(request.body.partnerCode, request.body.startDate, request.body.endDate);
+    const currentProgram = await discount.getRunningDiscount(request.body.partnerCode, request.body.startDate, request.body.endDate);
     if (currentProgram.err && currentProgram.err.message !== "Active discount not found") {
         wrapper.response(response, false, currentProgram);
         return;
@@ -26,7 +26,7 @@ const insertDiscount = async (request, response) => {
         return;
     }
 
-    let result = await discount.insertDiscount(request.body);
+    const result = await discount.insertDiscount(request.body);
     if (result.err) {
         wrapper.response(response, false, result);
     } else {
@@ -38,15 +38,15 @@ const insertDiscount = async (request, response) => {
 const deleteDiscount = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        const error = wrapper.error(new BadRequestError("Invalid input parameter"));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
     }
 
-    let { code } = request.params;
+    const { code } = request.params;
 
-    let result = await discount.softDeleteDiscount(code);
+    const result = await discount.softDeleteDiscount(code);
     if (result.err) {
         wrapper.response(response, false, result);
     } else {
@@ -76,14 +76,14 @@ const getDiscounts = async (request, response) => {
 const getActiveDiscounts = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        const error = wrapper.error(new BadRequestError("Invalid input parameter"));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
     }
 
-    let { partnerCode } = request.params;
-    let result = await discount.getActiveDiscount(partnerCode);
+    const { partnerCode } = request.params;
+    const result = await discount.getActiveDiscount(partnerCode);
 
     if (result.err) {
         wrapper.response(response, false, result);

@@ -14,15 +14,15 @@ class PartnerProgram {
 
     /* istanbul ignore next */
     async insertProgram(params) {
-        let {partnerCode, exchangeRate, minAmountPerTransaction, maxAmountPerTransaction, maxTransactionAmountPerDay,
+        const {partnerCode, exchangeRate, minAmountPerTransaction, maxAmountPerTransaction, maxTransactionAmountPerDay,
             maxTransactionAmountPerMonth, startDate, endDate} = params;
         let status = false;
-        let timestamp = new Date();
+        const timestamp = new Date();
         if (startDate.getTime() <= timestamp.getTime() && timestamp.getTime() < endDate.getTime()) {
             status = true;
         }
-        let dbPool = postgresqlWrapper.getConnection(this.database);
-        let insertPartnerProgramQuery = {
+        const dbPool = postgresqlWrapper.getConnection(this.database);
+        const insertPartnerProgramQuery = {
             name: 'add-new-partner-program',
             text: `INSERT INTO public.partner_program(
                 partner_code, exchange_rate, start_date, end_date, minimum_amount_per_transaction, maximum_amount_per_transaction,
@@ -32,7 +32,7 @@ class PartnerProgram {
                 maxTransactionAmountPerMonth, status, timestamp, timestamp]
         }
 
-        let inserQuotaQuery = {
+        const inserQuotaQuery = {
             name: 'upsert-quota',
             text: `INSERT INTO public.partner_quota(
                 partner_code, remaining_deduction_quota_per_day, remaining_deduction_quota_per_month, is_deleted, created_at, updated_at)
@@ -42,12 +42,12 @@ class PartnerProgram {
             values: [partnerCode, maxTransactionAmountPerDay, maxTransactionAmountPerMonth, false, new Date(), new Date()]
         }
 
-        let client = await dbPool.connect();
+        const client = await dbPool.connect();
         try {
             await client.query('BEGIN');
             await client.query(insertPartnerProgramQuery);
             await client.query(inserQuotaQuery);
-            let result = await client.query('COMMIT');
+            const result = await client.query('COMMIT');
             if (result.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Failed add new partner program"));
             }
@@ -69,8 +69,8 @@ class PartnerProgram {
     }
 
     async softDeleteProgram(id) {
-        let dbPool = postgresqlWrapper.getConnection(this.database);
-        let deletePartnerProgramQuery = {
+        const dbPool = postgresqlWrapper.getConnection(this.database);
+        const deletePartnerProgramQuery = {
             name: 'soft-delete-partner-program',
             text: `UPDATE public.partner_program
                 SET is_active = false, updated_at = $2, deactivated_at = $3
@@ -79,7 +79,7 @@ class PartnerProgram {
         }
 
         try {
-            let result = await dbPool.query(deletePartnerProgramQuery);
+            const result = await dbPool.query(deletePartnerProgramQuery);
             if (result.rowCount === 0) {
                 return wrapper.error(new NotFoundError(PartnerProgramResponseMessage.PARTNER_PROGRAM_NOT_FOUND));
             }
@@ -91,8 +91,8 @@ class PartnerProgram {
     }
 
     async getAllProgram(page, limit, offset, search) {
-        let dbPool = postgresqlWrapper.getConnection(this.database);
-        let getAllPartnerProgramQuery = {
+        const dbPool = postgresqlWrapper.getConnection(this.database);
+        const getAllPartnerProgramQuery = {
             name: 'get-partner-program-list',
             text: `SELECT id, partner_code AS "partnerCode", name AS "partnerName", exchange_rate AS "exchangeRate",
                 minimum_amount_per_transaction AS "minimumAmountPerTransaction", maximum_amount_per_transaction as "maximumAmountPerTransaction",
@@ -106,7 +106,7 @@ class PartnerProgram {
                 LIMIT $1 OFFSET $2;`,
                 values: [limit, offset, search]
         }
-        let countDataQuery = {
+        const countDataQuery = {
             name: 'count-partner-program-list',
             text: `SELECT COUNT(*)
                 FROM public.partner_program
@@ -116,18 +116,18 @@ class PartnerProgram {
         }
 
         try {
-            let getAllPartnerProgramResult = await dbPool.query(getAllPartnerProgramQuery);
+            const getAllPartnerProgramResult = await dbPool.query(getAllPartnerProgramQuery);
             if (getAllPartnerProgramResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Partner program(s) not found"));
             }
-            let countAllPartnerProgramResult = await dbPool.query(countDataQuery);
-            let totalData = parseInt(countAllPartnerProgramResult.rows[0].count);
+            const countAllPartnerProgramResult = await dbPool.query(countDataQuery);
+            const totalData = parseInt(countAllPartnerProgramResult.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = getAllPartnerProgramResult.rows.length;
-            let meta = {
+            const totalDataOnPage = getAllPartnerProgramResult.rows.length;
+            const meta = {
                 page: page || 1,
                 totalData,
                 totalPage,
@@ -143,8 +143,8 @@ class PartnerProgram {
     }
 
     async getProgramById(id) {
-        let dbPool = postgresqlWrapper.getConnection(this.database);
-        let getPartnerProgramQuery = {
+        const dbPool = postgresqlWrapper.getConnection(this.database);
+        const getPartnerProgramQuery = {
             name: 'get-partner-program',
             text: `SELECT id, partner_code AS "partnerCode", exchange_rate AS "exchangeRate",
                 minimum_amount_per_transaction AS "minimumAmountPerTransaction", maximum_amount_per_transaction as "maximumAmountPerTransaction",
@@ -157,7 +157,7 @@ class PartnerProgram {
         }
 
         try {
-            let result = await dbPool.query(getPartnerProgramQuery);
+            const result = await dbPool.query(getPartnerProgramQuery);
             if (result.rows.length === 0) {
                 return wrapper.error(new NotFoundError(PartnerProgramResponseMessage.PARTNER_PROGRAM_NOT_FOUND));
             }
@@ -169,8 +169,8 @@ class PartnerProgram {
     }
 
     async getPartnerProgram(partnerCode, page = null, limit = null, offset = null) {
-        let dbPool = postgresqlWrapper.getConnection(this.database);
-        let getPartnerProgramQuery = {
+        const dbPool = postgresqlWrapper.getConnection(this.database);
+        const getPartnerProgramQuery = {
             name: 'get-program-of-partner',
             text: `SELECT id, partner_code AS "partnerCode", exchange_rate AS "exchangeRate",
                 minimum_amount_per_transaction AS "minimumAmountPerTransaction", maximum_amount_per_transaction as "maximumAmountPerTransaction",
@@ -183,7 +183,7 @@ class PartnerProgram {
                 LIMIT $2 OFFSET $3;`,
             values: [partnerCode, limit, offset]
         }
-        let countDataQuery = {
+        const countDataQuery = {
             name: 'count-program-of-partner',
             text: `SELECT COUNT(*)
                 FROM public.partner_program
@@ -191,18 +191,18 @@ class PartnerProgram {
                 values: [partnerCode]
         }
         try {
-            let getPartnerProgramResult = await dbPool.query(getPartnerProgramQuery);
+            const getPartnerProgramResult = await dbPool.query(getPartnerProgramQuery);
             if (getPartnerProgramResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Partner program(s) not found"));
             }
-            let count = await dbPool.query(countDataQuery);
-            let totalData = parseInt(count.rows[0].count);
+            const count = await dbPool.query(countDataQuery);
+            const totalData = parseInt(count.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = getPartnerProgramResult.rows.length;
-            let meta = {
+            const totalDataOnPage = getPartnerProgramResult.rows.length;
+            const meta = {
                 page: page || 1,
                 totalData,
                 totalPage,
@@ -217,8 +217,8 @@ class PartnerProgram {
     }
 
     async getActivePartnerProgram(partnerCode, startDate, endDate) {
-        let dbPool = postgresqlWrapper.getConnection(this.database);
-        let getActiveDiscountQuery = {
+        const dbPool = postgresqlWrapper.getConnection(this.database);
+        const getActiveDiscountQuery = {
             name: 'get-active-program',
             text: `SELECT partner_code AS "partnerCode", exchange_rate AS "exchangeRate", minimum_amount_per_transaction AS "minimumAmountPerTransaction",
                 maximum_amount_per_transaction AS "maximumAmountPerTransaction", maximum_transaction_amount_per_day AS "maximumTransactionAmountPerDay",
@@ -231,7 +231,7 @@ class PartnerProgram {
         }
 
         try {
-            let result = await dbPool.query(getActiveDiscountQuery);
+            const result = await dbPool.query(getActiveDiscountQuery);
             if (result.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Active partner program not found"));
             }

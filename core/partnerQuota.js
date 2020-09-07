@@ -8,15 +8,15 @@ const partnerQuota = new PartnerQuota(process.env.POSTGRESQL_DATABASE_PARTNER);
 const upsertQuota = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        const error = wrapper.error(new BadRequestError("Invalid input parameter"));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
     }
 
-    let { partnerCode, remainingQuotaPerDay, remainingQuotaPerMonth } = request.body;
+    const { partnerCode, remainingQuotaPerDay, remainingQuotaPerMonth } = request.body;
 
-    let upsertQuotaResult = await partnerQuota.upsertQuota(partnerCode, remainingQuotaPerDay, remainingQuotaPerMonth);
+    const upsertQuotaResult = await partnerQuota.upsertQuota(partnerCode, remainingQuotaPerDay, remainingQuotaPerMonth);
     if (upsertQuotaResult.err) {
         wrapper.response(response, false, upsertQuotaResult);
     } else {
@@ -28,16 +28,16 @@ const upsertQuota = async (request, response) => {
 const deductQuota = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        const error = wrapper.error(new BadRequestError("Invalid input parameter"));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
     }
 
-    let partnerCode = request.params.partnerCode;
-    let { dailyQuotaDeduction, monthlyQuotaDeduction } = request.body;
+    const partnerCode = request.params.partnerCode;
+    const { dailyQuotaDeduction, monthlyQuotaDeduction } = request.body;
 
-    let deductQuotaResult = await partnerQuota.deductQuota(partnerCode, dailyQuotaDeduction, monthlyQuotaDeduction);
+    const deductQuotaResult = await partnerQuota.deductQuota(partnerCode, dailyQuotaDeduction, monthlyQuotaDeduction);
     if (deductQuotaResult.err) {
         wrapper.response(response, false, deductQuotaResult);
     } else {
@@ -47,8 +47,8 @@ const deductQuota = async (request, response) => {
 }
 
 const getRemainingQuota = async (request, response) => {
-    let partnerCode = request.params.partnerCode;
-    let remainingQuotaResult = await partnerQuota.getQuotaByPartnerCode(partnerCode);
+    const partnerCode = request.params.partnerCode;
+    const remainingQuotaResult = await partnerQuota.getQuotaByPartnerCode(partnerCode);
 
     if (remainingQuotaResult.err) {
         wrapper.response(response, false, remainingQuotaResult);
@@ -58,8 +58,8 @@ const getRemainingQuota = async (request, response) => {
 }
 
 const getAllRemainingQuota = async (request, response) => {
-    let {page, limit, offset} = request.query;
-    let allRemainingQuotaResult = await partnerQuota.getAllQuota(page, limit, offset);
+    const { page, limit, offset } = request.query;
+    const allRemainingQuotaResult = await partnerQuota.getAllQuota(page, limit, offset);
 
     if (allRemainingQuotaResult.err) {
         wrapper.response(response, false, allRemainingQuotaResult);

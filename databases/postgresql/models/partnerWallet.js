@@ -10,8 +10,8 @@ class PartnerWallet{
     }
 
     async upsertWallet (partnerCode, walletCode) {
-        let dbPool = postgresqlWrapper.getConnection(this.database);
-        let upsertWalletQuery = {
+        const dbPool = postgresqlWrapper.getConnection(this.database);
+        const upsertWalletQuery = {
             name: 'upsert-wallet',
             text: `INSERT INTO public.partner_wallet(
                 partner_code, wallet_code, is_deleted, created_at, updated_at)
@@ -21,7 +21,7 @@ class PartnerWallet{
             values: [partnerCode, walletCode, false, new Date(), new Date()]
         }
         try {
-            let result = await dbPool.query(upsertWalletQuery);
+            const result = await dbPool.query(upsertWalletQuery);
             if (result.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Failed to add new partner wallet"));
             }
@@ -36,8 +36,8 @@ class PartnerWallet{
     }
 
     async deleteWallet (partnerCode) {
-        let dbPool = postgresqlWrapper.getConnection(this.database);
-        let deleteWalletQuery = {
+        const dbPool = postgresqlWrapper.getConnection(this.database);
+        const deleteWalletQuery = {
             name: 'delete-wallet',
             text: `UPDATE public.partner_wallet
                 SET is_deleted = true, updated_at = $2, deleted_at = $3
@@ -45,7 +45,7 @@ class PartnerWallet{
             values: [partnerCode, new Date(), new Date()]
         }
         try {
-            let result = await dbPool.query(deleteWalletQuery);
+            const result = await dbPool.query(deleteWalletQuery);
             if (result.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Failed to delete partner wallet"));
             }
@@ -56,8 +56,8 @@ class PartnerWallet{
     }
 
     async getWalletByPartnerCode (partnerCode) {
-        let dbPool = postgresqlWrapper.getConnection(this.database);
-        let getWalletQuery = {
+        const dbPool = postgresqlWrapper.getConnection(this.database);
+        const getWalletQuery = {
             name: 'get-wallet',
             text: `SELECT partner_code AS "partnerCode", wallet_code AS "walletCode"
                 FROM public.partner_wallet
@@ -65,7 +65,7 @@ class PartnerWallet{
             values: [partnerCode]
         }
         try {
-            let result = await dbPool.query(getWalletQuery);
+            const result = await dbPool.query(getWalletQuery);
             if (result.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Partner wallet not found"));
             }

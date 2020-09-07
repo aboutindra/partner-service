@@ -9,9 +9,9 @@ const connection = () => {
 
 function addConnectionPool() {
     if (config.has("PostgreSQL.databases")) {
-        let databases = config.get("PostgreSQL.databases");
-        for (let database of databases) {
-            let newConnection = connection();
+        const databases = config.get("PostgreSQL.databases");
+        for (const database of databases) {
+            const newConnection = connection();
             newConnection.index = database.index;
             newConnection.config = database.config;
             connectionPool.push(newConnection);
@@ -20,14 +20,14 @@ function addConnectionPool() {
 }
 
 async function createConnectionPool() {
-    for (let connection of connectionPool) {
+    for (const connection of connectionPool) {
         connection.db = new Pool(connection.config);
     }
 }
 
 /* istanbul ignore next */
 function getConnection(index) {
-    for (let connection of connectionPool) {
+    for (const connection of connectionPool) {
         if (connection.index === index) {
             if (connection.db !== null) {
                 return connection.db;

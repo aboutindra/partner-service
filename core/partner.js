@@ -16,13 +16,13 @@ const PartnerResponseMessage = {
 const insertPartner = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
+        const error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
     }
 
-    let insertPartnerResult = await partner.insertPartner(request.body);
+    const insertPartnerResult = await partner.insertPartner(request.body);
 
     if (insertPartnerResult.err) {
         wrapper.response(response, false, insertPartnerResult);
@@ -35,18 +35,18 @@ const insertPartner = async (request, response) => {
 const updatePartner = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
+        const error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
     }
 
-    let params = {
+    const params = {
         code: request.params.code,
         ...request.body,
     }
 
-    let updatePartnerResult = await partner.updatePartner(params);
+    const updatePartnerResult = await partner.updatePartner(params);
 
     if (updatePartnerResult.err) {
         wrapper.response(response, false, updatePartnerResult);
@@ -57,9 +57,9 @@ const updatePartner = async (request, response) => {
 }
 
 const deletePartner = async (request, response) => {
-    let code = request.params.code.toUpperCase();
+    const code = request.params.code.toUpperCase();
 
-    let deletePartnerResult = await partner.softDeletePartner(code);
+    const deletePartnerResult = await partner.softDeletePartner(code);
     if (deletePartnerResult.err) {
         wrapper.response(response, false, deletePartnerResult);
     } else {
@@ -70,7 +70,7 @@ const deletePartner = async (request, response) => {
 const getPartners = async (request, response) => {
     let getPartnerResult;
 
-    let { code, page, limit, offset, search } = request.query;
+    const { code, page, limit, offset, search } = request.query;
 
     if (code) {
         getPartnerResult = await partner.getPartnerByCode(code);
@@ -87,8 +87,8 @@ const getPartners = async (request, response) => {
 }
 
 const getActivePartners = async (request, response) => {
-    let {page, limit, offset} = request.query;
-    let getActivePartnerResult = await partner.getAllActivePartner(page, limit, offset);
+    const {page, limit, offset} = request.query;
+    const getActivePartnerResult = await partner.getAllActivePartner(page, limit, offset);
 
     if (getActivePartnerResult.err) {
         wrapper.response(response, false, getActivePartnerResult);
@@ -99,11 +99,9 @@ const getActivePartners = async (request, response) => {
 }
 
 const getIssuer = async (request, response) => {
-    let { partnerCode } = request.params;
+    const { partnerCode } = request.params;
 
-    partnerCode = partnerCode.toUpperCase();
-
-    let getIssuerResult = await partner.getIssuer(partnerCode);
+    const getIssuerResult = await partner.getIssuer(partnerCode.toUpperCase());
     if (getIssuerResult.err) {
         wrapper.response(response, false, getIssuerResult);
     } else {
@@ -112,8 +110,8 @@ const getIssuer = async (request, response) => {
 }
 
 const getIssuers = async (request, response) => {
-    let {page, limit, offset} = request.query;
-    let getIssuersResult = await partner.getAllIssuers(page, limit, offset);
+    const { page, limit, offset } = request.query;
+    const getIssuersResult = await partner.getAllIssuers(page, limit, offset);
 
     if (getIssuersResult.err) {
         wrapper.response(response, false, getIssuersResult);
@@ -124,8 +122,8 @@ const getIssuers = async (request, response) => {
 }
 
 const getActiveIssuers = async (request, response) => {
-    let {page, limit, offset} = request.query;
-    let getActiveIssuersResult = await partner.getAllActiveIssuers(page, limit, offset);
+    const { page, limit, offset } = request.query;
+    const getActiveIssuersResult = await partner.getAllActiveIssuers(page, limit, offset);
 
     if (getActiveIssuersResult.err) {
         wrapper.response(response, false, getActiveIssuersResult);
@@ -136,11 +134,9 @@ const getActiveIssuers = async (request, response) => {
 }
 
 const getAcquirer = async (request, response) => {
-    let { partnerCode } = request.params;
+    const { partnerCode } = request.params;
 
-    partnerCode = partnerCode.toUpperCase();
-
-    let getAcquirerResult = await partner.getAcquirer(partnerCode);
+    const getAcquirerResult = await partner.getAcquirer(partnerCode.toUpperCase());
     if (getAcquirerResult.err) {
         wrapper.response(response, false, getAcquirerResult);
     } else {
@@ -149,8 +145,8 @@ const getAcquirer = async (request, response) => {
 }
 
 const getAcquirers = async (request, response) => {
-    let {page, limit, offset} = request.query;
-    let getAcquirersResult = await partner.getAllAcquirers(page, limit, offset);
+    const { page, limit, offset } = request.query;
+    const getAcquirersResult = await partner.getAllAcquirers(page, limit, offset);
 
     if (getAcquirersResult.err) {
         wrapper.response(response, false, getAcquirersResult);
@@ -161,8 +157,8 @@ const getAcquirers = async (request, response) => {
 }
 
 const getActiveAcquirers = async (request, response) => {
-    let {page, limit, offset} = request.query;
-    let getActiveAcquirersResult = await partner.getAllActiveAcquirers(page, limit, offset);
+    const { page, limit, offset } = request.query;
+    const getActiveAcquirersResult = await partner.getAllActiveAcquirers(page, limit, offset);
 
     if (getActiveAcquirersResult.err) {
         wrapper.response(response, false, getActiveAcquirersResult);
@@ -173,7 +169,7 @@ const getActiveAcquirers = async (request, response) => {
 }
 
 const getPartnerCounts = async (request, response) => {
-    let partnerCountResult = await partner.getCounts();
+    const partnerCountResult = await partner.getCounts();
 
     if (partnerCountResult.err) {
         wrapper.response(response, false, partnerCountResult);
@@ -184,8 +180,8 @@ const getPartnerCounts = async (request, response) => {
 }
 
 const getPartnerImages = async (request, response) => {
-    let {page, limit, offset, search} = request.query;
-    let partnerImagesResult = await partner.getImages(page, limit, offset, search);
+    const { page, limit, offset, search } = request.query;
+    const partnerImagesResult = await partner.getImages(page, limit, offset, search);
 
     if (partnerImagesResult.err) {
         wrapper.response(response, false, partnerImagesResult);
@@ -196,8 +192,8 @@ const getPartnerImages = async (request, response) => {
 }
 
 const getActiveIssuersConfig = async (request, response) => {
-    let {page, limit, offset} = request.query;
-    let getActiveIssuersResult = await partner.getAllActiveIssuersConfig(page, limit, offset);
+    const { page, limit, offset } = request.query;
+    const getActiveIssuersResult = await partner.getAllActiveIssuersConfig(page, limit, offset);
 
     if (getActiveIssuersResult.err) {
         wrapper.response(response, false, getActiveIssuersResult);

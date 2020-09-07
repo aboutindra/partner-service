@@ -10,8 +10,8 @@ class CostPackage {
     }
 
     async insertPackage(name, amount) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let insertPackageQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const insertPackageQuery = {
             name: 'add-new-cost-package',
             text: `INSERT INTO public.cost_package(
                 name, amount, is_deleted, created_at, updated_at)
@@ -20,7 +20,7 @@ class CostPackage {
         }
 
         try {
-            let insertPackageResult = await dbClient.query(insertPackageQuery);
+            const insertPackageResult = await dbClient.query(insertPackageQuery);
             if (insertPackageResult.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Failed add new package"));
             }
@@ -38,8 +38,8 @@ class CostPackage {
     }
 
     async updatePackageById(id, name, amount) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let updatePackageQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const updatePackageQuery = {
             name: 'update-cost-package',
             text: `UPDATE public.cost_package
                 SET name=$2, amount=$3, updated_at=$4
@@ -48,7 +48,7 @@ class CostPackage {
         }
 
         try {
-            let updatePackageResult = await dbClient.query(updatePackageQuery);
+            const updatePackageResult = await dbClient.query(updatePackageQuery);
             if (updatePackageResult.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Package(s) not found"));
             }
@@ -66,8 +66,8 @@ class CostPackage {
     }
 
     async getPackages(page, limit, offset, search) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getCostPackagesQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const getCostPackagesQuery = {
             name: 'get-cost-packages',
             text: `SELECT id, name, amount, is_deleted AS "isDeleted", created_at AS "createdAt",
                 updated_at AS "updatedAt", deleted_at AS "deletedAt"
@@ -77,7 +77,7 @@ class CostPackage {
                 LIMIT $1 OFFSET $2;`,
                 values: [limit, offset, search]
         }
-        let countDataQuery = {
+        const countDataQuery = {
             name: 'count-cost-packages',
             text: `SELECT COUNT(*)
                 FROM public.cost_package
@@ -85,19 +85,19 @@ class CostPackage {
             values: [search]
         }
         try {
-            let costPackages = await dbClient.query(getCostPackagesQuery);
+            const costPackages = await dbClient.query(getCostPackagesQuery);
             if (costPackages.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Package(s) not found"));
             }
 
-            let numberOfPackages = await dbClient.query(countDataQuery);
-            let totalData = parseInt(numberOfPackages.rows[0].count);
+            const numberOfPackages = await dbClient.query(countDataQuery);
+            const totalData = parseInt(numberOfPackages.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = costPackages.rows.length;
-            let meta = {
+            const totalDataOnPage = costPackages.rows.length;
+            const meta = {
                 page: page || 1,
                 totalData,
                 totalPage,
@@ -113,8 +113,8 @@ class CostPackage {
     }
 
     async getPackageById(id) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getPackageByIdQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const getPackageByIdQuery = {
             name: 'get-cost-package',
             text: `SELECT id, name, amount, is_deleted AS "isDeleted", created_at AS "createdAt",
                 updated_at AS "updatedAt", deleted_at AS "deletedAt"
@@ -124,7 +124,7 @@ class CostPackage {
         }
 
         try {
-            let costPackage = await dbClient.query(getPackageByIdQuery);
+            const costPackage = await dbClient.query(getPackageByIdQuery);
             if (costPackage.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Package not found"));
             }
@@ -136,8 +136,8 @@ class CostPackage {
     }
 
     async softDeletePackageById(id) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let deletePackageQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const deletePackageQuery = {
             name: 'soft-delete-cost-package',
             text: `UPDATE public.cost_package
                 SET is_deleted = true, updated_at = $2, deleted_at = $3
@@ -146,7 +146,7 @@ class CostPackage {
         }
 
         try {
-            let deleteResult = await dbClient.query(deletePackageQuery);
+            const deleteResult = await dbClient.query(deletePackageQuery);
             if (deleteResult.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Package not found"));
             }

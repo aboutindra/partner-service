@@ -8,15 +8,15 @@ const { BadRequestError } = require('../utilities/error');
 const insertSegment = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        const error = wrapper.error(new BadRequestError("Invalid input parameter"));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
     }
 
-    let { name } = request.body;
+    const { name } = request.body;
 
-    let result = await segment.insertSegment(name);
+    const result = await segment.insertSegment(name);
 
     if (result.err) {
         wrapper.response(response, false, result);
@@ -29,16 +29,16 @@ const insertSegment = async (request, response) => {
 const updateSegment = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError("Invalid input parameter"));
+        const error = wrapper.error(new BadRequestError("Invalid input parameter"));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
     }
 
-    let id = parseInt(request.params.id);
-    let { name } = request.body;
+    const id = parseInt(request.params.id);
+    const { name } = request.body;
 
-    let result = await segment.updateSegment(id, name);
+    const result = await segment.updateSegment(id, name);
 
     if (result.err) {
         wrapper.response(response, false, result);
@@ -52,7 +52,7 @@ const getSegments = async (request, response) => {
     let result;
 
     if (request.query.id) {
-        let id = parseInt(request.query.id);
+        const id = parseInt(request.query.id);
         if (isNaN(id) || id < 0) {
             wrapper.response(response, false, wrapper.error(new BadRequestError("Id must be an integer value")));
             return;

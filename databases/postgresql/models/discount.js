@@ -14,12 +14,12 @@ class Discount {
 
     async insertDiscount({code, partnerCode, name, amount, startDate, endDate}) {
         let status = false;
-        let timestamp = new Date();
+        const timestamp = new Date();
         if (startDate.getTime() <= timestamp.getTime() && timestamp.getTime() < endDate.getTime()) {
             status = true;
         }
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let insertDiscountQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const insertDiscountQuery = {
             name: 'insert-discount',
             text: `INSERT INTO public.discount_program(
                 code, partner_code, name, amount, is_active, start_date, end_date, created_at, updated_at)
@@ -28,7 +28,7 @@ class Discount {
         }
 
         try {
-            let insertDiscountResult = await dbClient.query(insertDiscountQuery);
+            const insertDiscountResult = await dbClient.query(insertDiscountQuery);
             if (insertDiscountResult.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Failed add new package"));
             }
@@ -49,8 +49,8 @@ class Discount {
     }
 
     async softDeleteDiscount(code) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let deleteDiscountQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const deleteDiscountQuery = {
             name: 'soft-delete-discount-program',
             text: `UPDATE public.discount_program
                 SET is_active = false, updated_at = $2, deactivated_at = $3
@@ -59,7 +59,7 @@ class Discount {
         }
 
         try {
-            let result = await dbClient.query(deleteDiscountQuery);
+            const result = await dbClient.query(deleteDiscountQuery);
             if (result.rowCount === 0) {
                 return wrapper.error(new NotFoundError(DiscountResponseMessage.DISCOUNT_NOT_FOUND));
             }
@@ -71,8 +71,8 @@ class Discount {
     }
 
     async getAllDiscount(page, limit, offset, search) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getAllDiscountQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const getAllDiscountQuery = {
             name: 'get-discounts',
             text: `SELECT code, partner_code AS "partnerCode", name, amount, is_active AS "isActive", start_date AS "startDate",
                 end_date AS "endDate", created_at AS "createdAt", updated_at AS "updatedAt", deactivated_at AS "deactivatedAt"
@@ -82,7 +82,7 @@ class Discount {
                 LIMIT $1 OFFSET $2;`,
             values: [limit, offset, search]
         }
-        let countDataQuery = {
+        const countDataQuery = {
             name: 'count-discounts',
             text: `SELECT COUNT(*)
                 FROM public.discount_program
@@ -91,18 +91,18 @@ class Discount {
         }
 
         try {
-            let getAllDiscountResult = await dbClient.query(getAllDiscountQuery);
+            const getAllDiscountResult = await dbClient.query(getAllDiscountQuery);
             if (getAllDiscountResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Discount(s) not found"));
             }
-            let countAllDiscountResult = await dbClient.query(countDataQuery);
-            let totalData = parseInt(countAllDiscountResult.rows[0].count);
+            const countAllDiscountResult = await dbClient.query(countDataQuery);
+            const totalData = parseInt(countAllDiscountResult.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = getAllDiscountResult.rows.length;
-            let meta = {
+            const totalDataOnPage = getAllDiscountResult.rows.length;
+            const meta = {
                 page: page || 1,
                 totalData,
                 totalPage,
@@ -118,8 +118,8 @@ class Discount {
     }
 
     async getDiscountByCode(code) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getDiscountQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const getDiscountQuery = {
             name: 'get-discount',
             text: `SELECT code, partner_code AS "partnerCode", name, amount, is_active AS "isActive", start_date AS "startDate",
                 end_date AS "endDate", created_at AS "createdAt", updated_at AS "updatedAt", deactivated_at AS "deactivatedAt"
@@ -129,7 +129,7 @@ class Discount {
         }
 
         try {
-            let result = await dbClient.query(getDiscountQuery);
+            const result = await dbClient.query(getDiscountQuery);
             if (result.rows.length === 0) {
                 return wrapper.error(new NotFoundError(DiscountResponseMessage.DISCOUNT_NOT_FOUND));
             }
@@ -142,8 +142,8 @@ class Discount {
     }
 
     async getActiveDiscount(partnerCode) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getActiveDiscountQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const getActiveDiscountQuery = {
             name: 'get-active-discount-list',
             text: `SELECT code, partner_code AS "partnerCode", name, amount
                 FROM public.discount_program
@@ -153,7 +153,7 @@ class Discount {
         }
 
         try {
-            let result = await dbClient.query(getActiveDiscountQuery);
+            const result = await dbClient.query(getActiveDiscountQuery);
             if (result.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Active discount not found"));
             }
@@ -165,8 +165,8 @@ class Discount {
     }
 
     async getRunningDiscount(partnerCode, startDate, endDate) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getActiveDiscountQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const getActiveDiscountQuery = {
             name: 'get-active-discount-list',
             text: `SELECT code, partner_code AS "partnerCode", name, amount
                 FROM public.discount_program
@@ -177,7 +177,7 @@ class Discount {
         }
 
         try {
-            let result = await dbClient.query(getActiveDiscountQuery);
+            const result = await dbClient.query(getActiveDiscountQuery);
             if (result.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Active discount not found"));
             }

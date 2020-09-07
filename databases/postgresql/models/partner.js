@@ -13,8 +13,8 @@ class Partner {
     }
 
     async insertPartner({ code, name, costPackageId, isAcquirer, isIssuer, segmentId, costBearerType, urlLogo, unit }) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let insertPartnerQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const insertPartnerQuery = {
             name: "add-new-partner",
             text: `INSERT INTO public.partner(
                 code, segment_id, cost_package_id, name, is_acquirer, is_issuer, cost_bearer_type, url_logo, unit, is_deleted, created_at, updated_at)
@@ -23,7 +23,7 @@ class Partner {
         }
 
         try {
-            let insertQuotaResult = await dbClient.query(insertPartnerQuery);
+            const insertQuotaResult = await dbClient.query(insertPartnerQuery);
             if (insertQuotaResult.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Failed add new partner"));
             }
@@ -42,8 +42,8 @@ class Partner {
     }
 
     async updatePartner({ code, name, costPackageId, isAcquirer, isIssuer, segmentId, costBearerType, urlLogo, unit }) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let updatePartnerQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const updatePartnerQuery = {
             name: "update-partner",
             text: `UPDATE public.partner
                 SET segment_id = $2, cost_package_id = $3, name = $4, is_acquirer = $5, is_issuer = $6, cost_bearer_type = $7::cost_bearer_type,
@@ -53,7 +53,7 @@ class Partner {
         }
 
         try {
-            let updatePartnerResult = await dbClient.query(updatePartnerQuery);
+            const updatePartnerResult = await dbClient.query(updatePartnerQuery);
             if (updatePartnerResult.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Partner not found"));
             }
@@ -68,8 +68,8 @@ class Partner {
     }
 
     async softDeletePartner(code) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let deleteDiscountQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const deleteDiscountQuery = {
             name: 'soft-delete-partner-by-partner-code',
             text: `UPDATE public.partner
                 SET is_deleted = true, updated_at = $2, deleted_at = $3
@@ -78,7 +78,7 @@ class Partner {
         }
 
         try {
-            let deletePartnerResult = await dbClient.query(deleteDiscountQuery);
+            const deletePartnerResult = await dbClient.query(deleteDiscountQuery);
             if (deletePartnerResult.rowCount === 0) {
                 return wrapper.error(new NotFoundError("Partner not found"));
             }
@@ -91,8 +91,8 @@ class Partner {
     }
 
     async getAllPartner(page, limit, offset, search) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getAllPartnerQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const getAllPartnerQuery = {
             name: "get-partner-list",
             text: `SELECT code, segment_id AS "segmentId", cost_package_id AS "costPackageId", name, cost_bearer_type AS "costBearerType",
                 url_logo AS "urlLogo", unit,
@@ -108,7 +108,7 @@ class Partner {
                 LIMIT $1 OFFSET $2;`,
                 values: [limit, offset, search]
         }
-        let countDataQuery = {
+        const countDataQuery = {
             name: 'count-partner-list',
             text: `SELECT COUNT(*)
                 FROM public.partner
@@ -117,18 +117,18 @@ class Partner {
         }
 
         try {
-            let getAllPartnersResult = await dbClient.query(getAllPartnerQuery);
+            const getAllPartnersResult = await dbClient.query(getAllPartnerQuery);
             if (getAllPartnersResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError(PartnerResponseMessage.PARTNER_NOT_FOUND));
             }
-            let countAllPartnersResult = await dbClient.query(countDataQuery);
-            let totalData = parseInt(countAllPartnersResult.rows[0].count);
+            const countAllPartnersResult = await dbClient.query(countDataQuery);
+            const totalData = parseInt(countAllPartnersResult.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = getAllPartnersResult.rows.length;
-            let meta = {
+            const totalDataOnPage = getAllPartnersResult.rows.length;
+            const meta = {
                 page: page || 1,
                 totalData,
                 totalPage,
@@ -144,8 +144,8 @@ class Partner {
     }
 
     async getPartnerByCode(code) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getPartnerQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const getPartnerQuery = {
             name: "get-partner",
             text: `SELECT code, segment_id AS "segmentId", cost_package_id AS "costPackageId", name, cost_bearer_type AS "costBearerType",
                 url_logo AS "urlLogo", unit,
@@ -161,7 +161,7 @@ class Partner {
         }
 
         try {
-            let getPartnerByCodeResult = await dbClient.query(getPartnerQuery);
+            const getPartnerByCodeResult = await dbClient.query(getPartnerQuery);
             if (getPartnerByCodeResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError(PartnerResponseMessage.PARTNER_NOT_FOUND));
             }
@@ -173,8 +173,8 @@ class Partner {
     }
 
     async getAllActivePartner(page, limit, offset) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getAllActivePartnerQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const getAllActivePartnerQuery = {
             name: "get-active-partner-list",
             text: `SELECT  code, is_acquirer AS "isAcquirer", is_issuer AS "isIssuer",
                 CASE WHEN (SELECT true FROM public.partner_program WHERE partner_code = partner.code
@@ -186,25 +186,25 @@ class Partner {
                 LIMIT $1 OFFSET $2;`,
                 values: [limit, offset]
         }
-        let countDataQuery = {
+        const countDataQuery = {
             name: 'count-active-partner',
             text: `SELECT COUNT(*)
                 FROM public.partner
                 WHERE is_deleted = false;`
         }
         try {
-            let getAllActivePartnerResult = await dbClient.query(getAllActivePartnerQuery);
+            const getAllActivePartnerResult = await dbClient.query(getAllActivePartnerQuery);
             if (getAllActivePartnerResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError(PartnerResponseMessage.PARTNER_NOT_FOUND));
             }
-            let countAllActivePartnerResult = await dbClient.query(countDataQuery);
-            let totalData = parseInt(countAllActivePartnerResult.rows[0].count);
+            const countAllActivePartnerResult = await dbClient.query(countDataQuery);
+            const totalData = parseInt(countAllActivePartnerResult.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = getAllActivePartnerResult.rows.length;
-            let meta = {
+            const totalDataOnPage = getAllActivePartnerResult.rows.length;
+            const meta = {
                 page: page || 1,
                 totalData,
                 totalPage,
@@ -219,8 +219,8 @@ class Partner {
     }
 
     async getAllIssuers(page, limit, offset) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getAllIssuersQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const getAllIssuersQuery = {
             name: "get-issuer-list",
             text: `SELECT code, segment_id AS "segmentId", cost_package_id AS "costPackageId", name, cost_bearer_type AS "costBearerType",
                 url_logo AS "urlLogo", unit, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
@@ -230,25 +230,25 @@ class Partner {
                 LIMIT $1 OFFSET $2;`,
                 values: [limit, offset]
         }
-        let countDataQuery = {
+        const countDataQuery = {
             name: 'count-issuer-list',
             text: `SELECT COUNT(*)
                 FROM public.partner
                 WHERE is_issuer IS true;`
         }
         try {
-            let getAllIssuersResult = await dbClient.query(getAllIssuersQuery);
+            const getAllIssuersResult = await dbClient.query(getAllIssuersQuery);
             if (getAllIssuersResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError(PartnerResponseMessage.PARTNER_NOT_FOUND));
             }
-            let countAllIssuersResult = await dbClient.query(countDataQuery);
-            let totalData = parseInt(countAllIssuersResult.rows[0].count);
+            const countAllIssuersResult = await dbClient.query(countDataQuery);
+            const totalData = parseInt(countAllIssuersResult.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = getAllIssuersResult.rows.length;
-            let meta = {
+            const totalDataOnPage = getAllIssuersResult.rows.length;
+            const meta = {
                 page: page || 1,
                 totalData,
                 totalPage,
@@ -263,8 +263,8 @@ class Partner {
     }
 
     async getAllActiveIssuers(page, limit, offset) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getAllActiveIssuersQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const getAllActiveIssuersQuery = {
             name: "get-active-issuer-list",
             text: `SELECT code, name, url_logo AS "urlLogo", unit
                 FROM public.partner as partners
@@ -275,7 +275,7 @@ class Partner {
                 LIMIT $1 OFFSET $2;`,
                 values: [limit, offset]
         }
-        let countActiveIssuersQuery = {
+        const countActiveIssuersQuery = {
             name: 'count-active-issuer-list',
             text: `SELECT COUNT(*)
                 FROM public.partner as partners
@@ -284,18 +284,18 @@ class Partner {
                 AND partners.is_issuer IS true AND partners.is_deleted = false`
         }
         try {
-            let getAllActiveIssuersResult = await dbClient.query(getAllActiveIssuersQuery);
+            const getAllActiveIssuersResult = await dbClient.query(getAllActiveIssuersQuery);
             if (getAllActiveIssuersResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError(PartnerResponseMessage.PARTNER_NOT_FOUND));
             }
-            let countAllActiveIssuersResult = await dbClient.query(countActiveIssuersQuery);
-            let totalData = parseInt(countAllActiveIssuersResult.rows[0].count);
+            const countAllActiveIssuersResult = await dbClient.query(countActiveIssuersQuery);
+            const totalData = parseInt(countAllActiveIssuersResult.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = getAllActiveIssuersResult.rows.length;
-            let meta = {
+            const totalDataOnPage = getAllActiveIssuersResult.rows.length;
+            const meta = {
                 page: page || 1,
                 totalData,
                 totalPage,
@@ -310,8 +310,8 @@ class Partner {
     }
 
     async getIssuer(partnerCode) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getIssuerQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const getIssuerQuery = {
             name: "get-issuer",
             text: `SELECT partner.code, partner.name, partner.cost_bearer_type AS "costBearerType", programs.exchange_rate AS "exchangeRate",
                 CASE WHEN discount.amount IS NOT NULL THEN CEIL(package.amount::NUMERIC * (100 - discount.amount) / 100) ELSE package.amount END AS "costAmount",
@@ -331,7 +331,7 @@ class Partner {
             values: [partnerCode]
         }
         try {
-            let getIssuerResult = await dbClient.query(getIssuerQuery);
+            const getIssuerResult = await dbClient.query(getIssuerQuery);
             if (getIssuerResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Issuer not found"));
             }
@@ -344,8 +344,8 @@ class Partner {
     }
 
     async getAllAcquirers(page, limit, offset) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getAllAcquirersQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const getAllAcquirersQuery = {
             name: "get-acquirer-list",
             text: `SELECT  code, segment_id AS "segmentId", cost_package_id AS "costPackageId", name, cost_bearer_type AS "costBearerType",
                 url_logo AS "urlLogo", unit, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
@@ -355,25 +355,25 @@ class Partner {
                 LIMIT $1 OFFSET $2;`,
                 values: [limit, offset]
         }
-        let countDataQuery = {
+        const countDataQuery = {
             name: 'count-acquirer-list',
             text: `SELECT COUNT(*)
                 FROM public.partner
                 WHERE is_acquirer IS true;`
         }
         try {
-            let getAllAcquirersResult = await dbClient.query(getAllAcquirersQuery);
+            const getAllAcquirersResult = await dbClient.query(getAllAcquirersQuery);
             if (getAllAcquirersResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError(PartnerResponseMessage.PARTNER_NOT_FOUND));
             }
-            let countAllAcquirersResult = await dbClient.query(countDataQuery);
-            let totalData = parseInt(countAllAcquirersResult.rows[0].count);
+            const countAllAcquirersResult = await dbClient.query(countDataQuery);
+            const totalData = parseInt(countAllAcquirersResult.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = getAllAcquirersResult.rows.length;
-            let meta = {
+            const totalDataOnPage = getAllAcquirersResult.rows.length;
+            const meta = {
                 page: page || 1,
                 totalData,
                 totalPage,
@@ -388,8 +388,8 @@ class Partner {
     }
 
     async getAllActiveAcquirers(page, limit, offset) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getAllActiveAcquirersQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const getAllActiveAcquirersQuery = {
             name: "get-active-acquirer-list",
             text: `SELECT code, name, url_logo AS "urlLogo", unit
                 FROM public.partner as partners
@@ -400,7 +400,7 @@ class Partner {
                 LIMIT $1 OFFSET $2;`,
                 values: [limit, offset]
         }
-        let countActiveAcquirersQuery = {
+        const countActiveAcquirersQuery = {
             name: 'count-active-acquirer-list',
             text: `SELECT COUNT(*)
                 FROM public.partner as partners
@@ -409,18 +409,18 @@ class Partner {
                 AND partners.is_acquirer IS true AND partners.is_deleted = false`
         }
         try {
-            let getAllActiveAcquirersResult = await dbClient.query(getAllActiveAcquirersQuery);
+            const getAllActiveAcquirersResult = await dbClient.query(getAllActiveAcquirersQuery);
             if (getAllActiveAcquirersResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError(PartnerResponseMessage.PARTNER_NOT_FOUND));
             }
-            let count = await dbClient.query(countActiveAcquirersQuery);
-            let totalData = parseInt(count.rows[0].count);
+            const count = await dbClient.query(countActiveAcquirersQuery);
+            const totalData = parseInt(count.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = getAllActiveAcquirersResult.rows.length;
-            let meta = {
+            const totalDataOnPage = getAllActiveAcquirersResult.rows.length;
+            const meta = {
                 page: page || 1,
                 totalData,
                 totalPage,
@@ -435,8 +435,8 @@ class Partner {
     }
 
     async getAcquirer(partnerCode) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getAcquirerQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const getAcquirerQuery = {
             name: "get-acquirer",
             text: `SELECT  code, name, exchange_rate AS "exchangeRate"
                 FROM public.partner
@@ -446,7 +446,7 @@ class Partner {
             values: [partnerCode]
         }
         try {
-            let getAcquireResult = await dbClient.query(getAcquirerQuery);
+            const getAcquireResult = await dbClient.query(getAcquirerQuery);
             if (getAcquireResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Acquirer not found"));
             }
@@ -459,8 +459,8 @@ class Partner {
     }
 
     async getCounts() {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getCountQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const getCountQuery = {
             name: "get-partner-count",
             text: `SELECT COUNT(CASE WHEN is_acquirer = true THEN partner.code END) AS "isAcquirer",
                 COUNT(CASE WHEN is_issuer = true THEN partner.code END) AS "isIssuer",
@@ -469,7 +469,7 @@ class Partner {
                 FROM public.partner AS partner;`
         }
         try {
-            let getCountResult = await dbClient.query(getCountQuery);
+            const getCountResult = await dbClient.query(getCountQuery);
             if (getCountResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Partner count not found"));
             }
@@ -482,8 +482,8 @@ class Partner {
     }
 
     async getImages(page, limit, offset, search) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getImagesQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const getImagesQuery = {
             name: "get-partner-images",
             text: `SELECT code, url_logo AS "urlLogo"
                 FROM public.partner AS partner
@@ -492,7 +492,7 @@ class Partner {
                 LIMIT $1 OFFSET $2;;`,
             values: [limit, offset, search]
         }
-        let countImages = {
+        const countImages = {
             name: 'count-partner-images',
             text: `SELECT COUNT(*)
                 FROM public.partner AS partner
@@ -500,18 +500,18 @@ class Partner {
             values: [search]
         }
         try {
-            let getImagesResult = await dbClient.query(getImagesQuery);
+            const getImagesResult = await dbClient.query(getImagesQuery);
             if (getImagesResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError(PartnerResponseMessage.PARTNER_NOT_FOUND));
             }
-            let count = await dbClient.query(countImages);
-            let totalData = parseInt(count.rows[0].count);
+            const count = await dbClient.query(countImages);
+            const totalData = parseInt(count.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = getImagesResult.rows.length;
-            let meta = {
+            const totalDataOnPage = getImagesResult.rows.length;
+            const meta = {
                 page: page || 1,
                 totalData,
                 totalPage,
@@ -527,8 +527,8 @@ class Partner {
     }
 
     async getAllActiveIssuersConfig(page, limit, offset) {
-        let dbClient = postgresqlWrapper.getConnection(this.database);
-        let getAllActiveIssuersConfigQuery = {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const getAllActiveIssuersConfigQuery = {
             name: "get-active-issuers-config",
             text: `SELECT partners.code, partners.name, partners.cost_bearer_type AS "costBearerType", programs.exchange_rate AS "exchangeRate",
                 partners.url_logo AS "urlLogo", partners.unit,
@@ -550,7 +550,7 @@ class Partner {
                 LIMIT $1 OFFSET $2;`,
                 values: [limit, offset]
         }
-        let countActiveIssuersConfigQuery = {
+        const countActiveIssuersConfigQuery = {
             name: 'count-active-issuers-config',
             text: `SELECT COUNT(*)
                 FROM public.partner as partners
@@ -564,18 +564,18 @@ class Partner {
                 AND partners.is_issuer IS true AND partners.is_deleted = false`
         }
         try {
-            let getAllActiveIssuersConfigResult = await dbClient.query(getAllActiveIssuersConfigQuery);
+            const getAllActiveIssuersConfigResult = await dbClient.query(getAllActiveIssuersConfigQuery);
             if (getAllActiveIssuersConfigResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError(PartnerResponseMessage.PARTNER_NOT_FOUND));
             }
-            let countAllActiveIssuersConfigResult = await dbClient.query(countActiveIssuersConfigQuery);
-            let totalData = parseInt(countAllActiveIssuersConfigResult.rows[0].count);
+            const countAllActiveIssuersConfigResult = await dbClient.query(countActiveIssuersConfigQuery);
+            const totalData = parseInt(countAllActiveIssuersConfigResult.rows[0].count);
             let totalPage = Math.ceil(totalData / limit);
             if (limit === null) {
                 totalPage = 1;
             }
-            let totalDataOnPage = getAllActiveIssuersConfigResult.rows.length;
-            let meta = {
+            const totalDataOnPage = getAllActiveIssuersConfigResult.rows.length;
+            const meta = {
                 page: page || 1,
                 totalData,
                 totalPage,

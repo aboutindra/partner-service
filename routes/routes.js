@@ -27,7 +27,7 @@ function AppServer() {
     });
 
     this.app.use(function(req, res, next) {
-        let ip = req.headers[ 'x-forwarded-for' ] || req.connection.remoteAddress;
+        const ip = req.headers[ 'x-forwarded-for' ] || req.connection.remoteAddress;
         logger.info(`Request Ip: ${ip}`, "receive request");
         next();
     });

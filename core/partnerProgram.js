@@ -10,7 +10,7 @@ const partnerProgram = new PartnerProgram(process.env.POSTGRESQL_DATABASE_PARTNE
 const insertProgram = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
+        const error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
@@ -18,7 +18,7 @@ const insertProgram = async (request, response) => {
     request.body.startDate = new Date(request.body.startDate);
     request.body.endDate = new Date(request.body.endDate);
 
-    let currentPartnerProgram = await partnerProgram.getActivePartnerProgram(request.body.partnerCode, request.body.startDate, request.body.endDate);
+    const currentPartnerProgram = await partnerProgram.getActivePartnerProgram(request.body.partnerCode, request.body.startDate, request.body.endDate);
     if (currentPartnerProgram.err && currentPartnerProgram.err.message !== "Active partner program not found") {
         wrapper.response(response, false, currentPartnerProgram);
         return;
@@ -27,7 +27,7 @@ const insertProgram = async (request, response) => {
         return;
     }
 
-    let insertPartnerProgramResult = await partnerProgram.insertProgram(request.body);
+    const insertPartnerProgramResult = await partnerProgram.insertProgram(request.body);
     if (insertPartnerProgramResult.err) {
         wrapper.response(response, false, insertPartnerProgramResult);
     } else {
@@ -39,14 +39,14 @@ const insertProgram = async (request, response) => {
 const softDeleteProgram = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
+        const error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
     }
 
-    let id = parseInt(request.params.id);
-    let deletePartnerProgramResult = await partnerProgram.softDeleteProgram(id);
+    const id = parseInt(request.params.id);
+    const deletePartnerProgramResult = await partnerProgram.softDeleteProgram(id);
 
     if (deletePartnerProgramResult.err) {
         wrapper.response(response, false, deletePartnerProgramResult);
@@ -59,18 +59,17 @@ const softDeleteProgram = async (request, response) => {
 const getPrograms = async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
-        let error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
+        const error = wrapper.error(new BadRequestError(ResponseMessage.INVALID_INPUT_PARAMETER));
         error.data = errors.array();
         wrapper.response(response, false, error);
         return;
     }
 
-    let { id, page, limit, offset, search } = request.query;
+    const { id, page, limit, offset, search } = request.query;
     let getPartnerProgramsResult;
 
     if (id) {
-        let id = parseInt(request.query.id);
-        getPartnerProgramsResult = await partnerProgram.getProgramById(id);
+        getPartnerProgramsResult = await partnerProgram.getProgramById(parseInt(id));
     } else {
         getPartnerProgramsResult = await partnerProgram.getAllProgram(page, limit, offset, search);
     }
@@ -84,9 +83,9 @@ const getPrograms = async (request, response) => {
 }
 
 const getPartnerPrograms = async (request, response) => {
-    let {page, limit, offset} = request.query;
-    let partnerCode = request.params.partnerCode.toUpperCase();
-    let getPartnerProgramResult = await partnerProgram.getPartnerProgram(partnerCode, page, limit, offset);
+    const { page, limit, offset } = request.query;
+    const { partnerCode } = request.params;
+    const getPartnerProgramResult = await partnerProgram.getPartnerProgram(partnerCode.toUpperCase(), page, limit, offset);
 
     if (getPartnerProgramResult.err) {
         wrapper.response(response, false, getPartnerProgramResult);
