@@ -61,7 +61,7 @@ class PartnerWallet{
             name: 'get-wallet',
             text: `SELECT partner_code AS "partnerCode", wallet_code AS "walletCode"
                 FROM public.partner_wallet
-                WHERE partner_code = $1;`,
+                WHERE partner_code = $1 AND is_deleted = false;`,
             values: [partnerCode]
         }
         try {
@@ -70,6 +70,48 @@ class PartnerWallet{
                 return wrapper.error(new NotFoundError("Partner wallet not found"));
             }
             return wrapper.data(result.rows[0]);
+        } catch (error) {
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
+        }
+    }
+
+    async getWallets(page, limit, offset, search) {
+        const dbPool = postgresqlWrapper.getConnection(this.database);
+        const getWalletsQuery = {
+            name: 'get-wallets',
+            text: `SELECT partner_code AS "partnerCode", wallet_code AS "walletCode"
+                FROM public.partner_wallet
+                WHERE is_deleted = false AND (lower(partner_code) LIKE lower('%' || $3 || '%') OR $3 IS NULL)
+                ORDER BY created_at
+                LIMIT $1 OFFSET $2;`,
+            values: [limit, offset, search]
+        }
+        const countWalletsQuery = {
+            name: 'count-wallets',
+            text: `SELECT COUNT(*)
+                FROM public.partner_wallet
+                WHERE is_deleted = false AND (lower(partner_code) LIKE lower('%' || $1 || '%') OR $1 IS NULL);`,
+            values: [search]
+        }
+        try {
+            const wallets = await dbPool.query(getWalletsQuery);
+            if (wallets.rows.length === 0) {
+                return wrapper.error(new NotFoundError("Partner wallet(s) not found"));
+            }
+            const walletCounter = await dbPool.query(countWalletsQuery);
+            const totalData = parseInt(walletCounter.rows[0].count);
+            let totalPage = Math.ceil(totalData / limit);
+            if (limit === null) {
+                totalPage = 1;
+            }
+            const totalDataOnPage = wallets.rows.length;
+            const meta = {
+                page: page || 1,
+                totalData,
+                totalPage,
+                totalDataOnPage
+            }
+            return wrapper.paginationData(wallets.rows, meta);
         } catch (error) {
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }

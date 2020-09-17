@@ -46,8 +46,20 @@ const getWalletByPartnerCode = async (request, response) => {
     }
 }
 
+const getWallets = async (request, response) => {
+    const { page, limit, offset, search } = request.query;
+
+    const result = await partnerWallet.getWallets(page, limit, offset, search);
+    if (result.err) {
+        wrapper.response(response, false, result);
+    } else {
+        wrapper.paginationResponse(response, true, result, "Partner wallet(s) retrieved", successCode.OK);
+    }
+}
+
 module.exports = {
     upsertWallet,
     deleteWallet,
-    getWalletByPartnerCode
+    getWalletByPartnerCode,
+    getWallets
 }
