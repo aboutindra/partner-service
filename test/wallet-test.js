@@ -61,6 +61,141 @@ describe("Get Partner Wallet", _ => {
     });
 });
 
+describe("Get All Partner Wallets", () => {
+    afterEach(() => {
+        sandbox.restore();
+    });
+
+    it("Sending get all partner wallets request with invalid page query parameter", done => {
+        chai.request(server)
+        .get(BASE_URL)
+        .query({ page: 0, limit: 100 })
+        .end((error, response) => {
+            responseValidator.validateResponse(response, "Page & Limit must be positive integer value", false, 400);
+            done();
+        });
+    });
+
+    it("Sending get all partner wallets request with invalid limit query parameter", done => {
+        chai.request(server)
+        .get(BASE_URL)
+        .query({ page: 1, limit: 0 })
+        .end((error, response) => {
+            responseValidator.validateResponse(response, "Page & Limit must be positive integer value", false, 400);
+            done();
+        });
+    });
+
+    it("Sending get all partner wallets request with connection failure response", done => {
+        sandbox.stub(pgPool.prototype, 'query').rejects();
+
+        chai.request(server)
+        .get(BASE_URL)
+        .end((error, response) => {
+            sandbox.restore();
+            responseValidator.validateResponse(response, "Internal server error", false, 500);
+            done();
+        });
+    });
+
+    it("Sending get all partner wallets request with empty partner list", done => {
+        let poolStub = sandbox.stub(pgPool.prototype, 'query');
+        let queryResult = {
+            rowCount: 0,
+            rows: []
+        }
+        poolStub.resolves(queryResult);
+
+        chai.request(server)
+        .get(BASE_URL)
+        .end((error, response) => {
+            poolStub.restore();
+            responseValidator.validateResponse(response, "Partner wallet(s) not found", false, 404);
+            done();
+        });
+    });
+
+    it("Sending get all partner wallets request with valid query parameter", done => {
+        let poolStub = sandbox.stub(pgPool.prototype, 'query');
+        let queryResult = {
+            rowCount: 1,
+            rows: [
+                {
+                    "partnerCode": "INP",
+                    "walletCode": "195293032458"
+                }
+            ]
+        }
+        let countResult = {
+            rowCount: 1,
+            rows: [
+                {
+                    count: 5
+                }
+            ]
+        }
+        poolStub.onFirstCall().resolves(queryResult);
+        poolStub.onSecondCall().resolves(countResult);
+
+        chai.request(server)
+        .get(BASE_URL)
+        .query({ page: 1, limit: 1 })
+        .end((error, response) => {
+            poolStub.restore();
+            responseValidator.validateResponse(response, "Partner wallet(s) retrieved", true, 200);
+            done();
+        });
+    });
+
+    it("Sending get all partner wallets request without query parameter", done => {
+        let poolStub = sandbox.stub(pgPool.prototype, 'query');
+        let queryResult = {
+            rowCount: 5,
+            rows: [
+                {
+                    "partnerCode": "INP",
+                    "walletCode": "195293032458"
+                },
+                {
+                    "partnerCode": "IDH",
+                    "walletCode": "195222677109"
+                },
+                {
+                    "partnerCode": "LKJ",
+                    "walletCode": "195253128954"
+                },
+                {
+                    "partnerCode": "ELM",
+                    "walletCode": "195223979028"
+                },
+                {
+                    "partnerCode": "OMO",
+                    "walletCode": "195255339229"
+                }
+            ]
+        }
+        let countResult = {
+            rowCount: 1,
+            rows: [
+                {
+                    count: 5
+                }
+            ]
+        }
+        poolStub.onFirstCall().resolves(queryResult);
+        poolStub.onSecondCall().resolves(countResult);
+
+        chai.request(server)
+        .get(BASE_URL)
+        .end((error, response) => {
+            poolStub.restore();
+            responseValidator.validateResponse(response, "Partner wallet(s) retrieved", true, 200);
+            done();
+        });
+    });
+
+});
+
 describe("Delete Partner Wallet", _ => {
     let PARAMS = "IDH";
 
