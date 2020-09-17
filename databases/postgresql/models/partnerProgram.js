@@ -55,7 +55,6 @@ class PartnerProgram {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            console.error(error);
             await client.query('ROLLBACK');
             client.release();
             if (error.code === errorCode.UNIQUE_VIOLATION) {
@@ -137,7 +136,6 @@ class PartnerProgram {
             return wrapper.paginationData(getAllPartnerProgramResult.rows, meta);
         }
         catch (error) {
-            console.error(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -238,7 +236,6 @@ class PartnerProgram {
             return wrapper.data(result.rows[0]);
         }
         catch (error) {
-            console.error(error)
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }

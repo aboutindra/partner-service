@@ -112,7 +112,6 @@ class Discount {
             return wrapper.paginationData(getAllDiscountResult.rows, meta);
         }
         catch (error) {
-            console.error(error)
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -136,7 +135,6 @@ class Discount {
             return wrapper.data(result.rows[0]);
         }
         catch (error) {
-            console.error(error)
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }

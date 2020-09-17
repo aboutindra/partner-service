@@ -27,7 +27,6 @@ class PartnerWallet{
             }
             return wrapper.data(result.rows);
         } catch (error) {
-            console.error(error);
             if (error.code === errorCode.FOREIGN_KEY_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Partner doesn't exist"));
             }
