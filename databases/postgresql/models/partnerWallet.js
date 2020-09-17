@@ -79,18 +79,20 @@ class PartnerWallet{
         const dbPool = postgresqlWrapper.getConnection(this.database);
         const getWalletsQuery = {
             name: 'get-wallets',
-            text: `SELECT partner_code AS "partnerCode", wallet_code AS "walletCode"
-                FROM public.partner_wallet
-                WHERE is_deleted = false AND (lower(partner_code) LIKE lower('%' || $3 || '%') OR $3 IS NULL)
-                ORDER BY created_at
+            text: `SELECT wallet.partner_code AS "partnerCode", partner.name AS "partnerName", wallet.wallet_code AS "walletCode"
+                FROM public.partner_wallet AS wallet
+                LEFT JOIN public.partner AS partner ON (partner_code = partner.code)
+                WHERE wallet.is_deleted = false AND partner.is_deleted = false AND (lower(partner_code) LIKE lower('%' || $3 || '%') OR $3 IS NULL)
+                ORDER BY wallet.created_at
                 LIMIT $1 OFFSET $2;`,
             values: [limit, offset, search]
         }
         const countWalletsQuery = {
             name: 'count-wallets',
             text: `SELECT COUNT(*)
-                FROM public.partner_wallet
-                WHERE is_deleted = false AND (lower(partner_code) LIKE lower('%' || $1 || '%') OR $1 IS NULL);`,
+            FROM public.partner_wallet AS wallet
+            LEFT JOIN public.partner AS partner ON (partner_code = partner.code)
+            WHERE wallet.is_deleted = false AND partner.is_deleted = false AND (lower(partner_code) LIKE lower('%' || $1 || '%') OR $1 IS NULL);`,
             values: [search]
         }
         try {
