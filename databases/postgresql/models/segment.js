@@ -27,7 +27,6 @@ class Segment {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            console.error(error);
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Segment name already exist"));
             }
@@ -77,7 +76,6 @@ class Segment {
             return wrapper.data(result.rows);
         }
         catch (error) {
-            console.error(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -100,7 +98,6 @@ class Segment {
             return wrapper.data(result.rows[0]);
         }
         catch (error) {
-            console.error(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
