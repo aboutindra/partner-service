@@ -58,9 +58,11 @@ class PartnerWallet{
         const dbPool = postgresqlWrapper.getConnection(this.database);
         const getWalletQuery = {
             name: 'get-wallet',
-            text: `SELECT partner_code AS "partnerCode", wallet_code AS "walletCode"
-                FROM public.partner_wallet
-                WHERE partner_code = $1 AND is_deleted = false;`,
+            text: `SELECT wallet.partner_code AS "partnerCode", partner.name AS "partnerName", wallet.wallet_code AS "walletCode",
+                partner.url_logo AS "urlLogo"
+                FROM public.partner_wallet AS wallet
+                LEFT JOIN public.partner AS partner ON (partner_code = partner.code)
+                WHERE wallet.partner_code = $1 AND wallet.is_deleted = false;`,
             values: [partnerCode]
         }
         try {
