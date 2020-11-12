@@ -12,6 +12,8 @@ const partnerProgram = require('./controllers/partnerProgram');
 const segment = require('./controllers/segment');
 const partnerQuota = require('./controllers/partnerQuota');
 const partnerWallet = require('./controllers/partnerWallet');
+const product = require('./controllers/product');
+const productCategory = require('./controllers/productCategory');
 
 function AppServer() {
     this.app = express();
@@ -49,6 +51,8 @@ function AppServer() {
     segment.routes(this.app);
     partnerQuota.routes(this.app);
     partnerWallet.routes(this.app);
+    product.routes(this.app);
+    productCategory.routes(this.app);
 
     postgreWrapper.init();
 }
