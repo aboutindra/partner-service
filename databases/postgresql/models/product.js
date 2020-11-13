@@ -69,7 +69,7 @@ class Product {
             name: 'soft-delete-product',
             text: `UPDATE public.product
                 SET is_deleted = true, updated_at = NOW(), deleted_at = NOW()
-                WHERE code = $1;`,
+                WHERE code = $1 AND is_deleted = false;`,
             values: [code]
         }
 
@@ -89,7 +89,7 @@ class Product {
         const dbClient = postgresqlWrapper.getConnection(this.database);
         const getProductQuery = {
             name: 'get-product',
-            text: `SELECT code, name, description, term_condition AS "termCondition", nominal, image_url AS "imageUrl", start_date AS "startDate", end_date AS "endDate"
+            text: `SELECT *
                 FROM public.product
                 WHERE (code = $1 OR $1 IS NULL) AND (category_id = $2 OR $2 IS NULL)
                 ORDER BY created_at DESC;`,
@@ -99,7 +99,30 @@ class Product {
         try {
             const result = await dbClient.query(getProductQuery);
             if (result.rows.length === 0) {
-                return wrapper.error(new NotFoundError("Product not found"));
+                return wrapper.error(new NotFoundError("Product(s) not found"));
+            }
+            return wrapper.data(result.rows);
+        }
+        catch (error) {
+            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
+        }
+    }
+
+    async getActiveProducts(code, category, name) {
+        const dbClient = postgresqlWrapper.getConnection(this.database);
+        const getProductQuery = {
+            name: 'get-active-product',
+            text: `SELECT code, name, description, term_condition AS "termCondition", nominal, image_url AS "imageUrl", start_date AS "startDate", end_date AS "endDate"
+                FROM public.product
+                WHERE is_deleted = false AND (code = $1 OR $1 IS NULL) AND (category_id = $2 OR $2 IS NULL) AND (lower(name) LIKE lower('%' || $3 || '%') OR $3 IS NULL)
+                ORDER BY created_at DESC;`,
+            values: [code, category, name]
+        }
+
+        try {
+            const result = await dbClient.query(getProductQuery);
+            if (result.rows.length === 0) {
+                return wrapper.error(new NotFoundError("Product(s) not found"));
             }
             return wrapper.data(result.rows);
         }

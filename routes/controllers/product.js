@@ -7,6 +7,7 @@ const routes = (server) => {
     server.put('/api/v1/products/:code', [validator.validateUpdateProduct, inputValidator], productHandler.updateProduct);
     server.delete('/api/v1/products/:code', [validator.validateDeleteProduct, inputValidator], productHandler.deleteProduct);
     server.get('/api/v1/products', [inputValidator], productHandler.getProducts);
+    server.get('/api/v1/active-products', [inputValidator], productHandler.getActiveProducts);
 }
 
 module.exports = {

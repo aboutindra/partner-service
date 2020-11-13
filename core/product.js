@@ -57,10 +57,23 @@ const getProducts = async (request, response) => {
     }
 }
 
+const getActiveProducts = async (request, response) => {
+    const { code, category, name } = request.query;
+    
+    const result = await product.getActiveProducts(code, category, name);
+
+    if (result.err) {
+        wrapper.response(response, false, result);
+    } else {
+        wrapper.response(response, true, result, "Product(s) retrieved", successCode.OK);
+    }
+}
+
 
 module.exports = {
     insertProduct,
     updateProduct,
     deleteProduct,
-    getProducts
+    getProducts,
+    getActiveProducts
 }
