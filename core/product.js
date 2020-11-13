@@ -46,9 +46,9 @@ const deleteProduct = async (request, response) => {
 }
 
 const getProducts = async (request, response) => {
-    const { code, category } = request.query;
+    const { code, categoryId } = request.query;
     
-    const result = await product.getProducts(code, category);
+    const result = await product.getProducts(code, categoryId);
 
     if (result.err) {
         wrapper.response(response, false, result);
@@ -58,9 +58,9 @@ const getProducts = async (request, response) => {
 }
 
 const getActiveProducts = async (request, response) => {
-    const { code, category, name } = request.query;
+    const { code, categoryId, name } = request.query;
     
-    const result = await product.getActiveProducts(code, category, name);
+    const result = await product.getActiveProducts(code, categoryId, name);
 
     if (result.err) {
         wrapper.response(response, false, result);

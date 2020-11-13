@@ -85,7 +85,7 @@ class Product {
         }
     }
 
-    async getProducts(code, category) {
+    async getProducts(code, categoryId) {
         const dbClient = postgresqlWrapper.getConnection(this.database);
         const getProductQuery = {
             name: 'get-product',
@@ -93,7 +93,7 @@ class Product {
                 FROM public.product
                 WHERE (code = $1 OR $1 IS NULL) AND (category_id = $2 OR $2 IS NULL)
                 ORDER BY created_at DESC;`,
-            values: [code, category]
+            values: [code, categoryId]
         }
 
         try {
@@ -108,7 +108,7 @@ class Product {
         }
     }
 
-    async getActiveProducts(code, category, name) {
+    async getActiveProducts(code, categoryId, name) {
         const dbClient = postgresqlWrapper.getConnection(this.database);
         const getProductQuery = {
             name: 'get-active-product',
@@ -116,7 +116,7 @@ class Product {
                 FROM public.product
                 WHERE is_deleted = false AND (code = $1 OR $1 IS NULL) AND (category_id = $2 OR $2 IS NULL) AND (lower(name) LIKE lower('%' || $3 || '%') OR $3 IS NULL)
                 ORDER BY created_at DESC;`,
-            values: [code, category, name]
+            values: [code, categoryId, name]
         }
 
         try {

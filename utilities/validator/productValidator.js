@@ -1,4 +1,4 @@
-const { param, body } = require('express-validator');
+const { param, query, body } = require('express-validator');
 const dateValidator = require('./dateFormatValidator');
 const CaseFormatter = require('./caseFormatter');
 
@@ -20,7 +20,7 @@ exports.validateUpdateProduct = [
     param('code').isLength({ min: 1, max: 25 }).customSanitizer(CaseFormatter.upperingCaseInput)
     .withMessage("Code must be at least 1 character and maximum 25 character"),
     body('name').isLength({ min: 1, max: 50 }).withMessage("Name must be at least 1 character and maximum 50 character"),
-    body('categoryId').isInt({ min: 1 }).withMessage("Category id must be filled"),
+    body('categoryId').isInt({ min: 1 }).withMessage("Category id must be integer"),
     body('description').optional({nullable: true}).isLength({min: 5}).withMessage("Description must be at least 5 characters"),
     body('termCondition').optional({nullable: true}).isLength({min: 5}).withMessage("Term and condition  must be at least 5 characters"),
     body('imageUrl').isLength({ min: 1, max: 255 }).withMessage("Image url must be at least 1 character and maximum 255 characters"),
@@ -34,4 +34,8 @@ exports.validateUpdateProduct = [
 exports.validateDeleteProduct = [
     param('code').isLength({ min: 1, max: 25 }).customSanitizer(CaseFormatter.upperingCaseInput)
     .withMessage("Code must be at least 1 character and maximum 25 character")
+]
+
+exports.validateGetProduct = [
+    query('categoryId').optional({nullable: true}).isInt({ min: 1 }).withMessage("Category id must be integer")
 ]
