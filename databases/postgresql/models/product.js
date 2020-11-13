@@ -9,14 +9,14 @@ class Product {
         this.database = database;
     }
 
-    async insertProduct({ code, name, categoryId, description, termCondition, imageUrl, nominal, startDate, endDate }) {
+    async insertProduct({ code, name, categoryId, description, termCondition, imageUrl, nominals, startDate, endDate }) {
         const dbClient = postgresqlWrapper.getConnection(this.database);
         const insertProductQuery = {
             name: 'insert-product',
             text: `INSERT INTO public.product(
-                code, name, category_id, description, term_condition, image_url, nominal, start_date, end_date, is_deleted, created_at, updated_at, deleted_at)
+                code, name, category_id, description, term_condition, image_url, nominals, start_date, end_date, is_deleted, created_at, updated_at, deleted_at)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, false, NOW(), NOW(), null);`,
-            values: [code, name, categoryId, description, termCondition, imageUrl, nominal, startDate, endDate]
+            values: [code, name, categoryId, description, termCondition, imageUrl, nominals, startDate, endDate]
         }
 
         try {
@@ -37,15 +37,15 @@ class Product {
         }
     }
 
-    async updateProduct({ code, name, categoryId, description, termCondition, imageUrl, nominal, startDate, endDate, isDeleted, deletedAt }) {
+    async updateProduct({ code, name, categoryId, description, termCondition, imageUrl, nominals, startDate, endDate, isDeleted, deletedAt }) {
         const dbClient = postgresqlWrapper.getConnection(this.database);
         const updateProductQuery = {
             name: 'update-product',
             text: `UPDATE public.product
-                SET name = $2, category_id = $3, description = $4, term_condition = $5, image_url = $6, nominal = $7, start_date = $8, end_date = $9,
+                SET name = $2, category_id = $3, description = $4, term_condition = $5, image_url = $6, nominals = $7, start_date = $8, end_date = $9,
                 is_deleted = $10, updated_at = NOW(), deleted_at = $11
                 WHERE code = $1;`,
-            values: [code, name, categoryId, description, termCondition, imageUrl, nominal, startDate, endDate, isDeleted, deletedAt]
+            values: [code, name, categoryId, description, termCondition, imageUrl, nominals, startDate, endDate, isDeleted, deletedAt]
         }
 
         try {
@@ -112,7 +112,7 @@ class Product {
         const dbClient = postgresqlWrapper.getConnection(this.database);
         const getProductQuery = {
             name: 'get-active-product',
-            text: `SELECT code, name, description, term_condition AS "termCondition", nominal, image_url AS "imageUrl", start_date AS "startDate", end_date AS "endDate"
+            text: `SELECT code, name, description, term_condition AS "termCondition", nominals, image_url AS "imageUrl", start_date AS "startDate", end_date AS "endDate"
                 FROM public.product
                 WHERE is_deleted = false AND (code = $1 OR $1 IS NULL) AND (category_id = $2 OR $2 IS NULL) AND (lower(name) LIKE lower('%' || $3 || '%') OR $3 IS NULL)
                 ORDER BY created_at DESC;`,
