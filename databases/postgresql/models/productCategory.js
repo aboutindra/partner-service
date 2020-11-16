@@ -15,8 +15,8 @@ class ProductCategory {
             name: 'insert-product-category',
             text: `INSERT INTO public.product_category(
                 name, is_deleted, created_at, updated_at)
-                VALUES ($1, $2, $3, $4)`,
-            values: [name, false, new Date(), new Date()]
+                VALUES ($1, $2, NOW(), NOW())`,
+            values: [name, false]
         }
 
         try {
@@ -98,28 +98,6 @@ class ProductCategory {
                 return wrapper.error(new NotFoundError("Product category(s) not found"));
             }
             return wrapper.data(result.rows);
-        }
-        catch (error) {
-            return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
-        }
-    }
-
-    async getProductCategoryById(id) {
-        const dbClient = postgresqlWrapper.getConnection(this.database);
-        const getCategoryByIdQuery = {
-            name: 'get-product-category',
-            text: `SELECT id, name, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
-                FROM public.product_category
-                WHERE id = $1`,
-            values: [id]
-        }
-
-        try {
-            const result = await dbClient.query(getCategoryByIdQuery);
-            if (result.rows.length === 0) {
-                return wrapper.error(new NotFoundError("Product category not found"));
-            }
-            return wrapper.data(result.rows[0]);
         }
         catch (error) {
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));

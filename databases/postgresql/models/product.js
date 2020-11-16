@@ -59,6 +59,9 @@ class Product {
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Product already exist"));
             }
+            if (error.code === errorCode.FOREIGN_KEY_VIOLATION) {
+                return wrapper.error(new ForbiddenError("Category doesn't exist"));
+            }
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }

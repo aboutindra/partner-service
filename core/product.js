@@ -9,7 +9,7 @@ const insertProduct = async (request, response) => {
     if (result.err) {
         wrapper.response(response, false, result);
     } else {
-        wrapper.response(response, true, result, "Product added", successCode.OK);
+        wrapper.response(response, true, result, "Product added", successCode.CREATED);
     }
 }
 

@@ -6,7 +6,7 @@ const routes = (server) => {
     server.post('/api/v1/product-categories', [validator.validateInsertProductCategory, inputValidator], productCategoryHandler.insertProductCategory);
     server.put('/api/v1/product-categories/:id', [validator.validateUpdateProductCategory, inputValidator], productCategoryHandler.updateProductCategory);
     server.delete('/api/v1/product-categories/:id', [validator.validateDeleteProductCategory, inputValidator], productCategoryHandler.deleteProductCategory);
-    server.get('/api/v1/product-categories', [], productCategoryHandler.getProductCategory);
+    server.get('/api/v1/product-categories', [validator.validateGetProductCategory, inputValidator], productCategoryHandler.getProductCategory);
 }
 
 module.exports = {
