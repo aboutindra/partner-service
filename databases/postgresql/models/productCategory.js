@@ -1,3 +1,4 @@
+const apm = require('elastic-apm-node');
 const { NotFoundError, InternalServerError, ForbiddenError } = require('../../../utilities/error');
 const wrapper = require('../../../utilities/wrapper');
 const postgresqlWrapper = require('../../postgresql');
@@ -30,6 +31,7 @@ class ProductCategory {
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Product category already exist"));
             }
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -55,6 +57,7 @@ class ProductCategory {
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Product category already exist"));
             }
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -77,6 +80,7 @@ class ProductCategory {
             return wrapper.data(result.rows);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -100,6 +104,7 @@ class ProductCategory {
             return wrapper.data(result.rows);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }

@@ -1,3 +1,4 @@
+const apm = require('elastic-apm-node');
 const { NotFoundError, InternalServerError, ForbiddenError } = require('../../../utilities/error');
 const wrapper = require('../../../utilities/wrapper');
 const postgresqlWrapper = require('../../postgresql');
@@ -33,6 +34,7 @@ class CostPackage {
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Package name already exist"));
             }
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -61,6 +63,7 @@ class CostPackage {
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Package name already exist"));
             }
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -107,6 +110,7 @@ class CostPackage {
             return wrapper.paginationData(costPackages.rows, meta);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -130,6 +134,7 @@ class CostPackage {
             return wrapper.data(costPackage.rows[0]);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -152,6 +157,7 @@ class CostPackage {
             return wrapper.data(deleteResult.rows);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }

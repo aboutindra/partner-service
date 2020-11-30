@@ -1,5 +1,6 @@
 require('dotenv').config()
 const express = require('express');
+const apm = require('elastic-apm-node').start();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const responder = require('../utilities/responder');
@@ -17,6 +18,9 @@ const productCategory = require('./controllers/productCategory');
 
 function AppServer() {
     this.app = express();
+
+    this.app.use(apm.middleware.connect());
+
     //Body parser
     this.app.use(bodyParser.urlencoded({ extended: false }));
     this.app.use(bodyParser.json());

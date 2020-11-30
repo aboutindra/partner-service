@@ -3,12 +3,16 @@ const chaiHttp = require('chai-http');
 const server = require('../index');
 const sandbox = require('sinon').createSandbox();
 const BASE_URL = "/api/v1/packages/";
-const pgPool = require('pg-pool');
+const postgresqlPool = require('../databases/postgresql/index');
 const responseValidator = require('./responseValidator');
 
 chai.use(chaiHttp);
 
 describe("Get Cost Package", _ => {
+    afterEach(() => {
+        sandbox.restore();
+    });
+
     it("Sending get package request with invalid id parameter (negative number)", done => {
         chai.request(server)
         .get(BASE_URL)
@@ -30,7 +34,7 @@ describe("Get Cost Package", _ => {
     });
 
     it("Sending get package request with database connection failure", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns({query: sandbox.stub().rejects()});
 
         chai.request(server)
         .get(BASE_URL)
@@ -43,11 +47,11 @@ describe("Get Cost Package", _ => {
     });
 
     it("Sending get package request with package not found response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns({query: sandbox.stub().resolves(queryResult)});
 
         chai.request(server)
         .get(BASE_URL)
@@ -60,7 +64,7 @@ describe("Get Cost Package", _ => {
     });
 
     it("Sending get package request with package detail response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: [
                 {
@@ -74,7 +78,7 @@ describe("Get Cost Package", _ => {
                 }
             ]
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns({query: sandbox.stub().resolves(queryResult)});
 
         chai.request(server)
         .get(BASE_URL)
@@ -88,6 +92,10 @@ describe("Get Cost Package", _ => {
 });
 
 describe("Get Cost Packages", () => {
+    afterEach(() => {
+        sandbox.restore();
+    });
+
     it("Sending get all packages request with invalid page parameter", done => {
         chai.request(server)
         .get(BASE_URL)
@@ -109,7 +117,7 @@ describe("Get Cost Packages", () => {
     });
 
     it("Sending get all packages request with database connection failure (main query)", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns({query: sandbox.stub().rejects()});
 
         chai.request(server)
         .get(BASE_URL)
@@ -122,7 +130,7 @@ describe("Get Cost Packages", () => {
     });
 
     it("Sending get all packages request with database connection failure 2 (count query)", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: [
                 {
@@ -137,40 +145,46 @@ describe("Get Cost Packages", () => {
                 }
             ]
         }
-        let pool = sandbox.stub(pgPool.prototype, 'query');
-        pool.onFirstCall().resolves(queryResult);
-        pool.onSecondCall().rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        pgPool.query.onSecondCall().rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .query({ page: 1, limit: 10 })
         .end((error, response) => {
-            pool.restore();
+            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending get all packages request with empty package response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        let pool = sandbox.stub(pgPool.prototype, 'query');
-        pool.onFirstCall().resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        pgPool.query.onSecondCall().rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .query({ page: 1, limit: 10 })
         .end((error, response) => {
-            pool.restore();
             responseValidator.validateResponse(response, "Package(s) not found", false, 404);
             done();
         });
     });
 
     it("Sending get all packages request with list package response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 2,
             rows: [
                 {
@@ -194,29 +208,31 @@ describe("Get Cost Packages", () => {
                 }
             ]
         }
-        let countResult = {
+        const countResult = {
             rows: [
                 {
                     counts: 100
                 }
             ]
         }
-        let pool = sandbox.stub(pgPool.prototype, 'query');
-        pool.onFirstCall().resolves(queryResult);
-        pool.onSecondCall().resolves(countResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        pgPool.query.onSecondCall().resolves(countResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .query({ page: 1, limit: 2 })
         .end((error, response) => {
-            pool.restore();
             responseValidator.validateResponse(response, "Package(s) retrieved", true, 200);
             done();
         });
     });
 
     it("Sending get all packages request with list package response (without query parameter)", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 2,
             rows: [
                 {
@@ -239,32 +255,37 @@ describe("Get Cost Packages", () => {
                 }
             ]
         }
-        let countResult = {
+        const countResult = {
             rows: [
                 {
                     counts: 100
                 }
             ]
         }
-        let pool = sandbox.stub(pgPool.prototype, 'query');
-        pool.onFirstCall().resolves(queryResult);
-        pool.onSecondCall().resolves(countResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        pgPool.query.onSecondCall().resolves(countResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
-            pool.restore();
             responseValidator.validateResponse(response, "Package(s) retrieved", true, 200);
             done();
         });
     });
-
 })
 
 describe("Delete Cost Package", _ => {
-    let PARAMS = 1;
+    const PARAMS = 1;
+    afterEach(() => {
+        sandbox.restore();
+    });
+
     it("Sending delete cost package request with invalid package id (alphabet)", done => {
-        let PARAMS = 'SYS';
+        const PARAMS = 'SYS';
         chai.request(server)
         .delete(BASE_URL + PARAMS)
         .end((error, response) => {
@@ -274,7 +295,7 @@ describe("Delete Cost Package", _ => {
     });
 
     it("Sending delete cost package request with invalid package id (negative number)", done => {
-        let PARAMS = -2;
+        const PARAMS = -2;
         chai.request(server)
         .delete(BASE_URL + PARAMS)
         .end((error, response) => {
@@ -284,11 +305,15 @@ describe("Delete Cost Package", _ => {
     });
 
     it("Sending delete cost package request with not exist package id", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .delete(BASE_URL + PARAMS)
@@ -300,7 +325,11 @@ describe("Delete Cost Package", _ => {
     });
 
     it("Sending delete cost package request with database connection failure", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .delete(BASE_URL  + PARAMS)
@@ -312,11 +341,15 @@ describe("Delete Cost Package", _ => {
     });
 
     it("Sending delete cost package request with valid package id", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .delete(BASE_URL + PARAMS)
@@ -329,7 +362,10 @@ describe("Delete Cost Package", _ => {
 });
 
 describe("Update Cost Package", _ => {
-    let PARAMS = 1;
+    const PARAMS = 1;
+    afterEach(() => {
+        sandbox.restore();
+    });
 
     it("Sending update cost package request without body parameters", done => {
         chai.request(server)
@@ -381,10 +417,14 @@ describe("Update Cost Package", _ => {
     });
 
     it("Sending update cost package request with invalid package name parameter (name already exist)", done => {
-        let error = {
+        const error = {
             code: '23505'
         }
-        sandbox.stub(pgPool.prototype, 'query').rejects(error);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().rejects(error);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .put(BASE_URL + PARAMS)
@@ -397,10 +437,14 @@ describe("Update Cost Package", _ => {
     });
 
     it("Sending update cost package request with invalid cost type parameter (non existed type)", done => {
-        let error = {
+        const error = {
             code: '22P02'
         }
-        sandbox.stub(pgPool.prototype, 'query').rejects(error);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().rejects(error);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .put(BASE_URL + PARAMS)
@@ -413,7 +457,11 @@ describe("Update Cost Package", _ => {
     });
 
     it("Sending update cost package request with database connection failure", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .put(BASE_URL + PARAMS)
@@ -426,11 +474,15 @@ describe("Update Cost Package", _ => {
     });
 
     it("Sending update cost package request with package not found response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .put(BASE_URL + PARAMS)
@@ -443,11 +495,15 @@ describe("Update Cost Package", _ => {
     });
 
     it("Sending update cost package request with valid parameter", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .put(BASE_URL + PARAMS)
@@ -461,6 +517,10 @@ describe("Update Cost Package", _ => {
 });
 
 describe("Insert Cost Package", _ => {
+    afterEach(() => {
+        sandbox.restore();
+    });
+
     it("Sending insert cost package request without body parameter", done => {
         chai.request(server)
         .post(BASE_URL)
@@ -511,10 +571,14 @@ describe("Insert Cost Package", _ => {
     });
 
     it("Sending insert cost package request with invalid package name parameter (name already exist)", done => {
-        let error = {
+        const error = {
             code: '23505'
         }
-        sandbox.stub(pgPool.prototype, 'query').rejects(error);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().rejects(error);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
@@ -527,10 +591,14 @@ describe("Insert Cost Package", _ => {
     });
 
     it("Sending insert cost package request with invalid cost type parameter (non existed type)", done => {
-        let error = {
+        const error = {
             code: '22P02'
         }
-        sandbox.stub(pgPool.prototype, 'query').rejects(error);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().rejects(error);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
@@ -543,7 +611,11 @@ describe("Insert Cost Package", _ => {
     });
 
     it("Sending insert cost package request with database connection failure", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
@@ -560,7 +632,11 @@ describe("Insert Cost Package", _ => {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
@@ -577,7 +653,11 @@ describe("Insert Cost Package", _ => {
             rowCount: 1,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)

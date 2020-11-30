@@ -1,3 +1,4 @@
+const apm = require('elastic-apm-node');
 const { NotFoundError, InternalServerError, ForbiddenError } = require('../../../utilities/error');
 const { ERROR:errorCode } = require('../errorCode');
 const wrapper = require('../../../utilities/wrapper');
@@ -32,6 +33,7 @@ class PartnerQuota {
             if (error.code === errorCode.FOREIGN_KEY_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Partner doesn't exist"));
             }
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -64,6 +66,7 @@ class PartnerQuota {
             return wrapper.data(result.rows);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -108,6 +111,7 @@ class PartnerQuota {
             return wrapper.paginationData(getAllQuotaResult.rows, meta);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -131,6 +135,7 @@ class PartnerQuota {
             return wrapper.data(result.rows[0]);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }

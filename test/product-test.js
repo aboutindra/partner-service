@@ -3,42 +3,52 @@ const chaiHttp = require('chai-http');
 const server = require('../index');
 const sandbox = require('sinon').createSandbox();
 const BASE_URL = "/api/v1/products";
-const pgPool = require('pg-pool');
+const postgresqlPool = require('../databases/postgresql/index');
 const responseValidator = require('./responseValidator');
 
 chai.use(chaiHttp);
 
 describe("Get product(s)", _ => {
+    afterEach(() => {
+        sandbox.restore();
+    });
+
     it("Sending get all product with internal server error response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending get all product with product not found response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Product(s) not found", false, 404);
             done();
         });
     });
 
     it("Sending get all product with product list response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 2,
             rows: [
                 {
@@ -63,19 +73,26 @@ describe("Get product(s)", _ => {
                 }
             ]
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Product(s) retrieved", true, 200);
             done();
         });
     });
 
     it("Sending get product with internal server error response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
@@ -88,37 +105,37 @@ describe("Get product(s)", _ => {
     });
 
     it("Sending get product with invalid category id", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
-
         chai.request(server)
         .get(BASE_URL)
         .query({ categoryId: '{ $ne : -1 }' })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
 
     it("Sending get product with non exist product", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .query({ code: 1 })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Product(s) not found", false, 404);
             done();
         });
     });
 
     it("Sending get product with valid product id", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: [
                 {
@@ -133,13 +150,16 @@ describe("Get product(s)", _ => {
                 }
             ]
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .query({ id: 1 })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Product(s) retrieved", true, 200);
             done();
         });
@@ -148,37 +168,46 @@ describe("Get product(s)", _ => {
 
 describe("Get active product(s)", _ => {
     const BASE_URL = "/api/v1/active-products";
+    afterEach(() => {
+        sandbox.restore();
+    });
 
     it("Sending get all product with internal server error response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending get all product with product not found response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Product(s) not found", false, 404);
             done();
         });
     });
 
     it("Sending get all product with product list response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 2,
             rows: [
                 {
@@ -203,19 +232,26 @@ describe("Get active product(s)", _ => {
                 }
             ]
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Product(s) retrieved", true, 200);
             done();
         });
     });
 
     it("Sending get product with internal server error response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
@@ -228,37 +264,37 @@ describe("Get active product(s)", _ => {
     });
 
     it("Sending get product with invalid category id", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
-
         chai.request(server)
         .get(BASE_URL)
         .query({ categoryId: '{ $ne : -1 }' })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
 
     it("Sending get product with non exist product", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .query({ code: 1 })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Product(s) not found", false, 404);
             done();
         });
     });
 
     it("Sending get product with valid product id", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: [
                 {
@@ -273,13 +309,16 @@ describe("Get active product(s)", _ => {
                 }
             ]
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .query({ id: 1 })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Product(s) retrieved", true, 200);
             done();
         });
@@ -287,6 +326,10 @@ describe("Get active product(s)", _ => {
 });
 
 describe("Update product", _ => {
+    afterEach(() => {
+        sandbox.restore();
+    });
+
     const PARAMS = "TNMOALXL";
     const BODY = {
         name: "Smartcell",
@@ -322,79 +365,94 @@ describe("Update product", _ => {
     });
 
     it("Sending update product request with internal server error response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
         .send(BODY)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending update product request with existing product", done => {
-        let error = {
+        const error = {
             code: '23505'
         }
-        sandbox.stub(pgPool.prototype, 'query').rejects(error);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects(error);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
         .send(BODY)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Product already exist", false, 403);
             done();
         });
     });
 
     it("Sending update product request with invalid category id", done => {
-        let error = {
+        const error = {
             code: '23503'
         }
-        sandbox.stub(pgPool.prototype, 'query').rejects(error);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects(error);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
         .send(BODY)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Category doesn't exist", false, 403);
             done();
         });
     });
 
     it("Sending update product request with non existing product code", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
         .send(BODY)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Product not found", false, 404);
             done();
         });
     });
 
     it("Sending update product request with unique product name and delete status is false", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
         .send(BODY)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Product updated", true, 200);
             done();
         });
@@ -402,17 +460,20 @@ describe("Update product", _ => {
 
     it("Sending update product request with unique product name and delete status is true", done => {
         BODY.isDeleted = true;
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
         .send(BODY)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Product updated", true, 200);
             done();
         });
@@ -420,6 +481,10 @@ describe("Update product", _ => {
 });
 
 describe("Delete product", _ => {
+    afterEach(() => {
+        sandbox.restore();
+    });
+
     let PARAMS = "TMNOYTLSEL";
 
     it("Sending delete product request with invalid code parameters", done => {
@@ -435,44 +500,53 @@ describe("Delete product", _ => {
     });
 
     it("Sending delete product request with internal server error response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .delete(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending delete product request with non existing product code", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .delete(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Product not found", false, 404);
             done();
         });
     });
 
     it("Sending delete product request", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .delete(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Product deleted", true, 200);
             done();
         });
@@ -480,6 +554,10 @@ describe("Delete product", _ => {
 });
 
 describe("Insert Product", _ => {
+    afterEach(() => {
+        sandbox.restore();
+    });
+
     const BODY = {
         code: "TNMOALXL",
         name: "Smartcell",
@@ -502,79 +580,94 @@ describe("Insert Product", _ => {
     });
 
     it("Sending insert product request with existing product name", done => {
-        let error = {
+        const error = {
             code: '23505'
         }
-        sandbox.stub(pgPool.prototype, 'query').rejects(error);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects(error);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send(BODY)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Product already exist", false, 403);
             done();
         });
     });
 
     it("Sending insert product request with invalid category id", done => {
-        let error = {
+        const error = {
             code: '23503'
         }
-        sandbox.stub(pgPool.prototype, 'query').rejects(error);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects(error);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send(BODY)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Category doesn't exist", false, 403);
             done();
         });
     });
 
     it("Sending insert product request with internal server error response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send(BODY)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending insert product request with empty result", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send(BODY)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Failed to add new product", false, 404);
             done();
         });
     });
 
     it("Sending insert product request with unique name", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send(BODY)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Product added", true, 201);
             done();
         });

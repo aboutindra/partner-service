@@ -1,3 +1,4 @@
+const apm = require('elastic-apm-node');
 const { NotFoundError, InternalServerError, BadRequestError, ForbiddenError } = require('../../../utilities/error');
 const wrapper = require('../../../utilities/wrapper');
 const postgresqlWrapper = require('../../postgresql');
@@ -36,6 +37,7 @@ class Partner {
             if (error.code === errorCode.FOREIGN_KEY_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Id not exist"));
             }
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
 
@@ -63,6 +65,7 @@ class Partner {
             if (error.code === errorCode.FOREIGN_KEY_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Id not exist"));
             }
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -85,7 +88,7 @@ class Partner {
             return wrapper.data(deletePartnerResult.rows);
         }
         catch (error) {
-            console.error(error);
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -138,7 +141,7 @@ class Partner {
             return wrapper.paginationData(getAllPartnersResult.rows, meta);
         }
         catch (error) {
-            console.error(error);
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -168,6 +171,7 @@ class Partner {
             return wrapper.data(getPartnerByCodeResult.rows[0]);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -214,6 +218,7 @@ class Partner {
             return wrapper.paginationData(getAllActivePartnerResult.rows, meta);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -258,6 +263,7 @@ class Partner {
             return wrapper.paginationData(getAllIssuersResult.rows, meta);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -305,6 +311,7 @@ class Partner {
             return wrapper.paginationData(getAllActiveIssuersResult.rows, meta);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -338,7 +345,7 @@ class Partner {
             return wrapper.data(getIssuerResult.rows[0]);
         }
         catch (error) {
-            console.error(error)
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -383,6 +390,7 @@ class Partner {
             return wrapper.paginationData(getAllAcquirersResult.rows, meta);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -430,6 +438,7 @@ class Partner {
             return wrapper.paginationData(getAllActiveAcquirersResult.rows, meta);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -453,7 +462,7 @@ class Partner {
             return wrapper.data(getAcquireResult.rows[0]);
         }
         catch (error) {
-            console.error(error)
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -476,7 +485,7 @@ class Partner {
             return wrapper.data(getCountResult.rows[0]);
         }
         catch (error) {
-            console.error(error)
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -521,7 +530,7 @@ class Partner {
             return wrapper.paginationData(getImagesResult.rows, meta);
         }
         catch (error) {
-            console.error(error)
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -585,7 +594,7 @@ class Partner {
             return wrapper.paginationData(getAllActiveIssuersConfigResult.rows, meta);
         }
         catch (error) {
-            console.error(error)
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }

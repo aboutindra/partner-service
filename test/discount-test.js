@@ -3,18 +3,20 @@ const chaiHttp = require('chai-http');
 const server = require('../index');
 const sandbox = require('sinon').createSandbox();
 const BASE_URL = "/api/v1/discounts";
-const pgPool = require('pg-pool');
+const postgresqlPool = require('../databases/postgresql/index');
 const responseValidator = require('./responseValidator');
 
 chai.use(chaiHttp);
 
 describe("Get Active Discount", _ => {
-    let BASE_URL = "/api/v1/active-discount/";
-    let PARTNER_CODE = "AESTR";
+    const BASE_URL = "/api/v1/active-discount/";
+    const PARTNER_CODE = "AESTR";
+
+    afterEach(() => {
+        sandbox.restore();
+    });
 
     it("Sending get active discount request with invalid partner code", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
-
         chai.request(server)
         .get(BASE_URL + "ALJABAR")
         .end((error, response) => {
@@ -25,35 +27,41 @@ describe("Get Active Discount", _ => {
     });
 
     it("Sending get active discount request with database connection failure", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PARTNER_CODE)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending get active discount request with active discount not found response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PARTNER_CODE)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Active discount not found", false, 404);
             done();
         });
     });
 
     it("Sending get active discount request with active discount detail response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: [
                 {
@@ -70,12 +78,15 @@ describe("Get Active Discount", _ => {
                 }
             ]
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PARTNER_CODE)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Active discount retrieved", true, 200);
             done();
         });
@@ -83,8 +94,16 @@ describe("Get Active Discount", _ => {
 });
 
 describe("Get Discount(s)", _ => {
+    afterEach(() => {
+        sandbox.restore();
+    });
+
     it("Sending get discount with internal server error response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
@@ -97,24 +116,27 @@ describe("Get Discount(s)", _ => {
     });
 
     it("Sending get discount with empty discount list response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .query({ code: 'NEWYEAR5'})
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Discount not found", false, 404);
             done();
         })
     });
 
     it("Sending get discount", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: [
                 {
@@ -131,13 +153,16 @@ describe("Get Discount(s)", _ => {
                 }
             ]
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .query({ code: 'NEWYEAR5'})
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Discount(s) retrieved", true, 200);
             done();
         });
@@ -145,6 +170,10 @@ describe("Get Discount(s)", _ => {
 });
 
 describe("Get Discounts", () => {
+    afterEach(() => {
+        sandbox.restore();
+    });
+
     it("Sending get all discount with invalid page query parameter", done => {
         chai.request(server)
         .get(BASE_URL)
@@ -166,35 +195,41 @@ describe("Get Discounts", () => {
     });
 
     it("Sending get all discount with internal server error response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         })
     });
 
     it("Sending get all discount with empty discount list response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Discount(s) not found", false, 404);
             done();
         })
     });
 
-    it("Sending get all discount with empty discount list response", done => {
-        let queryResult = {
+    it("Sending get all discount with discount list response", done => {
+        const queryResult = {
             rowCount: 0,
             rows: [
                 {
@@ -211,7 +246,7 @@ describe("Get Discounts", () => {
                 }
             ]
         }
-        let countResult = {
+        const countResult = {
             rowCount: 1,
             rows: [
                 {
@@ -219,21 +254,23 @@ describe("Get Discounts", () => {
                 }
             ]
         }
-        let pool = sandbox.stub(pgPool.prototype, 'query')
-        pool.onFirstCall().resolves(queryResult);
-        pool.onSecondCall().resolves(countResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        pgPool.query.onSecondCall().resolves(countResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
-            pool.restore();
             responseValidator.validateResponse(response, "Discount(s) retrieved", true, 200);
             done();
         })
     });
 
     it("Sending get all discount (using query parameters)", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: [
                 {
@@ -250,7 +287,7 @@ describe("Get Discounts", () => {
                 }
             ]
         }
-        let countResult = {
+        const countResult = {
             rowCount: 1,
             rows: [
                 {
@@ -258,15 +295,17 @@ describe("Get Discounts", () => {
                 }
             ]
         }
-        let pool = sandbox.stub(pgPool.prototype, 'query')
-        pool.onFirstCall().resolves(queryResult);
-        pool.onSecondCall().resolves(countResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        pgPool.query.onSecondCall().resolves(countResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .query({ page: 1, limit: 1})
         .end((error, response) => {
-            pool.restore();
             responseValidator.validateResponse(response, "Discount(s) retrieved", true, 200);
             done();
         })
@@ -274,7 +313,10 @@ describe("Get Discounts", () => {
 });
 
 describe("Delete Discount", _ => {
-    let PARAMS = 'NEWYEAR5';
+    const PARAMS = 'NEWYEAR5';
+    afterEach(() => {
+        sandbox.restore();
+    });
 
     it("Sending delete discount request with invalid discount code parameter", done => {
         chai.request(server)
@@ -286,7 +328,11 @@ describe("Delete Discount", _ => {
     });
 
     it("Sending delete discount request with internal server error response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .delete(BASE_URL + '/' + PARAMS)
@@ -298,11 +344,15 @@ describe("Delete Discount", _ => {
     });
 
     it("Sending delete discount request with invalid discount code (code not exist)", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .delete(BASE_URL + '/' + PARAMS)
@@ -314,11 +364,15 @@ describe("Delete Discount", _ => {
     });
 
     it("Sending delete discount request with valid discount code", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .delete(BASE_URL + '/' + PARAMS)
@@ -402,8 +456,12 @@ describe("Add Discount with Invalid Parameter", () => {
 });
 
 describe("Add Discount", _ => {
+    afterEach(() => {
+        sandbox.restore();
+    });
+
     it("Sending add discount request when another discount already running", done => {
-        let existingDiscount = {
+        const existingDiscount = {
             rowCount: 1,
             rows: [
                 {
@@ -411,7 +469,11 @@ describe("Add Discount", _ => {
                 }
             ]
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(existingDiscount);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(existingDiscount);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
@@ -424,7 +486,11 @@ describe("Add Discount", _ => {
     });
 
     it("Sending add discount request with internal server error response on current active query", done => {
-        sandbox.stub(pgPool.prototype, 'query').onSecondCall().rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
@@ -437,131 +503,143 @@ describe("Add Discount", _ => {
     });
 
     it("Sending add discount request with internal server error response", done => {
-        let existingDiscount = {
+        const existingDiscount = {
             rowCount: 0,
             rows: []
         }
-        let pool = sandbox.stub(pgPool.prototype, 'query')
-        pool.onFirstCall().resolves(existingDiscount);
-        pool.onSecondCall().rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(existingDiscount);
+        pgPool.query.onSecondCall().rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send({ code: "NEWYEAR5", partnerCode: "AFK", name: "New Year Discount", amount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
-            pool.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending add discount request with invalid type value response", done => {
-        let existingDiscount = {
+        const existingDiscount = {
             rowCount: 0,
             rows: []
         }
-        let error = {
+        const error = {
             code: '22P02'
         }
-        let pool = sandbox.stub(pgPool.prototype, 'query')
-        pool.onFirstCall().resolves(existingDiscount);
-        pool.onSecondCall().rejects(error);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(existingDiscount);
+        pgPool.query.onSecondCall().rejects(error);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send({ code: "NEWYEAR5", partnerCode: "AFK", name: "New Year Discount", amount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
-            pool.restore();
             responseValidator.validateResponse(response, "Invalid type value", false, 403);
             done();
         });
     });
 
     it("Sending add discount request with code already exist response", done => {
-        let existingDiscount = {
+        const existingDiscount = {
             rowCount: 0,
             rows: []
         }
-        let error = {
+        const error = {
             code: '23505'
         }
-        let pool = sandbox.stub(pgPool.prototype, 'query')
-        pool.onFirstCall().resolves(existingDiscount);
-        pool.onSecondCall().rejects(error);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(existingDiscount);
+        pgPool.query.onSecondCall().rejects(error);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send({ code: "NEWYEAR5", partnerCode: "AFK", name: "New Year Discount", amount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
-            pool.restore();
             responseValidator.validateResponse(response, "Code already exist", false, 403);
             done();
         });
     });
 
     it("Sending add discount request with failed add new package response", done => {
-        let existingDiscount = {
+        const existingDiscount = {
             rowCount: 0,
             rows: []
         }
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        let pool = sandbox.stub(pgPool.prototype, 'query')
-        pool.onFirstCall().resolves(existingDiscount);
-        pool.onSecondCall().resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(existingDiscount);
+        pgPool.query.onSecondCall().resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send({ code: "NEWYEAR5", partnerCode: "AFK", name: "New Year Discount", amount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
-            pool.restore();
             responseValidator.validateResponse(response, "Failed add new package", false, 404);
             done();
         });
     });
 
     it("Sending add discount request with partner code not exist response", done => {
-        let existingDiscount = {
+        const existingDiscount = {
             rowCount: 0,
             rows: []
         }
-        let error = {
+        const error = {
             code: '23503'
         }
-        let pool = sandbox.stub(pgPool.prototype, 'query')
-        pool.onFirstCall().resolves(existingDiscount);
-        pool.onSecondCall().rejects(error);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(existingDiscount);
+        pgPool.query.onSecondCall().rejects(error);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send({ code: "NEWYEAR5", partnerCode: "AFK", name: "New Year Discount", amount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
-            pool.restore();
             responseValidator.validateResponse(response, "Partner doesn't exist", false, 403);
             done();
         });
     });
 
     it("Sending add discount request with valid parameter", done => {
-        let existingDiscount = {
+        const existingDiscount = {
             rowCount: 0,
             rows: []
         }
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: []
         }
-        let pool = sandbox.stub(pgPool.prototype, 'query')
-        pool.onFirstCall().resolves(existingDiscount);
-        pool.onSecondCall().resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(existingDiscount);
+        pgPool.query.onSecondCall().resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send({ code: "NEWYEAR5", partnerCode: "AFK", name: "New Year Discount", amount: 100, startDate: new Date(), endDate: new Date()})
         .end((error, response) => {
-            pool.restore();
             responseValidator.validateResponse(response, "Discount added", true, 201);
             done();
         });

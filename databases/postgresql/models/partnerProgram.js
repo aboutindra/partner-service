@@ -1,3 +1,4 @@
+const apm = require('elastic-apm-node');
 const { NotFoundError, InternalServerError, ForbiddenError } = require('../../../utilities/error');
 const wrapper = require('../../../utilities/wrapper');
 const postgresqlWrapper = require('../../postgresql');
@@ -63,6 +64,7 @@ class PartnerProgram {
             if (error.code === errorCode.FOREIGN_KEY_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Partner doesn't exist"));
             }
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -85,6 +87,7 @@ class PartnerProgram {
             return wrapper.data(result.rows);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -136,6 +139,7 @@ class PartnerProgram {
             return wrapper.paginationData(getAllPartnerProgramResult.rows, meta);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -162,6 +166,7 @@ class PartnerProgram {
             return wrapper.data(result.rows);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -210,6 +215,7 @@ class PartnerProgram {
             return wrapper.paginationData(getPartnerProgramResult.rows, meta);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -236,6 +242,7 @@ class PartnerProgram {
             return wrapper.data(result.rows[0]);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
