@@ -1,3 +1,4 @@
+require('elastic-apm-node').start();
 const AppServer = require('./routes/routes');
 const logger = require('./utilities/logger');
 const appServer = new AppServer();

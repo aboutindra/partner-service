@@ -576,7 +576,7 @@ describe("Insert or Update Partner Quota", _ => {
         chai.request(server)
         .get("/")
         .end((error, response) => {
-            responseValidator.validateResponse(response, "Service is active", true, 200);
+            responseValidator.validateResponse(response, "This service is running properly", true, 200);
             done();
         });
     });

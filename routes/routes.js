@@ -1,8 +1,7 @@
-require('dotenv').config()
 const express = require('express');
-const apm = require('elastic-apm-node').start();
-const morgan = require('morgan');
 const bodyParser = require('body-parser');
+const apm = require('elastic-apm-node');
+
 const responder = require('../utilities/responder');
 const logger = require('../utilities/logger');
 const postgreWrapper = require('../databases/postgresql/index');
@@ -28,25 +27,21 @@ function AppServer() {
     this.app.use(function(req, res, next) {
         res.header("Access-Control-Allow-Origin", "*");
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization, x-access-token");
-        res.header('Access-Control-Allow-Methods', "GET,PUT,POST,DELETE,PATCH,OPTIONS");
+        res.header('Access-Control-Allow-Methods', "GET, PUT, POST, DELETE, PATCH");
         next();
     });
 
-    this.app.use(function(req, res, next) {
-        const ip = req.headers[ 'x-forwarded-for' ] || req.connection.remoteAddress;
-        logger.info(`Request Ip: ${ip}`, "receive request");
+    this.app.use(function(request, response, next) {
+        logger.info(`IP addr ${request.connection.remoteAddress} request ${request.method} ${request.url}`);
         next();
     });
 
-    //Local env
-    if (process.env.NODE_ENV === 'dev')
-    {
-        this.app.use(morgan('dev'));
-    }
-
+    /* Endpoint for heartbeat */
     this.app.get('/', (request, response) => {
-        responder.sendResponse(response, true, "Service is active", null, 200);
-    })
+        responder.sendResponse(response, true, "This service is running properly", null, 200);
+    });
+
+    postgreWrapper.init();
 
     costPackage.routes(this.app);
     discount.routes(this.app);
@@ -58,7 +53,6 @@ function AppServer() {
     product.routes(this.app);
     productCategory.routes(this.app);
 
-    postgreWrapper.init();
 }
 
 module.exports = AppServer;
