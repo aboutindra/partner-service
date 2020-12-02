@@ -28,13 +28,13 @@ class CostPackage {
             return wrapper.data(insertPackageResult.rows);
         }
         catch (error) {
+            apm.captureError(error);
             if (error.code === errorCode.INVALID_ENUM) {
                 return wrapper.error(new ForbiddenError("Invalid type value"));
             }
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Package name already exist"));
             }
-            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -57,13 +57,13 @@ class CostPackage {
             return wrapper.data(updatePackageResult.rows);
         }
         catch (error) {
+            apm.captureError(error);
             if (error.code === errorCode.INVALID_ENUM) {
                 return wrapper.error(new ForbiddenError("Invalid type value"));
             }
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Package name already exist"));
             }
-            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }

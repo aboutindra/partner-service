@@ -28,10 +28,10 @@ class ProductCategory {
             return wrapper.data(result.rows);
         }
         catch (error) {
+            apm.captureError(error);
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Product category already exist"));
             }
-            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -54,10 +54,10 @@ class ProductCategory {
             return wrapper.data(result.rows);
         }
         catch (error) {
+            apm.captureError(error);
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Product category already exist"));
             }
-            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }

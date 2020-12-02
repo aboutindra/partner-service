@@ -28,13 +28,13 @@ class Product {
             return wrapper.data(result.rows);
         }
         catch (error) {
+            apm.captureError(error);
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Product already exist"));
             }
             if (error.code === errorCode.FOREIGN_KEY_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Category doesn't exist"));
             }
-            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -58,13 +58,13 @@ class Product {
             return wrapper.data(result.rows);
         }
         catch (error) {
+            apm.captureError(error);
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Product already exist"));
             }
             if (error.code === errorCode.FOREIGN_KEY_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Category doesn't exist"));
             }
-            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }

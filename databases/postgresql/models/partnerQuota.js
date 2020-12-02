@@ -30,10 +30,10 @@ class PartnerQuota {
             return wrapper.data(updateQuotaResult.rows);
         }
         catch (error) {
+            apm.captureError(error);
             if (error.code === errorCode.FOREIGN_KEY_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Partner doesn't exist"));
             }
-            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }

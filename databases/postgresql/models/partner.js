@@ -31,13 +31,13 @@ class Partner {
             return wrapper.data(insertQuotaResult.rows);
         }
         catch (error) {
+            apm.captureError(error);
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Code already exist"));
             }
             if (error.code === errorCode.FOREIGN_KEY_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Id not exist"));
             }
-            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
 
@@ -62,10 +62,10 @@ class Partner {
             return wrapper.data(updatePartnerResult.rows);
         }
         catch (error) {
+            apm.captureError(error);
             if (error.code === errorCode.FOREIGN_KEY_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Id not exist"));
             }
-            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
