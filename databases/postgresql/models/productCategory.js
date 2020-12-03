@@ -10,14 +10,14 @@ class ProductCategory {
         this.database = database
     }
 
-    async insertProductCategory(name) {
+    async insertProductCategory({name, imageUrl}) {
         const dbClient = postgresqlWrapper.getConnection(this.database);
         const insertCategoryQuery = {
             name: 'insert-product-category',
             text: `INSERT INTO public.product_category(
-                name, is_deleted, created_at, updated_at)
-                VALUES ($1, $2, NOW(), NOW())`,
-            values: [name, false]
+                name, image_url, is_deleted, created_at, updated_at)
+                VALUES ($1, $2, false, NOW(), NOW())`,
+            values: [name, imageUrl]
         }
 
         try {
@@ -36,14 +36,14 @@ class ProductCategory {
         }
     }
 
-    async updateProductCategory(id, name, isDeleted, deletedAt) {
+    async updateProductCategory({id, name, imageUrl, isDeleted, deletedAt}) {
         const dbClient = postgresqlWrapper.getConnection(this.database);
         const updateCategoryQuery = {
             name: 'update-product-category',
             text: `UPDATE public.product_category
-                SET name = $2, is_deleted = $3, updated_at = NOW(), deleted_at = $4
+                SET name = $2, image_url = $3, is_deleted = $4, updated_at = NOW(), deleted_at = $5
                 WHERE id = $1`,
-            values: [id, name, isDeleted, deletedAt]
+            values: [id, name, imageUrl, isDeleted, deletedAt]
         }
 
         try {
@@ -89,7 +89,7 @@ class ProductCategory {
         const dbClient = postgresqlWrapper.getConnection(this.database);
         const getCategoryQuery = {
             name: 'get-all-product-category',
-            text: `SELECT id, name
+            text: `SELECT id, name, image_url AS "imageUrl"
                 FROM public.product_category
                 WHERE is_deleted = false AND (id = $1 OR $1 is NULL)
                 ORDER BY id;`,
@@ -104,6 +104,7 @@ class ProductCategory {
             return wrapper.data(result.rows);
         }
         catch (error) {
+            console.log(error)
             apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }

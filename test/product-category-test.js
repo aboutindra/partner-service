@@ -199,7 +199,7 @@ describe("Update product category", _ => {
 
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
-        .send({ name: 'Fintech ', isDeleted: false })
+        .send({ name: 'Fintech ', imageUrl: "product-categories/Fintech.png", isDeleted: false })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
@@ -218,7 +218,7 @@ describe("Update product category", _ => {
 
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
-        .send({ name: 'Fintech ', isDeleted: false })
+        .send({ name: 'Fintech ', imageUrl: "product-categories/Fintech.png", isDeleted: false })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Product category already exist", false, 403);
             done();
@@ -238,7 +238,7 @@ describe("Update product category", _ => {
 
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
-        .send({ name: 'Fintech ', isDeleted: false })
+        .send({ name: 'Fintech ', imageUrl: "product-categories/Fintech.png", isDeleted: false })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Product category not found", false, 404);
             done();
@@ -258,7 +258,7 @@ describe("Update product category", _ => {
 
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
-        .send({ name: 'Fintech ', isDeleted: false })
+        .send({ name: 'Fintech ', imageUrl: "product-categories/Fintech.png", isDeleted: false })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Product category updated", true, 200);
             done();
@@ -278,7 +278,7 @@ describe("Update product category", _ => {
 
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
-        .send({ name: 'Fintech ', isDeleted: true })
+        .send({ name: 'Fintech ', imageUrl: "product-categories/Fintech.png", isDeleted: true })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Product category updated", true, 200);
             done();
@@ -383,7 +383,7 @@ describe("Insert Product Category", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ name: 'Fintech' })
+        .send({ name: 'Fintech', imageUrl: "product-categories/Fintech.png" })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Product category already exist", false, 403);
             done();
@@ -399,7 +399,7 @@ describe("Insert Product Category", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ name: 'Fintech' })
+        .send({ name: 'Fintech', imageUrl: "product-categories/Fintech.png" })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
@@ -419,7 +419,7 @@ describe("Insert Product Category", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ name: 'Fintech' })
+        .send({ name: 'Fintech', imageUrl: "product-categories/Fintech.png" })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Failed to add product category", false, 404);
             done();
@@ -439,7 +439,7 @@ describe("Insert Product Category", _ => {
 
         chai.request(server)
         .post(BASE_URL)
-        .send({ name: 'Fintech' })
+        .send({ name: 'Fintech', imageUrl: "product-categories/Fintech.png" })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Product category added", true, 201);
             done();

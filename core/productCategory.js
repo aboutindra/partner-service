@@ -5,9 +5,7 @@ const { SUCCESS:successCode } = require('../enum/httpStatusCode');
 const { BadRequestError } = require('../utilities/error');
 
 const insertProductCategory = async (request, response) => {
-    const { name } = request.body;
-
-    const result = await productCategory.insertProductCategory(name);
+    const result = await productCategory.insertProductCategory(request.body);
 
     if (result.err) {
         wrapper.response(response, false, result);
@@ -18,14 +16,15 @@ const insertProductCategory = async (request, response) => {
 
 const updateProductCategory = async (request, response) => {
     const id = parseInt(request.params.id);
-    const { name, isDeleted } = request.body;
+    const payload = request.body;
+    payload.id = id;
+    payload.deletedAt = null;
 
-    let deletedAt = null;
-    if (isDeleted === true) {
-        deletedAt = new Date();
+    if (payload.isDeleted === true) {
+        payload.deletedAt = new Date();
     }
 
-    const result = await productCategory.updateProductCategory(id, name, isDeleted, deletedAt);
+    const result = await productCategory.updateProductCategory(payload);
 
     if (result.err) {
         wrapper.response(response, false, result);
