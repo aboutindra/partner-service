@@ -3,44 +3,54 @@ const chaiHttp = require('chai-http');
 const server = require('../index');
 const sandbox = require('sinon').createSandbox();
 const BASE_URL = "/api/v1/wallets";
-const pgPool = require('pg-pool');
+const postgresqlPool = require('../databases/postgresql/index');
 const responseValidator = require('./responseValidator');
 
 chai.use(chaiHttp);
 
 describe("Get Partner Wallet", _ => {
-    let PARAMS = "IDH";
+    afterEach(() => {
+        sandbox.restore();
+    });
+
+    const PARAMS = "IDH";
 
     it("Sending get partner wallet request with internal server error response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending get partner wallet request with invalid partner code", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Partner wallet not found", false, 404);
             done();
         });
     });
 
     it("Sending get partner wallet request with valid partner code", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: [
                 {
@@ -49,12 +59,15 @@ describe("Get Partner Wallet", _ => {
                 }
             ]
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Partner wallet retrieved", true, 200);
             done();
         });
@@ -87,7 +100,11 @@ describe("Get All Partner Wallets", () => {
     });
 
     it("Sending get all partner wallets request with connection failure response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
@@ -99,25 +116,26 @@ describe("Get All Partner Wallets", () => {
     });
 
     it("Sending get all partner wallets request with empty partner list", done => {
-        let poolStub = sandbox.stub(pgPool.prototype, 'query');
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        poolStub.resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
-            poolStub.restore();
             responseValidator.validateResponse(response, "Partner wallet(s) not found", false, 404);
             done();
         });
     });
 
     it("Sending get all partner wallets request with valid query parameter", done => {
-        let poolStub = sandbox.stub(pgPool.prototype, 'query');
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: [
                 {
@@ -126,7 +144,7 @@ describe("Get All Partner Wallets", () => {
                 }
             ]
         }
-        let countResult = {
+        const countResult = {
             rowCount: 1,
             rows: [
                 {
@@ -134,22 +152,24 @@ describe("Get All Partner Wallets", () => {
                 }
             ]
         }
-        poolStub.onFirstCall().resolves(queryResult);
-        poolStub.onSecondCall().resolves(countResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        pgPool.query.onSecondCall().resolves(countResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .query({ page: 1, limit: 1 })
         .end((error, response) => {
-            poolStub.restore();
             responseValidator.validateResponse(response, "Partner wallet(s) retrieved", true, 200);
             done();
         });
     });
 
     it("Sending get all partner wallets request without query parameter", done => {
-        let poolStub = sandbox.stub(pgPool.prototype, 'query');
-        let queryResult = {
+        const queryResult = {
             rowCount: 5,
             rows: [
                 {
@@ -174,7 +194,7 @@ describe("Get All Partner Wallets", () => {
                 }
             ]
         }
-        let countResult = {
+        const countResult = {
             rowCount: 1,
             rows: [
                 {
@@ -182,13 +202,16 @@ describe("Get All Partner Wallets", () => {
                 }
             ]
         }
-        poolStub.onFirstCall().resolves(queryResult);
-        poolStub.onSecondCall().resolves(countResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        pgPool.query.onSecondCall().resolves(countResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
-            poolStub.restore();
             responseValidator.validateResponse(response, "Partner wallet(s) retrieved", true, 200);
             done();
         });
@@ -197,47 +220,60 @@ describe("Get All Partner Wallets", () => {
 });
 
 describe("Delete Partner Wallet", _ => {
-    let PARAMS = "IDH";
+    afterEach(() => {
+        sandbox.restore();
+    });
+
+    const PARAMS = "IDH";
 
     it("Sending delete partner wallet request with internal server error response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .delete(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending delete partner wallet request with invalid partner code", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .delete(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Failed to delete partner wallet", false, 404);
             done();
         });
     });
 
     it("Sending delete partner wallet request with valid partner code", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .delete(BASE_URL + '/' + PARAMS)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Partner wallet deleted", true, 200);
             done();
         });
@@ -245,6 +281,10 @@ describe("Delete Partner Wallet", _ => {
 })
 
 describe("Insert or Update Partner Wallet", _ => {
+    afterEach(() => {
+        sandbox.restore();
+    });
+
     it("Sending insert or update partner wallet request without body parameters", done => {
         chai.request(server)
         .post(BASE_URL)
@@ -275,63 +315,75 @@ describe("Insert or Update Partner Wallet", _ => {
     });
 
     it("Sending insert or update partner wallet request with invalid partner code parameter", done => {
-        let error = {
+        const error = {
             code: '23503'
         }
-        sandbox.stub(pgPool.prototype, 'query').rejects(error);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects(error);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send({ partnerCode: "IDK", walletCode: "1029312031" })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Partner doesn't exist", false, 403);
             done();
         });
     });
 
     it("Sending insert or update partner wallet request with invalid partner code parameter", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send({ partnerCode: "IDK", walletCode: "1029312031" })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Failed to add new partner wallet", false, 404);
             done();
         });
     });
 
     it("Sending insert or update partner wallet request with internal server error response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send({ partnerCode: "IDK", walletCode: "1029312031" })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending insert or update partner wallet request with valid partner code parameter", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send({ partnerCode: "IDK", walletCode: "1029312031" })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Partner wallet added", true, 201);
             done();
         });

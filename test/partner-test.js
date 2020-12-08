@@ -3,14 +3,17 @@ const chaiHttp = require('chai-http');
 const server = require('../index');
 const sandbox = require('sinon').createSandbox();
 const BASE_URL = "/api/v1/partners";
-const pgPool = require('pg-pool');
+const postgresqlPool = require('../databases/postgresql/index');
 const responseValidator = require('./responseValidator');
 const CostBearerType = require('../enum/costBearerType');
 
 chai.use(chaiHttp);
 
 describe("Get Active Partners", _ => {
-    let BASE_URL = "/api/v1/active-partners";
+    const BASE_URL = "/api/v1/active-partners";
+    afterEach(() => {
+        sandbox.restore();
+    });
 
     it("Sending get all active partners request with invalid page query parameter", done => {
         chai.request(server)
@@ -33,37 +36,41 @@ describe("Get Active Partners", _ => {
     });
 
     it("Sending get all active partners request with connection failure response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending get all active partners request with empty partner list", done => {
-        let poolStub = sandbox.stub(pgPool.prototype, 'query');
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        poolStub.resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
-            poolStub.restore();
             responseValidator.validateResponse(response, "Partner(s) not found", false, 404);
             done();
         });
     });
 
     it("Sending get all active partners request with valid query parameter", done => {
-        let poolStub = sandbox.stub(pgPool.prototype, 'query');
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: [
                 {
@@ -81,7 +88,7 @@ describe("Get Active Partners", _ => {
                 }
             ]
         }
-        let countResult = {
+        const countResult = {
             rowCount: 1,
             rows: [
                 {
@@ -89,22 +96,24 @@ describe("Get Active Partners", _ => {
                 }
             ]
         }
-        poolStub.onFirstCall().resolves(queryResult);
-        poolStub.onSecondCall().resolves(countResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        pgPool.query.onSecondCall().resolves(countResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .query({ page: 1, limit: 1 })
         .end((error, response) => {
-            poolStub.restore();
             responseValidator.validateResponse(response, "Partner(s) retrieved", true, 200);
             done();
         });
     });
 
     it("Sending get all active partners request without query parameter", done => {
-        let poolStub = sandbox.stub(pgPool.prototype, 'query');
-        let queryResult = {
+        const queryResult = {
             rowCount: 4,
             rows: [
                 {
@@ -161,7 +170,7 @@ describe("Get Active Partners", _ => {
                 }
             ]
         }
-        let countResult = {
+        const countResult = {
             rowCount: 1,
             rows: [
                 {
@@ -169,13 +178,16 @@ describe("Get Active Partners", _ => {
                 }
             ]
         }
-        poolStub.onFirstCall().resolves(queryResult);
-        poolStub.onSecondCall().resolves(countResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        pgPool.query.onSecondCall().resolves(countResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
-            poolStub.restore();
             responseValidator.validateResponse(response, "Partner(s) retrieved", true, 200);
             done();
         });
@@ -183,38 +195,48 @@ describe("Get Active Partners", _ => {
 });
 
 describe("Get Partner", _ => {
+    afterEach(() => {
+        sandbox.restore();
+    });
+
     it("Sending get partner request with database connection failure response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .query({ code: "AFK" })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending get partner request with empty partner response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .query({ code: "AFK" })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Partner(s) not found", false, 404);
             done();
         });
     });
 
     it("Sending get partner request with partner detail response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: [
                 {
@@ -233,13 +255,16 @@ describe("Get Partner", _ => {
                 }
             ]
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .query({ code: "IDH" })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Partner(s) retrieved", true, 200);
             done();
         });
@@ -247,6 +272,10 @@ describe("Get Partner", _ => {
 });
 
 describe("Get Partners", () => {
+    afterEach(() => {
+        sandbox.restore();
+    });
+
     it("Sending get all partners request with invalid page query parameter", done => {
         chai.request(server)
         .get(BASE_URL)
@@ -268,37 +297,41 @@ describe("Get Partners", () => {
     });
 
     it("Sending get all partners request with connection failure response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending get all partners request with empty partner list", done => {
-        let poolStub = sandbox.stub(pgPool.prototype, 'query');
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        poolStub.resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
-            poolStub.restore();
             responseValidator.validateResponse(response, "Partner(s) not found", false, 404);
             done();
         });
     });
 
     it("Sending get all partners request with valid query parameter", done => {
-        let poolStub = sandbox.stub(pgPool.prototype, 'query');
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: [
                 {
@@ -316,7 +349,7 @@ describe("Get Partners", () => {
                 }
             ]
         }
-        let countResult = {
+        const countResult = {
             rowCount: 1,
             rows: [
                 {
@@ -324,22 +357,24 @@ describe("Get Partners", () => {
                 }
             ]
         }
-        poolStub.onFirstCall().resolves(queryResult);
-        poolStub.onSecondCall().resolves(countResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        pgPool.query.onSecondCall().resolves(countResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .query({ page: 1, limit: 1 })
         .end((error, response) => {
-            poolStub.restore();
             responseValidator.validateResponse(response, "Partner(s) retrieved", true, 200);
             done();
         });
     });
 
     it("Sending get all partners request without query parameter", done => {
-        let poolStub = sandbox.stub(pgPool.prototype, 'query');
-        let queryResult = {
+        const queryResult = {
             rowCount: 2,
             rows: [
                 {
@@ -370,7 +405,7 @@ describe("Get Partners", () => {
                 }
             ]
         }
-        let countResult = {
+        const countResult = {
             rowCount: 1,
             rows: [
                 {
@@ -378,13 +413,16 @@ describe("Get Partners", () => {
                 }
             ]
         }
-        poolStub.onFirstCall().resolves(queryResult);
-        poolStub.onSecondCall().resolves(countResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        pgPool.query.onSecondCall().resolves(countResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
-            poolStub.restore();
             responseValidator.validateResponse(response, "Partner(s) retrieved", true, 200);
             done();
         });
@@ -393,47 +431,59 @@ describe("Get Partners", () => {
 });
 
 describe("Delete a Partner", _ => {
-    let PARAMS = '/IDH';
+    const PARAMS = '/IDH';
+    afterEach(() => {
+        sandbox.restore();
+    });
 
     it("Sending delete partner request with database connection failure response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .delete(BASE_URL + PARAMS)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending delete partner request with empty partner response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .delete(BASE_URL + PARAMS)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Partner not found", false, 404);
             done();
         });
     });
 
     it("Sending delete partner request with valid partner code", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .delete(BASE_URL + PARAMS)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Partner deleted", true, 200);
             done();
         });
@@ -441,7 +491,10 @@ describe("Delete a Partner", _ => {
 });
 
 describe("Update Partner", _ => {
-    let PARAMS = '/IDH';
+    const PARAMS = '/IDH';
+    afterEach(() => {
+        sandbox.restore();
+    });
 
     it("Sending update partner request without body parameters", done => {
         chai.request(server)
@@ -493,39 +546,30 @@ describe("Update Partner", _ => {
     });
 
     it("Sending update partner request without cost package id parameter", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
-
         chai.request(server)
         .put(BASE_URL + PARAMS)
         .send({ name: 'indihome', segmentId: 1, isAcquirer: true, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
 
     it("Sending update partner request without acquirer status parameter", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
-
         chai.request(server)
         .put(BASE_URL + PARAMS)
         .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
 
     it("Sending update partner request without issuer status parameter", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
-
         chai.request(server)
         .put(BASE_URL + PARAMS)
         .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
@@ -536,70 +580,81 @@ describe("Update Partner", _ => {
         .put(BASE_URL + PARAMS)
         .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Invalid input parameter", false, 400);
             done();
         });
     });
 
     it("Sending update partner request with database connection failure response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .put(BASE_URL + PARAMS)
         .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending update partner request with unavaliable foregin key id response", done => {
-        let error = {
+        const error = {
             code: "23503"
         }
-        sandbox.stub(pgPool.prototype, 'query').rejects(error);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects(error);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .put(BASE_URL + PARAMS)
         .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Id not exist", false, 403);
             done();
         });
     });
 
     it("Sending update partner request with unavailable partner code response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .put(BASE_URL + PARAMS)
         .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Partner not found", false, 404);
             done();
         });
     });
 
     it("Sending update partner request with valid partner code response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .put(BASE_URL + PARAMS)
         .send({ name: 'Indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Partner updated", true, 200);
             done();
         });
@@ -607,6 +662,10 @@ describe("Update Partner", _ => {
 });
 
 describe("Add New Partner", _ => {
+    afterEach(() => {
+        sandbox.restore();
+    });
+
     it("Sending add new partner request without body parameters", done => {
         chai.request(server)
         .post(BASE_URL)
@@ -687,79 +746,94 @@ describe("Add New Partner", _ => {
     });
 
     it("Sending add new partner request with database connection failure response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send({ code: 'IDH', name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending add new partner request with unavaliable foregin key id response", done => {
-        let error = {
+        const error = {
             code: "23503"
         }
-        sandbox.stub(pgPool.prototype, 'query').rejects(error);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects(error);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send({ code: 'IDH', name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Id not exist", false, 403);
             done();
         });
     });
 
     it("Sending add new partner request with existed partner code parameter", done => {
-        let error = {
+        const error = {
             code: "23505"
         }
-        sandbox.stub(pgPool.prototype, 'query').rejects(error);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects(error);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send({ code: 'IDH', name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Code already exist", false, 403);
             done();
         });
     });
 
     it("Sending add new partner request with inserting data failure", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send({ code: 'IDH', name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Failed add new partner", false, 404);
             done();
         });
     });
 
     it("Sending add new partner request with valid partner code response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send({ code: 'IDH', name: 'Indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Partner added", true, 200);
             done();
         });
@@ -768,37 +842,46 @@ describe("Add New Partner", _ => {
 
 describe("Get Partner Counts", _ => {
     const PATH = '/counts';
+    afterEach(() => {
+        sandbox.restore();
+    });
 
     it("Sending get partner count request with database connection failure response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PATH)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending get partner count request with empty partner response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PATH)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Partner count not found", false, 404);
             done();
         });
     });
 
     it("Sending get partner count request with partner detail response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: [
                 {
@@ -817,12 +900,15 @@ describe("Get Partner Counts", _ => {
                 }
             ]
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PATH)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Partner counts retrieved", true, 200);
             done();
         });
@@ -831,6 +917,9 @@ describe("Get Partner Counts", _ => {
 
 describe("Get Partner Images", _ => {
     const PATH = '/images';
+    afterEach(() => {
+        sandbox.restore();
+    });
 
     it("Sending get all partners image request with invalid page query parameter", done => {
         chai.request(server)
@@ -853,37 +942,41 @@ describe("Get Partner Images", _ => {
     });
 
     it("Sending get all partners image request with connection failure response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PATH)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending get all partners image request with empty partner list", done => {
-        let poolStub = sandbox.stub(pgPool.prototype, 'query');
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        poolStub.resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PATH)
         .end((error, response) => {
-            poolStub.restore();
             responseValidator.validateResponse(response, "Partner(s) not found", false, 404);
             done();
         });
     });
 
     it("Sending get all partners image request with valid query parameter", done => {
-        let poolStub = sandbox.stub(pgPool.prototype, 'query');
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: [
                 {
@@ -901,7 +994,7 @@ describe("Get Partner Images", _ => {
                 }
             ]
         }
-        let countResult = {
+        const countResult = {
             rowCount: 1,
             rows: [
                 {
@@ -910,22 +1003,24 @@ describe("Get Partner Images", _ => {
                 }
             ]
         }
-        poolStub.onFirstCall().resolves(queryResult);
-        poolStub.onSecondCall().resolves(countResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        pgPool.query.onSecondCall().resolves(countResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PATH)
         .query({ page: 1, limit: 1 })
         .end((error, response) => {
-            poolStub.restore();
             responseValidator.validateResponse(response, "Partner images retrieved", true, 200);
             done();
         });
     });
 
     it("Sending get all partners image request without query parameter", done => {
-        let poolStub = sandbox.stub(pgPool.prototype, 'query');
-        let queryResult = {
+        const queryResult = {
             rowCount: 2,
             rows: [
                 {
@@ -956,7 +1051,7 @@ describe("Get Partner Images", _ => {
                 }
             ]
         }
-        let countResult = {
+        const countResult = {
             rowCount: 6,
             rows: [
                 {
@@ -985,13 +1080,16 @@ describe("Get Partner Images", _ => {
                 }
             ]
         }
-        poolStub.onFirstCall().resolves(queryResult);
-        poolStub.onSecondCall().resolves(countResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        pgPool.query.onSecondCall().resolves(countResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PATH)
         .end((error, response) => {
-            poolStub.restore();
             responseValidator.validateResponse(response, "Partner images retrieved", true, 200);
             done();
         });

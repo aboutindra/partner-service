@@ -3,42 +3,52 @@ const chaiHttp = require('chai-http');
 const server = require('../index');
 const sandbox = require('sinon').createSandbox();
 const BASE_URL = "/api/v1/segments";
-const pgPool = require('pg-pool');
+const postgresqlPool = require('../databases/postgresql/index');
 const responseValidator = require('./responseValidator');
 
 chai.use(chaiHttp);
 
 describe("Get Segment(s)", _ => {
+    afterEach(() => {
+        sandbox.restore();
+    });
+
     it("Sending get all segment with internal server error response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending get all segment with segment not found response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Segment(s) not found", false, 404);
             done();
         });
     });
 
     it("Sending get all segment with segment list response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 2,
             rows: [
                 {
@@ -55,75 +65,78 @@ describe("Get Segment(s)", _ => {
                 }
             ]
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Segment(s) retrieved", true, 200);
             done();
         });
     });
 
     it("Sending get segment with internal server error response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .query({ id: 1 })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending get segment with invalid segment id (numeric id)", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
-
         chai.request(server)
         .get(BASE_URL)
         .query({ id: -1 })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Id must be an integer value", false, 400);
             done();
         });
     });
 
     it("Sending get segment with invalid segment id (alphabetical id)", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
-
         chai.request(server)
         .get(BASE_URL)
         .query({ id: '{ $ne : -1 }' })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Id must be an integer value", false, 400);
             done();
         });
     });
 
     it("Sending get segment with non exist segment", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .query({ id: 1 })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Segment not found", false, 404);
             done();
         });
     });
 
     it("Sending get segment with valid segment id", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: [
                 {
@@ -134,13 +147,16 @@ describe("Get Segment(s)", _ => {
                 }
             ]
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL)
         .query({ id: 1 })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Segment(s) retrieved", true, 200);
             done();
         });
@@ -148,6 +164,10 @@ describe("Get Segment(s)", _ => {
 });
 
 describe("Update Segment", _ => {
+    afterEach(() => {
+        sandbox.restore();
+    });
+
     let PARAMS = "1";
 
     it("Sending update segment request without body parameters", done => {
@@ -182,63 +202,75 @@ describe("Update Segment", _ => {
     });
 
     it("Sending update segment request with internal server error response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
         .send({ name: 'Fintech '})
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending update segment request with existing segment name", done => {
-        let error = {
+        const error = {
             code: '23505'
         }
-        sandbox.stub(pgPool.prototype, 'query').rejects(error);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects(error);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
         .send({ name: 'Fintech '})
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Segment name already exist", false, 403);
             done();
         });
     });
 
     it("Sending update segment request with non existing segment id", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
         .send({ name: 'Fintech '})
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Segment not found", false, 404);
             done();
         });
     });
 
     it("Sending update segment request with unique segment name", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .put(BASE_URL + '/' + PARAMS)
         .send({ name: 'Fintech '})
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Segment updated", true, 200);
             done();
         });
@@ -246,6 +278,10 @@ describe("Update Segment", _ => {
 });
 
 describe("Insert Segment", _ => {
+    afterEach(() => {
+        sandbox.restore();
+    });
+
     it("Sending insert segment request without body parameter", done => {
         chai.request(server)
         .post(BASE_URL)
@@ -256,63 +292,75 @@ describe("Insert Segment", _ => {
     });
 
     it("Sending insert segment request with existing segment name", done => {
-        let error = {
+        const error = {
             code: '23505'
         }
-        sandbox.stub(pgPool.prototype, 'query').rejects(error);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects(error);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send({ name: 'Fintech' })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Segment name already exist", false, 403);
             done();
         });
     });
 
     it("Sending insert segment request with internal server error response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send({ name: 'Fintech' })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending insert segment request with empty result", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send({ name: 'Fintech' })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Failed add new segment", false, 404);
             done();
         });
     });
 
     it("Sending insert segment request with unique name", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .post(BASE_URL)
         .send({ name: 'Fintech' })
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Segment added", true, 201);
             done();
         });

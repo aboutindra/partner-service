@@ -1,3 +1,4 @@
+const apm = require('elastic-apm-node');
 const { NotFoundError, InternalServerError, ForbiddenError } = require('../../../utilities/error');
 const wrapper = require('../../../utilities/wrapper');
 const postgresqlWrapper = require('../../postgresql');
@@ -27,6 +28,7 @@ class Segment {
             return wrapper.data(result.rows);
         }
         catch (error) {
+            apm.captureError(error);
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Segment name already exist"));
             }
@@ -52,6 +54,7 @@ class Segment {
             return wrapper.data(result.rows);
         }
         catch (error) {
+            apm.captureError(error);
             if (error.code === errorCode.UNIQUE_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Segment name already exist"));
             }
@@ -76,6 +79,7 @@ class Segment {
             return wrapper.data(result.rows);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -98,6 +102,7 @@ class Segment {
             return wrapper.data(result.rows[0]);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }

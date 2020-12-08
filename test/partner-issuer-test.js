@@ -3,13 +3,16 @@ const chaiHttp = require('chai-http');
 const server = require('../index');
 const sandbox = require('sinon').createSandbox();
 const BASE_URL = "/api/v1/partners";
-const pgPool = require('pg-pool');
+const postgresqlPool = require('../databases/postgresql/index');
 const responseValidator = require('./responseValidator');
 
 chai.use(chaiHttp);
 
 describe("Get Active Issuers", _ => {
-    let PARAMS = '/active-issuers';
+    const PARAMS = '/active-issuers';
+    afterEach(() => {
+        sandbox.restore();
+    });
 
     it("Sending get all active issuers request with invalid page query parameter", done => {
         chai.request(server)
@@ -32,7 +35,11 @@ describe("Get Active Issuers", _ => {
     });
 
     it("Sending get all active issuers request with connection failure response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PARAMS)
@@ -44,25 +51,26 @@ describe("Get Active Issuers", _ => {
     });
 
     it("Sending get all active issuers request with empty partner list", done => {
-        let poolStub = sandbox.stub(pgPool.prototype, 'query');
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        poolStub.resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PARAMS)
-        .end((error, response) => {
-            poolStub.restore();
+        .end((error, response) => {     
             responseValidator.validateResponse(response, "Partner(s) not found", false, 404);
             done();
         });
     });
 
-    it("Sending get all active issuers request with valid query parameter", done => {
-        let poolStub = sandbox.stub(pgPool.prototype, 'query');
-        let queryResult = {
+    it("Sending get all active issuers request with valid query parameter", done => {  
+        const queryResult = {
             rowCount: 1,
             rows: [
                 {
@@ -73,7 +81,7 @@ describe("Get Active Issuers", _ => {
                 }
             ]
         }
-        let countResult = {
+        const countResult = {
             rowCount: 1,
             rows: [
                 {
@@ -81,22 +89,24 @@ describe("Get Active Issuers", _ => {
                 }
             ]
         }
-        poolStub.onFirstCall().resolves(queryResult);
-        poolStub.onSecondCall().resolves(countResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        pgPool.query.onSecondCall().resolves(countResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PARAMS)
         .query({ page: 1, limit: 1 })
-        .end((error, response) => {
-            poolStub.restore();
+        .end((error, response) => {          
             responseValidator.validateResponse(response, "Partner(s) retrieved", true, 200);
             done();
         });
     });
 
-    it("Sending get all active issuers request without query parameter", done => {
-        let poolStub = sandbox.stub(pgPool.prototype, 'query');
-        let queryResult = {
+    it("Sending get all active issuers request without query parameter", done => {       
+        const queryResult = {
             rowCount: 2,
             rows: [
                 {
@@ -113,7 +123,7 @@ describe("Get Active Issuers", _ => {
                 }
             ]
         }
-        let countResult = {
+        const countResult = {
             rowCount: 1,
             rows: [
                 {
@@ -121,13 +131,17 @@ describe("Get Active Issuers", _ => {
                 }
             ]
         }
-        poolStub.onFirstCall().resolves(queryResult);
-        poolStub.onSecondCall().resolves(countResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        pgPool.query.onSecondCall().resolves(countResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PARAMS)
         .end((error, response) => {
-            poolStub.restore();
+            
             responseValidator.validateResponse(response, "Partner(s) retrieved", true, 200);
             done();
         });
@@ -135,38 +149,47 @@ describe("Get Active Issuers", _ => {
 });
 
 describe("Get Active Issuer", _ => {
-    let PARAMS = '/active-issuers/IDH';
+    const PARAMS = '/active-issuers/IDH';
+    afterEach(() => {
+        sandbox.restore();
+    });
 
     it("Sending get issuer request with empty issuer response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PARAMS)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Issuer not found", false, 404);
             done();
         });
     });
 
     it("Sending get issuer request with database connection failure", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PARAMS)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending get issuer request with empty issuer response", done => {
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: [
                 {
@@ -181,12 +204,15 @@ describe("Get Active Issuer", _ => {
                 }
             ]
         }
-        sandbox.stub(pgPool.prototype, 'query').resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PARAMS)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Issuer retrieved", true, 200);
             done();
         });
@@ -194,7 +220,10 @@ describe("Get Active Issuer", _ => {
 });
 
 describe("Get Issuers", _ => {
-    let PARAMS = '/issuers';
+    const PARAMS = '/issuers';
+    afterEach(() => {
+        sandbox.restore();
+    });
 
     it("Sending get all issuers request with invalid page query parameter", done => {
         chai.request(server)
@@ -217,37 +246,41 @@ describe("Get Issuers", _ => {
     });
 
     it("Sending get all issuers request with connection failure response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PARAMS)
         .end((error, response) => {
-            sandbox.restore();
             responseValidator.validateResponse(response, "Internal server error", false, 500);
             done();
         });
     });
 
     it("Sending get all issuers request with empty partner list", done => {
-        let poolStub = sandbox.stub(pgPool.prototype, 'query');
-        let queryResult = {
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        poolStub.resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PARAMS)
-        .end((error, response) => {
-            poolStub.restore();
+        .end((error, response) => {  
             responseValidator.validateResponse(response, "Partner(s) not found", false, 404);
             done();
         });
     });
 
     it("Sending get all issuers request with valid query parameter", done => {
-        let poolStub = sandbox.stub(pgPool.prototype, 'query');
-        let queryResult = {
+        const queryResult = {
             rowCount: 2,
             rows: [
                 {
@@ -278,7 +311,7 @@ describe("Get Issuers", _ => {
                 }
             ]
         }
-        let countResult = {
+        const countResult = {
             rowCount: 1,
             rows: [
                 {
@@ -286,22 +319,24 @@ describe("Get Issuers", _ => {
                 }
             ]
         }
-        poolStub.onFirstCall().resolves(queryResult);
-        poolStub.onSecondCall().resolves(countResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        pgPool.query.onSecondCall().resolves(countResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PARAMS)
         .query({ page: 1, limit: 2 })
         .end((error, response) => {
-            poolStub.restore();
             responseValidator.validateResponse(response, "Partner(s) retrieved", true, 200);
             done();
         });
     });
 
     it("Sending get all issuers request without query parameter", done => {
-        let poolStub = sandbox.stub(pgPool.prototype, 'query');
-        let queryResult = {
+        const queryResult = {
             rowCount: 2,
             rows: [
                 {
@@ -332,7 +367,7 @@ describe("Get Issuers", _ => {
                 }
             ]
         }
-        let countResult = {
+        const countResult = {
             rowCount: 1,
             rows: [
                 {
@@ -340,13 +375,16 @@ describe("Get Issuers", _ => {
                 }
             ]
         }
-        poolStub.onFirstCall().resolves(queryResult);
-        poolStub.onSecondCall().resolves(countResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        pgPool.query.onSecondCall().resolves(countResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PARAMS)
         .end((error, response) => {
-            poolStub.restore();
             responseValidator.validateResponse(response, "Partner(s) retrieved", true, 200);
             done();
         });
@@ -354,7 +392,10 @@ describe("Get Issuers", _ => {
 });
 
 describe("Get Active Issuers Config", _ => {
-    let PARAMS = '/active-issuers-config';
+    const PARAMS = '/active-issuers-config';
+    afterEach(() => {
+        sandbox.restore();
+    });
 
     it("Sending get all active issuers config request with invalid page query parameter", done => {
         chai.request(server)
@@ -377,7 +418,11 @@ describe("Get Active Issuers Config", _ => {
     });
 
     it("Sending get all active issuers config request with connection failure response", done => {
-        sandbox.stub(pgPool.prototype, 'query').rejects();
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.rejects();
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PARAMS)
@@ -388,26 +433,27 @@ describe("Get Active Issuers Config", _ => {
         });
     });
 
-    it("Sending get all active issuers config request with empty partner list", done => {
-        let poolStub = sandbox.stub(pgPool.prototype, 'query');
-        let queryResult = {
+    it("Sending get all active issuers config request with empty partner list", done => {        
+        const queryResult = {
             rowCount: 0,
             rows: []
         }
-        poolStub.resolves(queryResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.resolves(queryResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PARAMS)
         .end((error, response) => {
-            poolStub.restore();
             responseValidator.validateResponse(response, "Partner(s) not found", false, 404);
             done();
         });
     });
 
     it("Sending get all active issuers config request with valid query parameter", done => {
-        let poolStub = sandbox.stub(pgPool.prototype, 'query');
-        let queryResult = {
+        const queryResult = {
             rowCount: 1,
             rows: [
                 {
@@ -418,7 +464,7 @@ describe("Get Active Issuers Config", _ => {
                 }
             ]
         }
-        let countResult = {
+        const countResult = {
             rowCount: 1,
             rows: [
                 {
@@ -426,22 +472,24 @@ describe("Get Active Issuers Config", _ => {
                 }
             ]
         }
-        poolStub.onFirstCall().resolves(queryResult);
-        poolStub.onSecondCall().resolves(countResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        pgPool.query.onSecondCall().resolves(countResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PARAMS)
         .query({ page: 1, limit: 1 })
         .end((error, response) => {
-            poolStub.restore();
             responseValidator.validateResponse(response, "Partner(s) retrieved", true, 200);
             done();
         });
     });
 
     it("Sending get all active issuers config request without query parameter", done => {
-        let poolStub = sandbox.stub(pgPool.prototype, 'query');
-        let queryResult = {
+        const queryResult = {
             rowCount: 2,
             rows: [
                 {
@@ -458,7 +506,7 @@ describe("Get Active Issuers Config", _ => {
                 }
             ]
         }
-        let countResult = {
+        const countResult = {
             rowCount: 1,
             rows: [
                 {
@@ -466,13 +514,17 @@ describe("Get Active Issuers Config", _ => {
                 }
             ]
         }
-        poolStub.onFirstCall().resolves(queryResult);
-        poolStub.onSecondCall().resolves(countResult);
+        const pgPool = {
+            query: sandbox.stub()
+        }
+        pgPool.query.onFirstCall().resolves(queryResult);
+        pgPool.query.onSecondCall().resolves(countResult);
+        sandbox.stub(postgresqlPool, 'getConnection').returns(pgPool);
 
         chai.request(server)
         .get(BASE_URL + PARAMS)
         .end((error, response) => {
-            poolStub.restore();
+            
             responseValidator.validateResponse(response, "Partner(s) retrieved", true, 200);
             done();
         });

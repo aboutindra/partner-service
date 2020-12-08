@@ -1,3 +1,4 @@
+const apm = require('elastic-apm-node');
 const { NotFoundError,InternalServerError,ConflictError,BadRequestError,ForbiddenError } = require('../../../utilities/error');
 const wrapper = require('../../../utilities/wrapper');
 const postgresqlWrapper = require('../../postgresql');
@@ -35,6 +36,7 @@ class Discount {
             return wrapper.data(insertDiscountResult.rows);
         }
         catch (error) {
+            apm.captureError(error);
             if (error.code === errorCode.INVALID_ENUM) {
                 return wrapper.error(new ForbiddenError("Invalid type value"));
             }
@@ -66,6 +68,7 @@ class Discount {
             return wrapper.data(result.rows);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -112,6 +115,7 @@ class Discount {
             return wrapper.paginationData(getAllDiscountResult.rows, meta);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -135,6 +139,7 @@ class Discount {
             return wrapper.data(result.rows[0]);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -158,6 +163,7 @@ class Discount {
             return wrapper.data(result.rows[0]);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -182,6 +188,7 @@ class Discount {
             return wrapper.data(result.rows[0]);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }

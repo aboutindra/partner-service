@@ -1,3 +1,4 @@
+const apm = require('elastic-apm-node');
 const { NotFoundError, InternalServerError, ForbiddenError } = require('../../../utilities/error');
 const wrapper = require('../../../utilities/wrapper');
 const postgresqlWrapper = require('../../postgresql');
@@ -27,6 +28,7 @@ class CostPackage {
             return wrapper.data(insertPackageResult.rows);
         }
         catch (error) {
+            apm.captureError(error);
             if (error.code === errorCode.INVALID_ENUM) {
                 return wrapper.error(new ForbiddenError("Invalid type value"));
             }
@@ -55,6 +57,7 @@ class CostPackage {
             return wrapper.data(updatePackageResult.rows);
         }
         catch (error) {
+            apm.captureError(error);
             if (error.code === errorCode.INVALID_ENUM) {
                 return wrapper.error(new ForbiddenError("Invalid type value"));
             }
@@ -107,6 +110,7 @@ class CostPackage {
             return wrapper.paginationData(costPackages.rows, meta);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -130,6 +134,7 @@ class CostPackage {
             return wrapper.data(costPackage.rows[0]);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -152,6 +157,7 @@ class CostPackage {
             return wrapper.data(deleteResult.rows);
         }
         catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }

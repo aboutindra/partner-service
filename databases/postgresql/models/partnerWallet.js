@@ -1,3 +1,4 @@
+const apm = require('elastic-apm-node');
 const { NotFoundError, InternalServerError, ForbiddenError } = require('../../../utilities/error');
 const { ERROR:errorCode } = require('../errorCode');
 const wrapper = require('../../../utilities/wrapper');
@@ -27,6 +28,7 @@ class PartnerWallet{
             }
             return wrapper.data(result.rows);
         } catch (error) {
+            apm.captureError(error);
             if (error.code === errorCode.FOREIGN_KEY_VIOLATION) {
                 return wrapper.error(new ForbiddenError("Partner doesn't exist"));
             }
@@ -50,6 +52,7 @@ class PartnerWallet{
             }
             return wrapper.data(result.rows);
         } catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -58,9 +61,11 @@ class PartnerWallet{
         const dbPool = postgresqlWrapper.getConnection(this.database);
         const getWalletQuery = {
             name: 'get-wallet',
-            text: `SELECT partner_code AS "partnerCode", wallet_code AS "walletCode"
-                FROM public.partner_wallet
-                WHERE partner_code = $1 AND is_deleted = false;`,
+            text: `SELECT wallet.partner_code AS "partnerCode", partner.name AS "partnerName", wallet.wallet_code AS "walletCode",
+                partner.url_logo AS "urlLogo"
+                FROM public.partner_wallet AS wallet
+                LEFT JOIN public.partner AS partner ON (partner_code = partner.code)
+                WHERE wallet.partner_code = $1 AND wallet.is_deleted = false;`,
             values: [partnerCode]
         }
         try {
@@ -70,6 +75,7 @@ class PartnerWallet{
             }
             return wrapper.data(result.rows[0]);
         } catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
@@ -115,6 +121,7 @@ class PartnerWallet{
             }
             return wrapper.paginationData(wallets.rows, meta);
         } catch (error) {
+            apm.captureError(error);
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
