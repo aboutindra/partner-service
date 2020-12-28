@@ -469,9 +469,9 @@ class Partner {
 
     async getCounts() {
         const dbClient = postgresqlWrapper.getConnection(this.database);
-        const date = new Date();
+        const date = new Date().toISOString();
 
-        const dateLastMonth = new Date();
+        const dateLastMonth = new Date().toISOString();
         dateLastMonth.setMonth(dateLastMonth.getMonth() - 1);
 
         const getCountQuery = {
