@@ -488,6 +488,7 @@ class Partner {
             if (getCountResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Partner count not found"));
             }
+            console.log(getCountResult.rows[0])
             return wrapper.data(getCountResult.rows[0]);
         }
         catch (error) {
