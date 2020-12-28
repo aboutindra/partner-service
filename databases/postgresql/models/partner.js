@@ -469,12 +469,18 @@ class Partner {
 
     async getCounts() {
         const dbClient = postgresqlWrapper.getConnection(this.database);
+        const date = new Date();
+
+        const dateLastMonth = new Date();
+        dateLastMonth.setMonth(dateLastMonth.getMonth() - 1);
+
         const getCountQuery = {
             name: "get-partner-count",
             text: `SELECT COUNT(CASE WHEN is_acquirer = true THEN partner.code END) AS "isAcquirer",
                 COUNT(CASE WHEN is_issuer = true THEN partner.code END) AS "isIssuer",
                 COUNT(CASE WHEN is_acquirer = true AND is_issuer = true THEN partner.code END) AS "isBoth",
-                COUNT (*) AS "total"
+                COUNT (*) AS "total",
+                COUNT (CASE WHEN created_at <= ${date} AND created_at >= ${dateLastMonth} THEN partner.created_at END) AS "totalPartnerLastMonth"
                 FROM public.partner AS partner;`
         }
         try {
@@ -485,7 +491,7 @@ class Partner {
             return wrapper.data(getCountResult.rows[0]);
         }
         catch (error) {
-            apm.captureError(error);
+            apm.captureError(error)
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
     }
