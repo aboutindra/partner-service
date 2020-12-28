@@ -480,7 +480,7 @@ class Partner {
                 COUNT(CASE WHEN is_issuer = true THEN partner.code END) AS "isIssuer",
                 COUNT(CASE WHEN is_acquirer = true AND is_issuer = true THEN partner.code END) AS "isBoth",
                 COUNT (*) AS "total",
-                COUNT (CASE WHEN created_at <= ${date} AND created_at >= ${dateLastMonth.toISOString()} THEN partner.created_at END) AS "totalPartnerLastMonth"
+                COUNT (CASE WHEN created_at <= '${date}' AND created_at >= '${dateLastMonth.toISOString()}' THEN partner.created_at END) AS "totalPartnerLastMonth"
                 FROM public.partner AS partner;`
         }
         try {
