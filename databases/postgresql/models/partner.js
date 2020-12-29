@@ -484,16 +484,13 @@ class Partner {
                 FROM public.partner AS partner;`
         }
         try {
-            console.log(getCountQuery)
             const getCountResult = await dbClient.query(getCountQuery);
             if (getCountResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError("Partner count not found"));
             }
-            console.log(getCountResult.rows[0])
             return wrapper.data(getCountResult.rows[0]);
         }
         catch (error) {
-            console.log(error)
             apm.captureError(error)
             return wrapper.error(new InternalServerError(ResponseMessage.INTERNAL_SERVER_ERROR));
         }
