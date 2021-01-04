@@ -13,14 +13,14 @@ class Partner {
         this.database = database;
     }
 
-    async insertPartner({ code, name, costPackageId, isAcquirer, isIssuer, segmentId, costBearerType, urlLogo, unit }) {
+    async insertPartner({ code, name, costPackageId, isAcquirer, isIssuer, segmentId, costBearerType, urlLogo, unit, email }) {
         const dbClient = postgresqlWrapper.getConnection(this.database);
         const insertPartnerQuery = {
             name: "add-new-partner",
             text: `INSERT INTO public.partner(
-                code, segment_id, cost_package_id, name, is_acquirer, is_issuer, cost_bearer_type, url_logo, unit, is_deleted, created_at, updated_at)
-                VALUES ($1, $2, $3, $4, $5, $6, $7::cost_bearer_type, $8, $9, $10, $11, $12);`,
-            values: [code, segmentId, costPackageId, name, isAcquirer, isIssuer, costBearerType, urlLogo, unit, false, new Date(), new Date()]
+                code, segment_id, cost_package_id, name, email, is_acquirer, is_issuer, cost_bearer_type, url_logo, unit, is_deleted, created_at, updated_at)
+                VALUES ($1, $2, $3, $4, $5, $6, $7::cost_bearer_type, $8, $9, $10, $11, $12, $13);`,
+            values: [code, segmentId, costPackageId, name, email, isAcquirer, isIssuer, costBearerType, urlLogo, unit, false, new Date(), new Date()]
         }
 
         try {
@@ -43,15 +43,15 @@ class Partner {
 
     }
 
-    async updatePartner({ code, name, costPackageId, isAcquirer, isIssuer, segmentId, costBearerType, urlLogo, unit }) {
+    async updatePartner({ code, name, costPackageId, isAcquirer, isIssuer, segmentId, costBearerType, urlLogo, unit, email }) {
         const dbClient = postgresqlWrapper.getConnection(this.database);
         const updatePartnerQuery = {
             name: "update-partner",
             text: `UPDATE public.partner
-                SET segment_id = $2, cost_package_id = $3, name = $4, is_acquirer = $5, is_issuer = $6, cost_bearer_type = $7::cost_bearer_type,
-                url_logo = $8, unit = $9, updated_at = $10
+                SET segment_id = $2, cost_package_id = $3, name = $4, email = $5, is_acquirer = $6, is_issuer = $7, cost_bearer_type = $8::cost_bearer_type,
+                url_logo = $9, unit = $10, updated_at = $11
                 WHERE code = $1;`,
-            values: [code, segmentId, costPackageId, name, isAcquirer, isIssuer, costBearerType, urlLogo, unit, new Date()]
+            values: [code, segmentId, costPackageId, name, email,isAcquirer, isIssuer, costBearerType, urlLogo, unit, new Date()]
         }
 
         try {
@@ -97,7 +97,7 @@ class Partner {
         const dbClient = postgresqlWrapper.getConnection(this.database);
         const getAllPartnerQuery = {
             name: "get-partner-list",
-            text: `SELECT code, segment_id AS "segmentId", cost_package_id AS "costPackageId", name, cost_bearer_type AS "costBearerType",
+            text: `SELECT code, segment_id AS "segmentId", cost_package_id AS "costPackageId", name, email, cost_bearer_type AS "costBearerType",
                 url_logo AS "urlLogo", unit,
                 CASE WHEN is_acquirer IS true AND is_issuer IS true THEN 'Both'
                     WHEN is_acquirer IS true THEN 'Acquirer'
@@ -150,7 +150,7 @@ class Partner {
         const dbClient = postgresqlWrapper.getConnection(this.database);
         const getPartnerQuery = {
             name: "get-partner",
-            text: `SELECT code, segment_id AS "segmentId", cost_package_id AS "costPackageId", name, cost_bearer_type AS "costBearerType",
+            text: `SELECT code, segment_id AS "segmentId", cost_package_id AS "costPackageId", name, email, cost_bearer_type AS "costBearerType",
                 url_logo AS "urlLogo", unit,
                 CASE WHEN is_acquirer IS true AND is_issuer IS true THEN 'Both'
                     WHEN is_acquirer IS true THEN 'Acquirer'
@@ -227,7 +227,7 @@ class Partner {
         const dbClient = postgresqlWrapper.getConnection(this.database);
         const getAllIssuersQuery = {
             name: "get-issuer-list",
-            text: `SELECT code, segment_id AS "segmentId", cost_package_id AS "costPackageId", name, cost_bearer_type AS "costBearerType",
+            text: `SELECT code, segment_id AS "segmentId", cost_package_id AS "costPackageId", name, email, cost_bearer_type AS "costBearerType",
                 url_logo AS "urlLogo", unit, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.partner
                 WHERE is_issuer IS true
@@ -272,7 +272,7 @@ class Partner {
         const dbClient = postgresqlWrapper.getConnection(this.database);
         const getAllActiveIssuersQuery = {
             name: "get-active-issuer-list",
-            text: `SELECT code, name, url_logo AS "urlLogo", unit
+            text: `SELECT code, url_logo AS "urlLogo", unit
                 FROM public.partner as partners
                 WHERE EXISTS (SELECT 1 FROM public.partner_program WHERE partners.code = partner_code
                 AND start_date <= NOW()::date AND NOW()::date <= end_date AND is_active = true)
@@ -354,7 +354,7 @@ class Partner {
         const dbClient = postgresqlWrapper.getConnection(this.database);
         const getAllAcquirersQuery = {
             name: "get-acquirer-list",
-            text: `SELECT  code, segment_id AS "segmentId", cost_package_id AS "costPackageId", name, cost_bearer_type AS "costBearerType",
+            text: `SELECT  code, segment_id AS "segmentId", cost_package_id AS "costPackageId", name, email, cost_bearer_type AS "costBearerType",
                 url_logo AS "urlLogo", unit, is_deleted AS "isDeleted", created_at AS "createdAt", updated_at AS "updatedAt", deleted_at AS "deletedAt"
                 FROM public.partner
                 WHERE is_acquirer IS true
@@ -447,7 +447,7 @@ class Partner {
         const dbClient = postgresqlWrapper.getConnection(this.database);
         const getAcquirerQuery = {
             name: "get-acquirer",
-            text: `SELECT  code, name, exchange_rate AS "exchangeRate"
+            text: `SELECT  code, name, email, exchange_rate AS "exchangeRate"
                 FROM public.partner
                 INNER JOIN public.partner_program AS programs ON (code = programs.partner_code)
                 WHERE code = $1 AND is_deleted = false AND programs.is_active = true AND is_acquirer = true

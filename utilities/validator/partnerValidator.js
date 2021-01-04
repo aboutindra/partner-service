@@ -16,6 +16,7 @@ exports.validateCodeParam = [
 
 exports.validateUpsertPartner = [
     body('name').isLength({ min: 1, max: 50 }).withMessage("Name should be at least 1 character and maximum 50 characters"),
+    body('name').isEmail().withMessage("Email can not be empty"),
     body('segmentId').isInt({ min: 1 }).withMessage("Segment id can not be empty"),
     body('costPackageId').isInt({ min: 1 }).withMessage("Cost package id can not be empty"),
     body('isAcquirer').isBoolean().withMessage("Acquirer status can not be empty"),
