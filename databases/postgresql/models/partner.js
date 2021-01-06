@@ -165,6 +165,7 @@ class Partner {
 
         try {
             const getPartnerByCodeResult = await dbClient.query(getPartnerQuery);
+            console.log('Get Partner By Code : ', getPartnerByCodeResult)
             if (getPartnerByCodeResult.rows.length === 0) {
                 return wrapper.error(new NotFoundError(PartnerResponseMessage.PARTNER_NOT_FOUND));
             }
