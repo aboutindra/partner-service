@@ -613,7 +613,7 @@ describe("Update Partner", _ => {
 
         chai.request(server)
         .put(BASE_URL + PARAMS)
-        .send({ name: 'indihome', segmentId: 1, costPackageId: 1, isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
+        .send({ name: 'indihome', segmentId: 1, costPackageId: 1, email: 'test@test.com', isAcquirer: true, isIssuer: true, costBearerType: CostBearerType.PARTNER, urlLogo: 'partner/logo/idh-logo.png', unit: 'Poin' })
         .end((error, response) => {
             responseValidator.validateResponse(response, "Id not exist", false, 403);
             done();
