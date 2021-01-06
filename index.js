@@ -13,7 +13,7 @@ process.on('SIGTERM', () => {
 	console.info('SIGTERM signal received');
 	console.log('Closing http server...');
 
-	//close server connection
+	//close server connectio
 	server.close(() => {
 		console.log('Http server closed.');
 		setTimeout(() => {
